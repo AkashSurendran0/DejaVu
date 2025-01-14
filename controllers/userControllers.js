@@ -23,7 +23,6 @@ cron.schedule('*/1 * * * *',async (req,res)=>{
                 await offers.updateMany(
                     {_id: allOffers[i].id},
                     {$set: {isActive:true}}
-
                 )
             }
         }

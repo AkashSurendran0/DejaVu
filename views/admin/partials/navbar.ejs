@@ -441,12 +441,12 @@
 
         <script>
           
-          const currentLink=window.location.pathname
+          const currentLink=window.location.href
 
           const navLinks=document.querySelectorAll('a')
 
           navLinks.forEach(link=>{
-            if(link.pathname==currentLink){
+            if(link.href==currentLink){
               link.classList.add('active')
             }else{
               link.classList.remove('active')
