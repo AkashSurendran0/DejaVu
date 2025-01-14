@@ -1,0 +1,427 @@
+<%-include('partials/userHeader')%>
+<%-include('partials/userNavbar')%>
+<style>
+    .image-container{
+        overflow: hidden;
+        margin-bottom: 30px;
+    }
+    .image-container img{
+        transition: transform 0.2s ease;
+    }
+    .image-container:hover img{
+        transform: scale(2);
+        cursor: zoom-in;
+    }
+    .size-selector {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .size-selector label {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 60px;
+      border: 2px solid black;
+      border-radius: 50%;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .size-selector label:hover {
+      background-color: #f0f0f0; 
+    }
+
+    .size-selector input[type="radio"] {
+      display: none;
+    }
+
+    .size-selector input[type="radio"]:checked + label {
+      background-color: black; 
+      color: white;
+    }
+
+    .size-selector label span {
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .inputDiv input[type="radio"]{
+        margin-left: 10px;
+    }
+
+    #quantity{
+        width: 50%;
+    }
+
+    .stars{
+      display: inline-flex;
+      gap: 5px;
+    }
+
+    .stars{
+      display: flex;
+      flex-direction: row-reverse;
+      justify-content: flex-end;
+    }
+
+    .rating-input input[type='radio']{
+      display: none;
+    }
+
+    .rating-input label{
+      font-size: 30px;
+      color: #ddd;
+      cursor: pointer;
+    }
+
+    .rating-input label:hover,
+    .rating-input label:hover ~ label{
+      color: #FFD700;
+    }
+
+    .rating-input input[type='radio']:checked ~ label{
+      color: #FFD700;
+    }
+
+    .rating-input input[type='text']{
+      width: 100%;
+      margin-top: 10px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      resize: none;
+    }
+    
+    .rating-input input[type='submit']{
+      width: 250px;
+      margin-top: 20px;
+      margin-bottom: 40px;
+      padding: 10px;
+      background-color: #dbcc8f;
+      border: none;
+      border-radius: 4px;
+      resize: none;
+    }
+
+    .review-stars input[type='radio']{
+      display: none;
+    }
+
+    .review-stars label{
+      font-size: 20px;
+    }
+
+    .review-stars{
+      display: flex;
+      flex-direction: row-reverse;
+      justify-content: flex-end;
+    }
+
+    .avgStars input[type='radio']{
+      display: none;
+    }
+
+    .avgStars label{
+      font-size: 20px;
+    }
+
+    .avgStars{
+      display: flex;
+      flex-direction: row-reverse;
+      justify-content: flex-end;
+    }
+
+</style>
+
+<div class="hero-wrap hero-bread" style="background-image: url('/uploads/productbanner.jpg');">
+    <div class="container">
+      <div class="row no-gutters slider-text align-items-center justify-content-center">
+        <div class="col-md-9 ftco-animate text-center">
+          <h1 class="mb-0 bread">Product Details</h1>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="ftco-section">
+      <div class="container">
+          <div class="row">
+            <nav aria-label="breadcrumb">
+              <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                  <li><a href="/user" style="color: rgba(33, 37, 41, 0.75);">Home&nbsp;&nbsp;>&nbsp;&nbsp;</a></li>
+                  <li><a href="/user/shop" style="color: rgba(33, 37, 41, 0.75);">Shop&nbsp;&nbsp;>&nbsp;&nbsp;</a></li>
+                  <li>Product Details</li>
+                </ol>
+                </nav>
+              </nav>
+              <div class="col-lg-8" style="display: flex;flex-wrap: wrap;">
+                <% for(let i=0;i<product.images.length;i++){ %>
+                    <div class="col-lg-5 mr-3 ftco-animate image-container" id="magnifier">
+                        <img src="<%= product.images[i] %>" class="img-fluid" alt="Colorlib Template">
+                    </div>
+                <% } %>
+              </div>
+              <div class="col-lg-4 product-details pl-md-5 ftco-animate">
+                  <h3><%= product.productName %></h3>
+                  <div class="rating d-flex">
+                          <p class="text-left mr-1">
+                            <a href="#" class="mr-2 mt-5"><%= rating %></a>
+                            <div class="avgStars mr-2">
+                              <% for(let j=5;j>=1;j-- ){ %>
+                                <% if(j<=rating){ %>
+                                  <input type="radio" name="rating" id="review-star<%= j %>" value="<%= j %>" disabled>
+                                  <label for="review-star<%= j %>" style="color: #dbcc8f;">★</i></label>
+                                <% }else{ %>
+                                  <input type="radio" name="rating" id="review-star<%= j %>" value="<%= j %>" disabled>
+                                  <label for="review-star<%= j %>" style="color: #ddd;">★</i></label>
+                                <% } %>
+                              <% } %>
+                            </div>
+                          </p>
+                          <p class="text-left mr-4">
+                              <a href="#" class="mr-2" style="color: #000;"><%= product.review?.length || '0' %> <span style="color: #bbb;">Ratings</span></a>
+                          </p>
+                      </div>
+                      <% if(offerPrices.length==0){ %>
+                        <p class="price"><span>₹<%= product.amount %></span></p>
+                      <% }else{ %>
+                        <% if(product.amount>offerPrices[0].minAmount && product.amount<offerPrices[0].maxAmount){ %>
+                          <p class="price"><span class="mr-3" style="color: red;"><del>₹<%= product.amount %></del></span><span class="mr-3">₹<%= product.amount - (((offerPrices[0].offer*product.amount)/100).toFixed(2)) %></span><span style="font-size: 12px;color: white;background-color: red; padding-left: 2px;padding-right: 2px;"><%= offerPrices[0].offer %>% off</span></p>
+                        <% }else{ %>
+                          <p class="price"><span>₹<%= product.amount %></span></p>
+                        <% } %>
+                      <% } %>
+                  <h5><u>Product Description</u></h5>
+                      <ul>
+                        <% for(let i=0;i<product.description.length;i++){ %>
+                        <li><%= product.description[i] %></li>
+                        <% } %>
+                      </ul>
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="form-group size-selector">
+                                <h5><u>Select Size:</u></h5>
+                                <form action="">
+                                    <div style="display: flex;" class="inputDiv">
+                                        <input type="radio" id="size-s" name="size" value="S">
+                                        <label for="size-s"><span>S</span></label>
+                                        <input type="radio" id="size-m" name="size" value="M">
+                                        <label for="size-m"><span>M</span></label>
+                                        <input type="radio" id="size-l" name="size" value="L">
+                                        <label for="size-l"><span>L</span></label>
+                                        <input type="radio" id="size-xl" name="size" value="XL">
+                                        <label for="size-xl"><span>XL</span></label>
+                                        <input type="radio" id="size-xxl" name="size" value="XXL">
+                                        <label for="size-xxl"><span>XXL</span></label>
+                                    </div>
+                                    <h5><u>Select Quantity:</u></h5>
+                                    <input type="text" value="1" id="quantity">
+                                </form>
+                            </div>
+                        </div>
+                          <div class="w-100"></div>
+                        <div class="w-100"></div>
+                <div class="col-md-12">
+                    <% if(product.stock==0 || !product.stock){ %>
+                        <p style="color: #ff0000;">Out of Stock</p>
+                    <% }else{ %>
+                        <p style="color: #000;"><%= product.stock %> piece available</p>
+                    <% } %>
+                </div>
+            </div>
+            <p><a href="cart.html" class="btn btn-black py-3 px-5 mr-2">Add to Cart</a><a href="cart.html" class="btn btn-primary py-3 px-5">Buy now</a></p>
+              </div>
+          </div>
+
+          <div class="mt-5">
+            <div><h4><b>Add your Review</b></h4></div>
+            <div class="rating-input">
+              <form action="/user/shop/product-details/add-review/<%= product._id %>" method="post">
+                <div class="stars">
+                  <% for(let i=5;i>=1;i-- ){ %>
+                    <input type="radio" name="rating" id="star<%= i %>" value="<%= i %>">
+                    <label for="star<%= i %>">★</i></label>
+                  <% } %>
+                </div>
+                <div>
+                  <input type="text" name="comment" placeholder="Write your review here..." required>
+                </div>  
+                <input type="submit" value="Submit Review">
+              </form>
+            </div>
+            <div><h4><b>See other Reviews:</b></h4></div>
+              <% for(let i=0;i<product.review.length;i++){ %>
+                <div class="other-reviews">
+                  <p style="font-size: 15px;">Review by : <%= product.review[i].user %></p>
+                  <div class="review-stars">
+                    <% for(let j=5;j>=1;j-- ){ %>
+                      <% if(j<=product.review[i].rating){ %>
+                        <input type="radio" name="rating" id="review-star<%= j %>" value="<%= j %>" disabled>
+                        <label for="review-star<%= j %>" style="color: #dbcc8f;">★</i></label>
+                      <% }else{ %>
+                        <input type="radio" name="rating" id="review-star<%= j %>" value="<%= j %>" disabled>
+                        <label for="review-star<%= j %>" style="color: #ddd;">★</i></label>
+                      <% } %>
+                    <% } %>
+                  </div>
+                  <p><b><%= product.review[i].desc %></b></p>
+                  <hr style="color: black;">
+                </div>
+              <% } %>
+            </div>
+
+
+
+
+        <div class="column mt-5" style="display: flex;align-items: center;flex-direction: column;">
+            <div><h2><b>Others Also Bought</b></h2></div>
+            <div style="display: flex;">
+                <% for(let i=0;i<3;i++){ %>
+                    <div class="col-md-4">
+                        <div class="product d-flex flex-column">
+                            <a href="/user/shop/product-details/<%= similarProducts[i]._id %>" class="img-prod"><img class="img-fluid" src="<%= similarProducts[i].images[0] %>" alt="Colorlib Template">
+                                <div class="overlay"></div>
+                            </a>
+                            <div class="text py-3 pb-4 px-3">
+                                <div class="d-flex">
+                                    <div class="cat">
+                                        <span>Lifestyle</span>
+                                    </div>
+                                    <div class="rating">
+                                        <p class="text-right mb-0">
+                                            <a href="#"><span class="ion-ios-star-outline"></span></a>
+                                            <a href="#"><span class="ion-ios-star-outline"></span></a>
+                                            <a href="#"><span class="ion-ios-star-outline"></span></a>
+                                            <a href="#"><span class="ion-ios-star-outline"></span></a>
+                                            <a href="#"><span class="ion-ios-star-outline"></span></a>
+                                        </p>
+                                    </div>
+                                </div>
+                                <h3><a href="/user/shop/product-details/<%= similarProducts[i]._id %>"><%= similarProducts[i].productName %></a></h3>
+                                <div class="pricing">
+                                  <% if(offerPrices.length==0){ %>
+                                    <p class="price"><span>₹<%= product.amount %></span></p>
+                                  <% }else{ %>
+                                    <% if(similarProducts[i].amount>offerPrices[0].minAmount && similarProducts[i].amount<offerPrices[0].maxAmount){ %>
+                                      <p class="price"><span class="mr-2" style="color: red;"><del>₹<%= similarProducts[i].amount %></del></span><span class="mr-2">₹<%= similarProducts[i].amount - (((offerPrices[0].offer*similarProducts[i].amount)/100).toFixed(2)) %></span><span style="font-size: 12px;color: white;background-color: red; padding-left: 2px;padding-right: 2px;"><%= offerPrices[0].offer %>% off</span></p>
+                                    <% }else{ %>
+                                      <p class="price"><span>₹<%= similarProducts[i].amount %></span></p>
+                                    <% } %>
+                                  <% } %>
+                                </div>
+                                <p class="bottom-area d-flex px-3">
+                                    <a href="#" class="add-to-cart text-center py-2 mr-1"><span>Add to cart <i class="ion-ios-add ml-1"></i></span></a>
+                                    <a href="#" class="buy-now text-center py-2">Buy now<span><i class="ion-ios-cart ml-1"></i></span></a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+        </div>
+  </section>
+  <footer class="ftco-footer ftco-section">
+    <div class="container">
+        <div class="row">
+            <div class="mouse">
+                      <a href="#" class="mouse-icon">
+                          <div class="mouse-wheel"><span class="ion-ios-arrow-up"></span></div>
+                      </a>
+                  </div>
+        </div>
+      <div class="row mb-5">
+        <div class="col-md">
+          <div class="ftco-footer-widget mb-4">
+            <h2 class="ftco-heading-2">Minishop</h2>
+            <p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia.</p>
+            <ul class="ftco-footer-social list-unstyled float-md-left float-lft mt-5">
+              <li class="ftco-animate"><a href="#"><span class="icon-twitter"></span></a></li>
+              <li class="ftco-animate"><a href="#"><span class="icon-facebook"></span></a></li>
+              <li class="ftco-animate"><a href="#"><span class="icon-instagram"></span></a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="col-md">
+          <div class="ftco-footer-widget mb-4 ml-md-5">
+            <h2 class="ftco-heading-2">Menu</h2>
+            <ul class="list-unstyled">
+              <li><a href="#" class="py-2 d-block">Shop</a></li>
+              <li><a href="#" class="py-2 d-block">About</a></li>
+              <li><a href="#" class="py-2 d-block">Journal</a></li>
+              <li><a href="#" class="py-2 d-block">Contact Us</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="col-md-4">
+           <div class="ftco-footer-widget mb-4">
+            <h2 class="ftco-heading-2">Help</h2>
+            <div class="d-flex">
+                <ul class="list-unstyled mr-l-5 pr-l-3 mr-4">
+                  <li><a href="#" class="py-2 d-block">Shipping Information</a></li>
+                  <li><a href="#" class="py-2 d-block">Returns &amp; Exchange</a></li>
+                  <li><a href="#" class="py-2 d-block">Terms &amp; Conditions</a></li>
+                  <li><a href="#" class="py-2 d-block">Privacy Policy</a></li>
+                </ul>
+                <ul class="list-unstyled">
+                  <li><a href="#" class="py-2 d-block">FAQs</a></li>
+                  <li><a href="#" class="py-2 d-block">Contact</a></li>
+                </ul>
+              </div>
+          </div>
+        </div>
+        <div class="col-md">
+          <div class="ftco-footer-widget mb-4">
+              <h2 class="ftco-heading-2">Have a Questions?</h2>
+              <div class="block-23 mb-3">
+                <ul>
+                  <li><span class="icon icon-map-marker"></span><span class="text">203 Fake St. Mountain View, San Francisco, California, USA</span></li>
+                  <li><a href="#"><span class="icon icon-phone"></span><span class="text">+2 392 3929 210</span></a></li>
+                  <li><a href="#"><span class="icon icon-envelope"></span><span class="text">info@yourdomain.com</span></a></li>
+                </ul>
+              </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12 text-center">
+
+          <p><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+                        Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="icon-heart color-danger" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
+                        <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+                      </p>
+        </div>
+      </div>
+    </div>
+  </footer>
+<script>
+
+            const containers = document.querySelectorAll('.image-container');
+
+            containers.forEach(container => {
+            const image = container.querySelector('img');
+
+            container.addEventListener('mousemove', (e) => {
+            const rect = container.getBoundingClientRect()
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            const xPercent = (x / rect.width) * 100;;
+            const yPercent = (y / rect.height) * 100;
+
+            image.style.transformOrigin = `${xPercent}% ${yPercent}%`;
+            image.style.transform = 'scale(2)';
+        });
+
+            container.addEventListener('mouseleave', () => {
+            image.style.transformOrigin = 'center center';
+            image.style.transform = 'scale(1)';
+        });
+    });
+</script>
+
+<%-include('partials/userFooter')%>

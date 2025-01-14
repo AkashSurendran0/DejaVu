@@ -1,0 +1,52 @@
+<div class="col-md-4 col-lg-2">
+    <div class="sidebar">
+            <div class="sidebar-box-2">
+                <h2 class="heading">Categories</h2>
+                <div class="fancy-collapse-panel">
+
+<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+    <% if(allCategories){ %>
+        <% for(let i=0;i<allCategories.length;i++){ %>
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="headingOne">
+                    <h4 class="panel-title">
+                        <a data-toggle="collapse" data-parent="#accordion" href="/user/shop?category=<%= allCategories[i].name.toLowerCase() %>" aria-expanded="true" aria-controls="collapseOne"><%= allCategories[i].name %>
+                        </a>
+                    </h4>
+                </div>
+            </div>
+        <% } %>
+    <% }else{ %>
+        <h4>No categories</h4>
+    <% } %>
+</div>
+</div>
+            </div>
+        </div>
+</div>
+
+
+<script>
+const currentURL = window.location.href;
+
+let isMatched=false
+
+const navLinks = document.querySelectorAll(".panel-title a");
+
+navLinks.forEach(link => {
+    if (link.href === currentURL) {
+        link.classList.add("active");
+        isMatched=true
+    } else {
+        link.classList.remove("active");
+    }
+});
+
+if(!isMatched){
+    const link=document.querySelector(".panel-title a")
+    if(link){
+        link.classList.add("active")
+    }
+}
+
+</script>

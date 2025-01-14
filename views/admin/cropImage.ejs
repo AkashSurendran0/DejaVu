@@ -1,0 +1,13 @@
+<%-include('partials/header')%>
+<%-include('partials/navbar')%>
+
+<h1>HIIII</h1>
+<div id="cropContainer" style="display: block;">
+    <img id="imagePreview" alt="" style="max-width: 100%;">
+</div>
+<button id="cropButton" style="display: none;">Crop Current Images</button>
+<button id="uploadButton" style="display: none;">Upload all Cropped Images</button>
+<div id="croppedResult" style="display: flex;flex-wrap: wrap;"></div>
+
+<script src="/cropImage.js"></script>
+<%- include('partials/footer')%>

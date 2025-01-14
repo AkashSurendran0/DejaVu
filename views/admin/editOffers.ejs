@@ -1,0 +1,133 @@
+<%- include('partials/header') %>
+<%- include('partials/navbar') %>
+<style>
+    input{
+        padding: 6px;
+        width: 100%;
+        margin: 10px 0 15px 0;
+        border: 1px solid black;
+    }
+
+    label {
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+
+    .btn {
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    select {
+        margin: 10px 0 15px 0;
+        width: 100%;
+        border: 1px solid black;
+        padding: 6px;
+  }
+</style>
+<main class="h-full pb-16 overflow-y-auto">
+    <h2 class="my-6 text-2xl font-semibold text-gray-700 dark:text-gray-200 ml-6">
+        Add Offers
+    </h2>
+    <form action="/admin/offers/editOffer/<%= offer._id %>" method="post">
+        <div class="container grid px-6 mx-auto">
+            <div class="row">
+                <div class="col-md-6">
+                    <label for="">Select Category:</label>
+                    <select name="offerCategory" id="" required>
+                        <% for(let i=0;i<categories.length;i++){ %>
+                            <option value="<%= categories[i].name %>"
+                                <%= categories[i].name===offer.category? 'selected':'' %>>
+                                <%= categories[i].name %></option>
+                        <% } %>
+                    </select>
+                    <label for="">Min Price:</label>
+                    <input type="number" name="minPrice" id="minPrice" value="<%= offer.minAmount %>" required>
+                    <label for="">Max Price</label>
+                    <input type="number" name="maxPrice" id="maxPrice" value="<%= offer.maxAmount %>" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="">Start Date:</label>
+                    <input type="datetime-local" name="startDate" id="startDate" value="<%= new Date(offer.startDate).toISOString().slice(0,16) %>" required>
+                    <label for="">End Date:</label>
+                    <input type="datetime-local" name="endDate" id="endDate" value="<%= new Date(offer.endDate).toISOString().slice(0,16) %>" required>
+                    <label for="">Offer:</label>
+                    <input type="number" name="offer" id="offer" value="<%= offer.offer %>" required>
+                </div>
+                <div class="d-flex justify-content-center mt-4">
+                    <input style="width: 300px;" id="submitBtn" class="btn btn-success" type="submit" value="Edit offer">
+                </div>
+            </div>
+        </div>
+    </form>
+    </div>
+</main>
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+
+    document.getElementById('submitBtn').addEventListener('click', ()=>{
+        const startDate=document.getElementById('startDate').value
+        const endDate=document.getElementById('endDate').value
+        if(new Date(startDate) >= new Date(endDate)){
+            event.preventDefault()
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: 'Start Date should not be greater than End date',
+            })
+            return
+        }else if(new Date(startDate) < new Date()){
+            event.preventDefault()
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: 'Start Date should not be in the past',
+            })
+            return
+        }
+
+        const amountPattern=/^[0-9]+$/
+        const offerPattern=/^[0-9]{2}$/
+        const offer=document.getElementById('offer').value
+        const minPrice=parseInt(document.getElementById('minPrice').value)
+        const maxPrice=parseInt(document.getElementById('maxPrice').value)
+        if(!amountPattern.test(minPrice) || !amountPattern.test(maxPrice)){
+            event.preventDefault()
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: 'Invalid Amount Input',
+                timer: 1500,
+                showConfirmButton: false
+            })
+            return
+        }else if(!offerPattern.test(offer)){
+            event.preventDefault()
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: 'Invalid offer Input',
+                timer: 1500,
+                showConfirmButton: false
+            })
+            return
+        }else if(minPrice > maxPrice){
+            event.preventDefault()
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: 'Min price should not be greater than Max price',
+                timer: 1500,
+                showConfirmButton: false
+            })
+            return
+        }
+    })
+
+</script>
+
+<%- include('partials/footer') %>

@@ -1,0 +1,29 @@
+<%-include('partials/header')%>
+<%-include('partials/navbar')%>
+
+<main class="h-full pb-16 overflow-y-auto">
+    <div class="container grid px-6 mx-auto">
+        <h2 class="my-6 text-2xl font-semibold text-gray-700 dark:text-gray-200">
+            Edit Categories
+            </h2>
+        <div class="container" style="display: flex; justify-content: center;">
+            <%if(category){%>
+            <form action="/admin/categories/editCategory/submit/<%= category._id %>" method="post">
+                <div style="display: flex;flex-direction: column;align-items: center;margin: 10px;">
+                        <label for="">Category Name:</label>
+                        <br>
+                        <input type="text" name="category" value="<%= category.name%>" style="height: 35px;width: 350px;border: 1px solid black;border-radius: 10px;padding-left: 10px;">
+                        <br>
+                        <label for="">Description:</label>
+                        <br>
+                        <input type="text" name="description" value="<%= category.description%>" style="height: 100px;width: 350px;border: 1px solid black;border-radius: 10px;padding-left: 10px;">
+                        <br>
+                        <input type="submit" value="Submit Changes" style="height: 40px;width: 150px;background:  rgb(138, 255, 130);border-radius: 10px;">
+                    <%}%>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+
+<%-include('partials/footer')%>

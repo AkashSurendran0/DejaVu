@@ -1,0 +1,462 @@
+<%-include('partials/header')%>
+<%-include('partials/navbar')%>
+<style>
+input[type="file"] {
+    padding: 5px;
+    border: 2px solid #848484;
+    background-color: #F8F9FA;
+    color: black;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: Arial, sans-serif;
+  }
+
+  input[type="file"]::file-selector-button {
+    background-color: rgb(112, 112, 112);
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+
+  input[type="file"]::file-selector-button:hover {
+    background-color: #535353;
+  }
+
+  input{
+    padding: 5px;
+  }
+
+  .image-cropper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    max-width: 500px;
+  }
+
+  .image-cropper img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 5px;
+  }
+
+  .image-cropper button {
+    font-size: 12px;
+    padding: 5px 10px;
+    border-radius: 3px;
+  }
+
+  .error-message {
+    color: red;
+    font-size: 0.9em;
+  }
+
+  .thumbnail {
+    display: inline-block;
+    margin: 10px;
+    position: relative;
+  }
+
+  .thumbnail img {
+    width: 50px;
+    height: auto;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+  }
+
+  .remove-icon {
+    position: absolute;
+    top: 0;
+    right: 0;
+    color: red;
+    font-size: 1.2em;
+    cursor: pointer;
+  }
+   .form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .form-section {
+    margin: 10px 0;
+  }
+
+  .input-group {
+    display: flex;
+    flex-direction: column;
+    margin: 10px 0;
+  }
+
+  .input-group label {
+    margin-bottom: 5px;
+    font-weight: bold;
+  }
+
+  .input-group input,
+  .input-group select {
+    border: 1px solid black;
+    padding: 5px;
+  }
+
+  .sizes-container {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .image-input-row {
+    margin: 10px 0;
+  }
+
+  .btn {
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  .btn.btn-success {
+    background-color: rgb(138, 255, 130);
+  }
+  .preview-container {
+    margin-top: 20px;
+  }
+
+  .preview-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .thumbnail {
+    position: relative;
+    display: inline-block;
+  }
+
+  .thumbnail img {
+    width: 80px;
+    height: 80px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    object-fit: cover;
+  }
+
+  .remove-icon {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: red;
+    color: white;
+    font-size: 14px;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+</style>
+
+<main class="h-full pb-16 overflow-y-auto">
+  <div class="container grid px-6 mx-auto">
+    <h2 class="my-6 text-2xl font-semibold text-gray-700 dark:text-gray-200">
+      Add Products
+    </h2>
+    <% if (messageInvalid.length > 0) { %>
+      <p>
+        <h4 class="text-danger"><%= messageInvalid %></h4>
+      </p>
+    <% } %>
+    <form action="/admin/products/addProduct" method="post" enctype="multipart/form-data">
+      <div class="form-container">
+        <div class="form-section">
+          <h3>Select Images:</h3>
+          <div id="imageUploadContainer" class="image-upload-container">
+              <div class="image-input-row" id="imageInput1">
+                <input
+                  type="file"
+                  class="form-control"
+                  name="productImages"
+                  id="input1"
+                  onchange="handleImageUpload(event, 1)"
+                />
+                <div class="image-cropper" id="cropper1" style="display: none;">
+                  <img id="croppedImg1" alt="" style="max-width: 200px; height: 500px; object-fit: cover;" />
+                  <button type="button" id="saveButton1" class="btn btn-primary" style="margin-top: 10px;" onclick="saveImage(1)">
+                    Save
+                  </button>
+                </div>
+              </div>
+          </div>
+        </div>
+        <div id="croppedImagesPreview" class="preview-container">
+          <h4>Preview Cropped Images:</h4>
+          <div id="previewList" class="preview-list"></div>
+        </div>
+
+        <div class="form-section">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="input-group">
+                <label for="productName">Product Name:</label>
+                <input type="text" name="productName" required/>
+              </div>
+              <div class="input-group">
+                <label for="productCategory">Product Category:</label>
+                <select name="productCategory" id="productCategory">
+                  <option value="" selected disabled></option>
+                  <% for (let j = 0; j < category.length; j++) { %>
+                    <option value="<%= category[j].name %>"><%= category[j].name %></option>
+                  <% } %>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="input-group">
+                <label for="productAmount">Product Amount:</label>
+                <input type="text" name="productAmount" id="productAmount" required/>
+              </div>
+              <div class="input-group">
+                <label for="productCount">Stock Count:</label>
+                <input type="number" name="productCount" id="productCount" required/>
+              </div>
+            </div>
+          </div>
+          </div>
+
+        <div class="form-section">
+          <div class="input-group">
+            <label for="sizes">Size Available:</label>
+            <div class="sizes-container">
+              <label>S:</label>
+              <input type="number" name="Scount" id="Scount"/>
+              <label>M:</label>
+              <input type="number" name="Mcount" id="Mcount"/>
+              <label>L:</label>
+              <input type="number" name="Lcount" id="Lcount"/>
+              <label>XL:</label>
+              <input type="number" name="XLcount" id="XLcount"/>
+              <label>XXL:</label>
+              <input type="number" name="XXLcount" id="XXLcount"/>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="input-group">
+                <label for="productColors">Enter Colors (Comma-separated):</label>
+                <input type="text" name="productColors" placeholder="Red, Blue, Green..." />
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="input-group">
+                <label for="productDesc">Product Description (Comma-separated):</label>
+                <input type="text" name="productDesc" required/>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <input
+            type="submit"
+            value="Add Product"
+            class="btn btn-success"
+            id="submitBtn"
+          />
+        </div>
+      </div>
+    </form>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    const cropperInstances = {};
+  
+    let uploadedImageCount = 0;
+  
+    function handleImageUpload(event, index) {
+  
+      const file = event.target.files[0];
+      if (!file) return;
+  
+      const reader = new FileReader();
+      reader.onload = () => {
+        const image = document.getElementById(`croppedImg${index}`);
+        image.src = reader.result;
+  
+        const cropperContainer = document.getElementById(`cropper${index}`);
+        cropperContainer.style.display = "block";
+  
+        const cropper = new Cropper(image, {
+          viewMode: 2,
+          guides: true,
+          background: false,
+          autoCropArea: 1,
+          zoomable: true,
+          scalable: true,
+          movable: true
+        });
+  
+        cropperInstances[index] = cropper;
+  
+        const saveButton = document.getElementById(`saveButton${index}`);
+        saveButton.addEventListener("click", () => saveCroppedImage(index, cropper));
+  
+        uploadedImageCount++;
+      };
+      reader.readAsDataURL(file);
+    }
+  
+    function saveCroppedImage(index, cropper) {
+      const canvas = cropper.getCroppedCanvas();
+      const imageInput = document.getElementById(`input${index}`);
+      const cropperContainer = document.getElementById(`cropper${index}`);
+
+    canvas.toBlob((blob) => {
+      const fileName = `cropped-image-${Date.now()}.jpg`;
+      const newFile = new File([blob], fileName, { type: "image/jpeg" });
+
+      const dataTransfer = new DataTransfer();
+      dataTransfer.items.add(newFile);
+      imageInput.files = dataTransfer.files;
+
+      const previewList = document.getElementById("previewList");
+      const thumbnail = document.createElement("div");
+      thumbnail.className = "thumbnail";
+
+      const img = document.createElement("img");
+      img.src = canvas.toDataURL("image/jpeg");
+      thumbnail.appendChild(img);
+
+      const removeButton = document.createElement("button");
+      removeButton.className = "remove-icon";
+      removeButton.innerHTML = "&times;";
+      removeButton.onclick = () => removeCroppedImage(thumbnail, imageInput, index);
+      thumbnail.appendChild(removeButton);
+
+      previewList.appendChild(thumbnail);
+
+      cropperContainer.style.display = "none";
+      cropper.destroy();
+      delete cropperInstances[index];
+  });
+}
+
+function removeCroppedImage(thumbnail, imageInput, index) {
+  thumbnail.remove();
+
+  imageInput.value = "";
+
+  document.getElementById(`imageInput${index}`).innerHTML=''
+
+  uploadedImageCount--;
+}
+
+
+document.getElementById('submitBtn').addEventListener('click', (event)=>{
+  if(uploadedImageCount==0){
+    event.preventDefault()
+    Swal.fire({
+      title:'Error!',
+      text:'Add at least one image',
+      icon:'error',
+  })
+    return
+  }
+  const category=document.getElementById('productCategory').value  
+  const productAmount=document.getElementById('productAmount').value
+  const productCount=document.getElementById('productCount').value
+  const Scount=document.getElementById('Scount')?.value || 0
+  const Mcount=document.getElementById('Mcount')?.value || 0
+  const Lcount=document.getElementById('Lcount')?.value || 0
+  const XLcount=document.getElementById('XLcount')?.value || 0
+  const XXLcount=document.getElementById('XXLcount')?.value || 0
+  const amountStockPattern=/^[0-9]*$/
+  if(!amountStockPattern.test(productAmount) || !amountStockPattern.test(productCount) || !amountStockPattern.test(Scount) || !amountStockPattern.test(Mcount) || !amountStockPattern.test(Lcount) || !amountStockPattern.test(XLcount) || !amountStockPattern.test(XXLcount)){
+    event.preventDefault()
+
+    Swal.fire({
+      title:'Error!',
+      text:'Invalid Input',
+      icon:'error',
+  })
+  return
+  }
+
+  if(!category){
+    event.preventDefault()
+
+    Swal.fire({
+      title:'Error!',
+      text:'Please select a category',
+      icon:'error',
+  })
+  return
+}
+
+  if(parseInt(Scount)+parseInt(Mcount)+parseInt(Lcount)+parseInt(XLcount)+parseInt(XXLcount) != parseInt(productCount)){
+    event.preventDefault()
+
+    Swal.fire({
+      title:'Error!',
+      text:'Stock Count doesnt match',
+      icon:'error',
+  })
+  return
+  }
+})
+
+let fileInputCount=1
+
+function saveImage(id){
+  console.log(`Image ${id} saved`);
+  addNewImage()
+}
+
+function addNewImage(){
+  fileInputCount++
+
+  const newInput=document.createElement('div')
+  newInput.className='image-input-row'
+  newInput.id=`imageInput${fileInputCount}`
+
+  newInput.innerHTML=`
+    <input
+      type="file"
+      class="form-control"
+      name="productImages"
+      id="input${fileInputCount}"
+      onchange="handleImageUpload(event, ${fileInputCount})"
+    />
+    <div class="image-cropper" id="cropper${fileInputCount}" style="display: none;">
+      <img id="croppedImg${fileInputCount}" alt="" style="max-width: 200px; height: 500px; object-fit: cover;" />
+      <button type="button" id="saveButton${fileInputCount}" class="btn btn-primary" style="margin-top: 10px;" onclick="saveImage(${fileInputCount})">
+        Save
+      </button>
+    </div>
+  `
+
+  document.getElementById('imageUploadContainer').appendChild(newInput)
+}
+
+  
+</script>
+  
+
+<%-include('partials/footer')%>
+
+
