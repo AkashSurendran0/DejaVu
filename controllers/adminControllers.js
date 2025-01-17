@@ -8,7 +8,7 @@ const users=require('../models/userSchema')
 const offers=require('../models/offerSchema')
 const env=require('dotenv').config()
 
-const STATUS_SERVER_ERROR=process.env.STATUS_SERVER_ERROR
+const STATUS_SERVER_ERROR=parseInt(process.env.STATUS_SERVER_ERROR)
 
 const loadAdminPage = async (req,res)=>{
     try {
@@ -227,6 +227,7 @@ const showProducts = async (req,res)=>{
         .populate('category')
         .skip(skip)
         .limit(limit)
+        .sort({createdAt : -1})
 
         const totalProduct=await products.countDocuments()
         const totalPages=Math.ceil(totalProduct/limit)
@@ -239,7 +240,7 @@ const showProducts = async (req,res)=>{
             productAction: req.flash('productAction'),
             currentPage: page,
             totalPages: totalPages,
-            limit: limit
+            limit: limit    
         })
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).send('Server not responding')
@@ -501,6 +502,17 @@ const deleteOffer = async (req,res)=>{
     }
 }
 
+const adminLogout = async (req,res)=>{
+    try {
+        req.session.destroy(()=>{
+            res.redirect('/admin');
+        })
+    } catch (error) {
+        res.status(STATUS_SERVER_ERROR).send('Server not responding')
+        console.log(error.message);
+    }
+}
+
 module.exports={
     loadAdminPage,    
     adminAuthenticate,
@@ -524,5 +536,6 @@ module.exports={
     addOffer,
     loadOfferEditPage,
     editOffer,
-    deleteOffer
+    deleteOffer,
+    adminLogout
 }

@@ -28,5 +28,6 @@ routes.post('/offers/addOffer', adminAuth, adminRoutes.addOffer)
 routes.get('/offers/editOffer/:id', adminAuth, adminRoutes.loadOfferEditPage)
 routes.post('/offers/editOffer/:id', adminAuth, adminRoutes.editOffer)
 routes.get('/offers/deleteOffer/:id', adminAuth, adminRoutes.deleteOffer)
+routes.post('/logout', adminRoutes.adminLogout)
 
 module.exports=routes;

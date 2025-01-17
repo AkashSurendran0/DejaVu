@@ -94,7 +94,9 @@
 		          <div class="col text-center">
 		            <div class="block-27">
 		              <ul>
-
+						<% for(let i=0;i<totalPages;i++){ %>
+							<li><a href="/user/shop?category=<%= category %>&&page=<%= i+1 %>&&limit=<%= limit %>"><%= i+1 %></a></li>
+		                <% } %>
 		              </ul>
 		            </div>
 		          </div>
@@ -235,6 +237,32 @@
 			</div>
 		  </div>
 		</div>
+
+		<script>
+			const currentURL = window.location.href;
+			
+			let isMatched=false
+			
+			const navLinks = document.querySelectorAll(".block-27 a");
+			
+			navLinks.forEach(link => {
+				if (link.href === currentURL) {
+					link.classList.add("active");
+					isMatched=true
+				} else {
+					link.classList.remove("active");
+				}
+			});
+			
+			if(!isMatched){
+				const link=document.querySelector(".block-27 a")
+				if(link){
+					link.classList.add("active")
+				}
+			}
+			
+			</script>
+		
 	  </footer>
     
   <%- include('partials/userFooter') %>

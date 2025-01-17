@@ -37,6 +37,7 @@ app.use(express.static(path.join(__dirname, 'public/banners')));
 app.use(express.static(path.join(__dirname, 'public')));
 
 db()
+
 app.use('/admin', adminRoutes)
 app.use('/user', userRoutes)
 

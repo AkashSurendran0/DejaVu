@@ -1,3 +1,20 @@
+<style>
+  #logout{
+    background: none;
+    border: none;
+    font-size: 10px;
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+    padding-left: 20px;
+    padding-right: 20px;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    opacity: 1;
+    color: red;
+  }
+</style>
+
 <body class="goto-here">
     <div class="py-1 bg-black">
     <div class="container">
@@ -37,9 +54,9 @@
           <li class="nav-item"><a href="blog.html" class="nav-link">Wishlist</a></li>
           <li class="nav-item"><a href="blog.html" class="nav-link">Settings</a></li>
           <% if(isLogged) { %>
-            <li class="nav-item"><a href="/user/logout" class="nav-link" style="color: red;">Logout</a></li>
+            <li class="nav-item"><form action="/user/logout" method="post"><input id="logout" type="submit" value="Logout"></form></li>
           <% }else{ %>
-            <li class="nav-item"><a href="/user/login" class="nav-link" style="color: rgb(95, 95, 255);">LogIn</a></li>
+            <li class="nav-item"><a href="/user/login" class="nav-link" style="color: rgba(0, 38, 255, 0.916);">Login</a></li>
           <% } %>
         </ul>   
       </div>

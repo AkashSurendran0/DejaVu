@@ -7,9 +7,10 @@ const offers = require('../models/offerSchema')
 const categories = require('../models/categorySchema')
 const cron = require('node-cron')
 const sendMail=require('../helpers/mailHelper')
+const bcrypt=require('../helpers/bcrypt')
 
-const STATUS_SERVER_ERROR=process.env.STATUS_SERVER_ERROR
-const STATUS_NOT_FOUND=process.env.STATUS_NOT_FOUND
+const STATUS_SERVER_ERROR=parseInt(process.env.STATUS_SERVER_ERROR)
+const STATUS_NOT_FOUND=parseInt(process.env.STATUS_NOT_FOUND)
 
 cron.schedule('*/1 * * * *',async (req,res)=>{
     const allOffers=await offers.find()
@@ -40,10 +41,17 @@ const loadHomePage = async (req,res)=>{
 
 const loadShopPage = async (req,res)=>{
     try {
+        const page=parseInt(req.query.page) || 1
+        const limit=parseInt(req.query.limit) || 3
+        const skip=(page-1)*limit
         const banner=await banners.findOne({category: 'shirts'})
-        const allCategories=await categories.find()
-        const category=req.query.category || allCategories[0].name
-        let productList=await products.aggregate([
+        const allCategories=await categories.find({isDeleted:false})
+        let category=false
+        if(allCategories.length>0){
+            category=req.query.category || allCategories[0].name
+        }
+
+        let allProducts=await products.aggregate([
             {$lookup:{
                 from: 'categories',
                 foreignField: '_id',
@@ -60,6 +68,37 @@ const loadShopPage = async (req,res)=>{
                 }
             }
         ])
+
+        let productList=await products.aggregate([
+            {$lookup:{
+                from: 'categories',
+                foreignField: '_id',
+                localField: 'category',
+                as: 'resultProducts'
+            }},
+            {
+                $unwind: '$resultProducts'
+            },
+            {
+                $match: {
+                    'resultProducts.name':{$regex:`^${category}`, $options:'i'},
+                    isDeleted:false
+                }
+            },
+            {
+                $skip: skip
+            },
+            {
+                $limit: limit
+            }
+        ])
+
+        let totalCount=0
+        let totalPages=0
+        if(allProducts){
+            totalCount=allProducts.length
+            totalPages=Math.ceil(totalCount/limit)
+        }
 
         if (!productList || productList.length === 0) {
             productList = false;
@@ -85,7 +124,11 @@ const loadShopPage = async (req,res)=>{
             minPrice: minPrice,
             maxPrice: maxPrice,
             offer: offer,
-            allCategories: allCategories
+            category: category,
+            allCategories: allCategories,
+            currentPage: page,
+            totalPages: totalPages,
+            limit: limit
         })
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).send('Server not responding')
@@ -316,10 +359,12 @@ const userSignup = async (req,res)=>{
             req.flash('signupErr', 'Password Mismatch')
             return res.render('userSignup', {err: req.flash('signupErr')})
         }
+
+        const hashedPass= await bcrypt.hashPassword(password)
         await users.insertMany({
             email: email,
             name: name,
-            password: password
+            password: hashedPass
         })
         req.session.userEmail=email
         req.session.isLogged=true
@@ -345,16 +390,19 @@ const userLogin = async (req,res)=>{
     try {
         const {email,password}=req.body
         const user = await users.findOne({
-            email: email,
-            password: password
+            email: email
         })
-        console.log(user);
         if(!user){
             req.flash('invalidUser', 'User Not Found')
             return res.redirect('/user/login')
         }else if(user.isBlocked==true){
             req.flash('invalidUser', 'Unauthorized User')
             return res.redirect('/user/login') 
+        }
+        const check=await bcrypt.check(password,user.password)
+        if(!check){
+            req.flash('invalidUser', 'Password Incorrect')
+            return res.redirect('/user/login')
         }
         req.session.userEmail=email
         req.session.isLogged = true
@@ -447,9 +495,10 @@ const changePassword = async (req,res)=>{
             req.flash('signupErr', 'Password Mismatch')
             return res.render('recoverPassword', {err: req.flash('signupErr')})
         }
+        const hashedPass=await bcrypt.hashPassword(password)
         await users.updateOne(
             {email: email},
-            {$set: {password:confirmPassword}}
+            {$set: {password:hashedPass}}
         )
         req.flash('userLogin', 'Login using new Credentials')
         res.redirect('/user/login')
