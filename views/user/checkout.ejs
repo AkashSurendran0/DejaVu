@@ -1,0 +1,564 @@
+<%- include('partials/userHeader') %>
+<%- include('partials/userNavbar') %>
+
+<style>
+    input[type="radio"] {
+    appearance: none; /* Removes default browser styling */
+    width: 20px;
+    height: 20px;
+    border: 2px solid #dbcc8f;
+    border-radius: 50%; /* Makes it a circle */
+    outline: none;
+    cursor: pointer;
+  }
+  input[type="radio"]:checked {
+    background-color: #dbcc8f;
+    border-color: #dbcc8f;
+  }
+  .modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgba(0, 0, 0, 0.5); /* Black w/ opacity */
+}
+
+.modal-content {
+  background-color: #fff;
+  margin: 15% auto; /* 15% from the top and centered */
+  padding: 20px;
+  border-radius: 8px;
+  width: 80%; /* Could be more or less, depending on screen size */
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  text-align: center;
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+  color: red;
+  text-decoration: none;
+}
+
+/* Container for the table section */
+.products-container {
+  width: 100%;
+  max-width: 600px;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+/* Section title */
+.section-title {
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+/* Table styling */
+.custom-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+}
+
+/* Table header styling */
+.custom-table thead th {
+  background-color: #333;
+  color: #fff;
+  padding: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  border: 1px solid #ddd;
+}
+
+/* Table row and cell styling */
+.custom-table tbody tr {
+  background-color: #fff;
+  border-bottom: 1px solid #ddd;
+}
+
+.custom-table tbody td {
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ddd;
+}
+
+/* Image styling */
+.custom-table tbody td img {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.orderBtn{
+  cursor: pointer;
+  background-color: #ffe167;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.orderBtn:hover{
+  background-color: #ffd736;
+}
+
+.card{
+  cursor: pointer;
+}
+
+
+</style>
+
+<div class="hero-wrap hero-bread" style="background-image: url('/uploads/checkoutbanner.PNG');">
+    <div class="container">
+      <div class="row no-gutters slider-text align-items-center justify-content-center">
+        <div class="col-md-9 ftco-animate text-center">
+            <h1 class="mb-0 bread" style="background: white;">Checkout</h1>
+        </div>
+      </div>
+    </div>
+</div>
+
+
+<section class="ftco-section bg-light">
+    <div class="container">
+        <div class="row">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                  <li><a href="/user" style="color: rgba(33, 37, 41, 0.75);">Home&nbsp;&nbsp;>&nbsp;&nbsp;</a></li>
+                  <li><a href="/user/shop" style="color: rgba(33, 37, 41, 0.75);">Shop&nbsp;&nbsp;>&nbsp;&nbsp;</a></li>
+                  <li>Checkout</li>
+                </ol>
+              </nav>
+            <div class="col-md-6 order-md-last">
+                <h2 class="mb-4" style="font-weight: bold;">SELECT ADDRESS</h2>
+                <% if(msg.length>0){ %>
+                  <p class="text-success" id="msg"><%= msg %></p>
+                <% } %>
+                <div class="address-container">
+                    
+                            <div class="address-item mb-3">
+                                  <% if(!allAddress){ %>
+                                    <h5>No Saved Address</h5>
+                                  <% }else{ %>
+                                    <% for(let i=0;i<allAddress.address.length;i++){ %>
+                                      <div class="card addiv mb-2 addressDiv<%= i %>" onclick="addressDivClick('<%= i %>')">
+                                        <div class="card-body d-flex justify-content-between align-items-center">
+                                          <div style="display: flex;align-items: center;">
+                                            <input id="addressRadio" class="mr-3 radioDiv<%= i %>" type="radio" value="<%= allAddress.address[i]._id %>" name="address">
+                                            <div>
+                                                <h6 class="mb-1"><%= allAddress.address[i].name %></h6>
+                                                <p class="mb-0"><%= allAddress.address[i].state %>, <%= allAddress.address[i].streetAddress %>, <%= allAddress.address[i].city %>, <%= allAddress.address[i].postcode %>, <%= allAddress.address[i].phone %></p>
+                                            </div>
+                                          </div>
+                                            <div>
+                                                <button class="btn btn-primary" style="color: white;" onclick="editAddress('<%= allAddress.address[i]._id %>','<%= allAddress.address[i].name %>','<%= allAddress.address[i].state %>','<%= allAddress.address[i].streetAddress %>','<%= allAddress.address[i].apartment %>','<%= allAddress.address[i].city %>','<%= allAddress.address[i].postcode %>','<%= allAddress.address[i].phone %>','<%= allAddress.address[i].altphone %>','<%= products._id %>')">Edit</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <% } %>
+                                  <% } %>
+                            </div>
+                
+
+                    <button onclick="openModal('<%= products._id %>')" id="openModal" class="mt-2" style="background-color: rgb(31, 255, 19);border-radius: 50px;width: 20%;height: 40px;border: none;color: white;">Add Address</button>
+                </div>
+
+
+
+                <div class="row mt-5">
+              <div class="col text-center">
+              </div>
+            </div>
+            </div>
+            <div class="col-md-6 products-container">
+              <h2 class="mb-4" style="font-weight: bold;">YOUR PRODUCTS</h2>
+              <table class="custom-table">
+                <thead>
+                  <tr>
+                    <th>Product</th>
+                    <th>Size</th>
+                    <th>Quantity</th>
+                    <th>Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% for (let i = 0; i < products.products.length; i++) { %>
+                    <tr>
+                      <td>
+                        <img src="<%= products.products[i].productId.images[0] %>" alt="Product Image">
+                      </td>
+                      <td><%= products.products[i].size %></td>
+                      <td><%= products.products[i].quantity %></td>
+                      <td><%= (products.products[i].productId.amount) * (products.products[i].quantity) %></td>
+                    </tr>
+                  <% } %>
+                </tbody>
+              </table>
+              <div class="col-md-8">
+                <h2 class="mb-4 mt-5" style="font-weight: bold;">CHECKOUT</h2>
+                <div style="display: flex;justify-content: space-between;">
+                  <p>Cart total:</p>
+                  <p>₹<%= products.totalAmount %></p>
+                </div>
+                <div style="display: flex;justify-content: space-between;">
+                  <p>Discount:</p>
+                  <p>₹0</p>
+                </div>
+                <hr>
+                <div style="display: flex;justify-content: space-between;">
+                  <p><b>Total:</b></p>
+                  <p><b>₹<%= products.totalAmount %></b></p>
+                </div>
+              </div>
+            </div>
+            
+            
+        </div>
+        <div class="col-md-12">
+          <h2 class="mb-4 mt-4" style="font-weight: bold;">SELECT PAYMENT OPTION</h2>
+          <div class="card mb-2 codDiv" onclick="codDiv()">
+            <div class="card-body d-flex align-items-center">
+              <input value="Cash On Delivery" type="radio" class="mr-3 codRadio" name="payment">
+              <div>
+                <b>Cash On Delivery</b>
+                <p>Pay at your doorstep once you got your product.</p>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-body d-flex align-items-center">
+              <input value="Online Payment" type="radio" class="mr-3" name="payment">
+              <div>
+                <b>Other Payment Method</b>
+                <p>Other online payment methods.</p>
+              </div>
+            </div>
+          </div>
+          <button onclick="orderBtn()" class="mt-4 orderBtn" style="width: 100%;border: none;border-radius: 20px;height: 50px;color: black;">PLACE ORDER</button>
+        </div>
+    </div>
+</section>
+
+
+<div id="myModal" class="modal">
+  <div class="container">
+    <div class="row">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <div>
+          <h3><b>Add Address</b></h3>
+        </div>
+        <form method="POST" class="p-4 addressForm rounded">
+          <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="form-group">
+                  <label for="name" class="form-label">Name</label>
+                  <input type="text" class="form-control" id="name" name="name" required>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                  <label for="state" class="form-label">State</label>
+                  <select class="form-control" id="state" name="state" required>
+                      <option value="" selected disabled>Select State</option>
+                      <option value="Andhra Pradesh">Andhra Pradesh</option>
+                      <option value="Karnataka">Karnataka</option>
+                      <option value="Kerala">Kerala</option>
+                      <option value="Tamil Nadu">Tamil Nadu</option>
+                      <option value="Telangana">Telangana</option>
+                      <option value="Lakshadweep">Lakshadweep</option>
+                      <option value="Goa">Goa</option>
+                      <option value="Gujarat">Gujarat</option>
+                      <option value="Haryana">Haryana</option>
+                      <option value="Himachal Pradesh">Himachal Pradesh</option>
+                      <option value="Jharkhand">Jharkhand</option>
+                  </select>
+                </div>
+            </div>
+        </div>
+
+          <div class="form-group mb-4">
+              <label class="form-label">Street Address</label>
+              <div class="row">
+                  <div class="col-md-6 mb-3">
+                      <input type="text" class="form-control" name="street" placeholder="House number and street name" required>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                      <input type="text" class="form-control" name="apartment" placeholder="Apartment, suite, unit etc. (optional)">
+                  </div>
+              </div>
+          </div>
+
+          <div class="row mb-4">
+              <div class="col-md-6">
+                  <div class="form-group">
+                      <label for="city" class="form-label">Town / City</label>
+                      <input type="text" class="form-control" id="city" name="city" required>
+                  </div>
+              </div>
+              <div class="col-md-6">
+                  <div class="form-group">
+                      <label for="postcode" class="form-label">Postcode / ZIP *</label>
+                      <input type="text" class="form-control" id="postcode" name="postcode" required>
+                  </div>
+              </div>
+          </div>
+
+          <div class="row mb-4">
+              <div class="col-md-6">
+                  <div class="form-group">
+                      <label for="phone" class="form-label">Phone</label>
+                      <input type="tel" class="form-control" id="phone" name="phone" required>
+                  </div>
+              </div>
+              <div class="col-md-6">
+                  <div class="form-group">
+                      <label for="altphone" class="form-label">Alternative Phone</label>
+                      <input type="tel" class="form-control" id="altphone" name="altphone">
+                  </div>
+              </div>
+          </div>
+
+          <div class="text-center">
+              <button class="mt-2" style="background-color: #e3ca82;border-radius: 50px;width: 20%;height: 40px;border: none;color: white;">Add Address</button>
+          </div>
+      </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<footer class="ftco-footer ftco-section">
+    <div class="container">
+      <div class="row mb-5">
+        <div class="col-md">
+          <div class="ftco-footer-widget mb-4">
+            <h2 class="ftco-heading-2">Minishop</h2>
+            <p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia.</p>
+            <ul class="ftco-footer-social list-unstyled float-md-left float-lft mt-5">
+              <li class="ftco-animate"><a href="#"><span class="icon-twitter"></span></a></li>
+              <li class="ftco-animate"><a href="#"><span class="icon-facebook"></span></a></li>
+              <li class="ftco-animate"><a href="#"><span class="icon-instagram"></span></a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="col-md">
+          <div class="ftco-footer-widget mb-4 ml-md-5">
+            <h2 class="ftco-heading-2">Menu</h2>
+            <ul class="list-unstyled">
+              <li><a href="#" class="py-2 d-block">Shop</a></li>
+              <li><a href="#" class="py-2 d-block">About</a></li>
+              <li><a href="#" class="py-2 d-block">Journal</a></li>
+              <li><a href="#" class="py-2 d-block">Contact Us</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="col-md-4">
+           <div class="ftco-footer-widget mb-4">
+            <h2 class="ftco-heading-2">Help</h2>
+            <div class="d-flex">
+                <ul class="list-unstyled mr-l-5 pr-l-3 mr-4">
+                  <li><a href="#" class="py-2 d-block">Shipping Information</a></li>
+                  <li><a href="#" class="py-2 d-block">Returns &amp; Exchange</a></li>
+                  <li><a href="#" class="py-2 d-block">Terms &amp; Conditions</a></li>
+                  <li><a href="#" class="py-2 d-block">Privacy Policy</a></li>
+                </ul>
+                <ul class="list-unstyled">
+                  <li><a href="#" class="py-2 d-block">FAQs</a></li>
+                  <li><a href="#" class="py-2 d-block">Contact</a></li>
+                </ul>
+              </div>
+          </div>
+        </div>
+        <div class="col-md">
+          <div class="ftco-footer-widget mb-4">
+              <h2 class="ftco-heading-2">Have a Questions?</h2>
+              <div class="block-23 mb-3">
+                <ul>
+                  <li><span class="icon icon-map-marker"></span><span class="text">203 Fake St. Mountain View, San Francisco, California, USA</span></li>
+                  <li><a href="#"><span class="icon icon-phone"></span><span class="text">+2 392 3929 210</span></a></li>
+                  <li><a href="#"><span class="icon icon-envelope"></span><span class="text">info@yourdomain.com</span></a></li>
+                </ul>
+              </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12 text-center">
+
+        </div>
+      </div>
+    </div>
+  </footer>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <script>
+
+const modal = document.getElementById("myModal");
+const closeModalBtn = document.querySelector(".close");
+
+const openModal = (cartId)=>{
+  modal.style.display = "block";
+  if(document.querySelector('[name="name"]').value){
+    document.querySelector('[name="name"]').value=''
+  }
+  if(document.querySelector('[name="state"]').value){
+    document.querySelector('[name="state"]').value=''
+  }
+  if(document.querySelector('[name="street"]').value){
+    document.querySelector('[name="street"]').value=''
+  }
+  if(document.querySelector('[name="apartment"]').value){
+    document.querySelector('[name="apartment"]').value=''
+  }
+  if(document.querySelector('[name="city"]').value){
+    document.querySelector('[name="city"]').value=''
+  }
+  if(document.querySelector('[name="postcode"]').value){
+    document.querySelector('[name="postcode"]').value=''
+  }
+  if(document.querySelector('[name="phone"]').value){
+    document.querySelector('[name="phone"]').value=''
+  }
+  if(document.querySelector('[name="altphone"]').value){
+    document.querySelector('[name="altphone"]').value=''
+  }
+  document.querySelector('.addressForm').action=`/user/settings/addAddressFromCheckout/${cartId}`
+}
+
+closeModalBtn.addEventListener("click", () => {
+  modal.style.display = "none";
+});
+
+window.addEventListener("click", (event) => {
+  if (event.target === modal) {
+    modal.style.display = "none";
+  }
+});
+
+
+setTimeout(()=>{
+  document.getElementById('msg').innerText=''
+},2500)
+
+const addressDivClick = (i) =>{
+  document.querySelector(`.radioDiv${i}`).checked=true
+  const addressDiv = document.querySelector(`.addressDiv${i}`);
+  addressDiv.style.transition = "border-color 0.5s ease";
+  addressDiv.style.borderColor = "gold";
+
+  document.querySelectorAll(".addiv").forEach((div, index) => {
+    if (index !== parseInt(i)) {
+      div.style.borderColor = ""; 
+    }
+  });
+}
+
+
+const codDiv = () =>{
+  document.querySelector('.codRadio').checked=true
+  const codDiv = document.querySelector('.codDiv');
+  codDiv.style.transition = "border-color 0.5s ease";
+  codDiv.style.borderColor = "gold";
+
+}
+
+const editAddress = (id,name,state,street,apartment,city,postcode,phone,altPhone,cartId) =>{
+  modal.style.display = "block";
+  if(name){
+    document.querySelector('[name="name"]').value=name
+  }
+  if(state){
+    document.querySelector('[name="state"]').value=state
+  }
+  if(street){
+    document.querySelector('[name="street"]').value=street
+  }
+  if(apartment){
+    document.querySelector('[name="apartment"]').value=apartment
+  }
+  if(city){
+    document.querySelector('[name="city"]').value=city
+  }
+  if(postcode){
+    document.querySelector('[name="postcode"]').value=postcode
+  }
+  if(phone){
+    document.querySelector('[name="phone"]').value=phone
+  }
+  if(altPhone){
+    document.querySelector('[name="altphone"]').value=altPhone
+  }
+  document.querySelector('.addressForm').action=`/user/settings/addAddressFromCheckout/${cartId}?address=${id}`
+}
+
+const orderBtn = () =>{
+  const selectedAddress=document.querySelector('input[name="address"]:checked')
+  if(!selectedAddress || selectedAddress==null){
+    return Swal.fire({
+      icon:'error',
+      text:'Please select a address',
+      title:'Address not found'
+    })
+  }
+  const address=selectedAddress.value
+
+  const payment=document.querySelector('input[name="payment"]:checked')
+  if(!payment){
+    return Swal.fire({
+      icon:'error',
+      text:'Please select a payment method',
+      title:'Payment Error'
+    })
+  }
+  const paymentMethod=payment.value
+  
+
+  fetch(`/user/placeOrder?address=${address}&&cart=<%= products._id %>&&method=${paymentMethod}`,{
+    method:'GET'
+  })
+  .then(response=>response.json())
+  .then(data=>{
+    if(data.success){
+      Swal.fire({
+        title:'Order Confirmed',
+        text:'Your order has been successfully placed!',
+        icon:'success',
+        confirmButtonText:'Done'
+      })
+      .then(result=>{
+        if(result.isConfirmed){
+          window.location.href=`/user/settings/orders`
+        }
+      })
+    }else{
+      Swal.fire({
+        title:'Order Error',
+        text:'There was an error while placing the order',
+        icon:'error',
+        confirmButtonText:'Ok'
+      })
+    }
+  })
+
+}
+
+  </script>
+
+<%- include('partials/userFooter') %>

@@ -12,6 +12,20 @@
       flex: 1;
       margin: 0 5px;
     }
+
+	.review-stars input[type='radio']{
+      display: none;
+    }
+
+    .review-stars label{
+      font-size: 20px;
+    }
+
+    .review-stars{
+      display: flex;
+      flex-direction: row-reverse;
+      justify-content: flex-end;
+    }
 </style>
 
     <div class="hero-wrap hero-bread" style="background-image: url(<%= banner.image %>);">
@@ -54,34 +68,45 @@
 		    						<div class="overlay"></div>
 		    					</a>
 		    					<div class="text py-3 pb-4 px-3">
-		    						<div class="d-flex">
+		    						<div class="d-flex" style="justify-content: space-between;">
 		    							<div class="cat">
-				    						<span>Lifestyle</span>
+				    						<span><%= product[i].resultProducts.name %></span>
 				    					</div>
-				    					<div class="rating">
-			    							<p class="text-right mb-0">
-			    								<a href="#"><span class="ion-ios-star-outline"></span></a>
-			    								<a href="#"><span class="ion-ios-star-outline"></span></a>
-			    								<a href="#"><span class="ion-ios-star-outline"></span></a>
-			    								<a href="#"><span class="ion-ios-star-outline"></span></a>
-			    								<a href="#"><span class="ion-ios-star-outline"></span></a>
-			    							</p>
-			    						</div>
+				    					<div class="review-stars">
+											
+												<% if(!product[i].avgRating || product[i].avgRating==null){ %>
+													<% for(let j=5;j>=1;j-- ){ %>
+														<input type="radio" name="rating" id="review-star<%= j %>" value="<%= j %>" disabled>
+														<label for="review-star<%= j %>" style="color: #ddd;">★</i></label>
+													<% } %>
+												<% }else{ %>
+													<% for(let j=5;j>=1;j-- ){ %>
+														<% if(j<= Math.floor(product[i].avgRating)){ %>
+															<input type="radio" name="rating" id="review-star<%= j %>" value="<%= j %>" disabled>
+															<label for="review-star<%= j %>" style="color: #dbcc8f;">★</i></label>
+														<% }else{ %>
+															<input type="radio" name="rating" id="review-star<%= j %>" value="<%= j %>" disabled>
+															<label for="review-star<%= j %>" style="color: #ddd;">★</i></label>
+														<% } %>
+													<% } %>
+												<% } %>
+
+										  </div>
 			    					</div>
 		    						<h3><a href="/user/shop/product-details/<%= product[i]._id %>"><%= product[i].productName %></a></h3>
 		    						<div class="pricing">
 										<% if(offer){ %>
 											<% if(product[i].amount>minPrice && product[i].amount<maxPrice){ %>
-			    								<p class="price"><span class="mr-2" style="color: red;"><del>₹<%= product[i].amount %></del></span><span class="mr-2">₹<%= product[i].amount - (((offer*product[i].amount)/100).toFixed(2)) %></span><span style="font-size: 12px;color: white;background-color: red; padding-left: 2px;padding-right: 2px;"><%= offer %>% off</span></p>
+			    								<p class="price" id="price"><span class="mr-2" style="color: red;"><del>₹<%= product[i].amount %></del></span><span class="mr-2">₹<%= product[i].amount - (((offer*product[i].amount)/100).toFixed(2)) %></span><span style="font-size: 12px;color: white;background-color: red; padding-left: 2px;padding-right: 2px;"><%= offer %>% off</span></p>
 											<% }else{ %>
-												<p class="price"><span>₹<%= product[i].amount %></span></p>
+												<p class="price" id="price"><span>₹<%= product[i].amount %></span></p>
 											<% } %>
 										<% }else{ %>
-											<p class="price"><span>₹<%= product[i].amount %></span></p>
+											<p class="price" id="price"><span>₹<%= product[i].amount %></span></p>
 										<% } %>
 			    					</div>
 			    					<p class="bottom-area d-flex px-3">
-		    							<a href="#" class="add-to-cart text-center py-2 mr-1"><span>Add to cart <i class="ion-ios-add ml-1"></i></span></a>
+		    							<a href="/user/shop/product-details/<%= product[i]._id %>" class="add-to-cart text-center py-2 mr-1"><span>Add to cart <i class="ion-ios-add ml-1"></i></span></a>
 		    							<a href="#" class="buy-now text-center py-2">Buy now<span><i class="ion-ios-cart ml-1"></i></span></a>
 		    						</p>
 		    					</div>
@@ -260,6 +285,7 @@
 					link.classList.add("active")
 				}
 			}
+			
 			
 			</script>
 		

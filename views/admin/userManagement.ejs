@@ -70,12 +70,14 @@
                           <a href="/admin/userManagement/manageUser/<%= users[i]._id %>">
                           <% if(users[i].isBlocked==false) { %>
                             <button
+                            onclick="manageUser('<%= users[i]._id %>', event)"
                             class="flex items-center justify-between px-2 py-2 text-md font-medium leading-5 text-purple-600 rounded-lg dark:text-gray-400 focus:outline-none focus:shadow-outline-gray"
                             aria-label="Edit"
                             style="color: white; background-color:red;border-radius: 15px;display: flex;justify-content: center;"
                           >BLOCK</button>
                           <% }else{ %>
                             <button
+                            onclick="manageUser('<%= users[i]._id %>', event)"
                             class="flex items-center justify-between px-2 py-2 text-md font-medium leading-5 text-purple-600 rounded-lg dark:text-gray-400 focus:outline-none focus:shadow-outline-gray"
                             aria-label="Edit"
                             style="color: white; background-color: rgb(54, 255, 81);border-radius: 15px;display: flex;justify-content: center;"
@@ -129,7 +131,30 @@
       </div>
     </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+
+  const manageUser = (userId,event) =>{
+    event.preventDefault()
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to change the status of this user?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Proceed',
+      cancelButtonText: 'Cancel',
+    }).then((result)=>{
+      if(result.isConfirmed){
+        window.location.href=`/admin/userManagement/manageUser/${userId}`
+      }else{
+        Swal.fire(
+          'Cancelled',
+          'The user status was not changed',
+          'info'
+        )
+      }
+    })
+  }
 
   const alertNoti = document.querySelectorAll('.notification')
   setTimeout(()=>{

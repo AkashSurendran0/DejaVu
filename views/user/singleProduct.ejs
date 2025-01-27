@@ -233,35 +233,40 @@
                         <div class="col-md-6">
                             <div class="form-group size-selector">
                                 <h5><u>Select Size:</u></h5>
+                                <p class="text-danger" id="selectSize" style="display: none;">Please select a size</p>
                                 <form action="">
-                                    <div style="display: flex;" class="inputDiv">
-                                        <input type="radio" id="size-s" name="size" value="S">
-                                        <label for="size-s"><span>S</span></label>
-                                        <input type="radio" id="size-m" name="size" value="M">
-                                        <label for="size-m"><span>M</span></label>
-                                        <input type="radio" id="size-l" name="size" value="L">
-                                        <label for="size-l"><span>L</span></label>
-                                        <input type="radio" id="size-xl" name="size" value="XL">
-                                        <label for="size-xl"><span>XL</span></label>
-                                        <input type="radio" id="size-xxl" name="size" value="XXL">
-                                        <label for="size-xxl"><span>XXL</span></label>
+                                    <div style="display: flex;" class="inputDiv" data-sizes='<%= JSON.stringify(product.sizeAvailable) %>'>
+                                      <% Object.keys(product.sizeAvailable).forEach(size => { %>
+                                        <% if(product.sizeAvailable[size]==0){ %>
+                                          <input class="size" type="radio" id="size-<%= size %>" name="size" value="<%= size %>" disabled>
+                                          <label style="border:1px solid red;color: red;margin-right: 5px;" for="size-<%= size %>"><span><%= size %></span></label>
+                                        <% }else{ %>
+                                          <input class="size" type="radio" id="size-<%= size %>" name="size" value="<%= size %>" required>
+                                          <label style="margin-right: 5px;" for="size-<%= size %>"><span><%= size %></span></label>
+                                        <% } %>
+                                      <% }) %>
                                     </div>
                                     <h5><u>Select Quantity:</u></h5>
-                                    <input type="text" value="1" id="quantity">
-                                </form>
-                            </div>
-                        </div>
-                          <div class="w-100"></div>
-                        <div class="w-100"></div>
-                <div class="col-md-12">
-                    <% if(product.stock==0 || !product.stock){ %>
-                        <p style="color: #ff0000;">Out of Stock</p>
-                    <% }else{ %>
-                        <p style="color: #000;"><%= product.stock %> piece available</p>
+                                    <div class="d-flex">
+                                      <button id="decreaseBtn" class="d-flex align-items-center"><b>-</b></button><input style="background-color: white;text-align: center;" type="text" name="quantity" id="quantity" disabled><button id="increaseBtn" class="d-flex align-items-center"><b>+</b></button>
+                                    </div>
+                                  </div>
+                                </div>
+                              <div class="w-100"></div>
+                            <div class="w-100"></div>
+                          <div class="col-md-12">
+                            <p class="text-danger" id="selectStock" style="display: none;">Please select quantity</p>
+                      <% if(product.stock==0 || !product.stock){ %>
+                          <p style="color: #ff0000;">Out of Stock</p>
+                      <% }else{%>
+                          <p style="color: #000;" id="stockCount"></p>
+                      <% } %>
+                      </div>
+                    </div>
+                    <% if(product.stock!=0){ %>
+                      <p><input type="submit" class="btn btn-black py-3 px-5 mr-2" value="Add to Cart" onclick="addToCart('<%= product._id %>', event)"><input type="submit" class="btn btn-primary py-3 px-5" value="Buy now"></p> 
                     <% } %>
-                </div>
-            </div>
-            <p><a href="cart.html" class="btn btn-black py-3 px-5 mr-2">Add to Cart</a><a href="cart.html" class="btn btn-primary py-3 px-5">Buy now</a></p>
+          </form>
               </div>
           </div>
 
@@ -342,7 +347,7 @@
                                   <% } %>
                                 </div>
                                 <p class="bottom-area d-flex px-3">
-                                    <a href="#" class="add-to-cart text-center py-2 mr-1"><span>Add to cart <i class="ion-ios-add ml-1"></i></span></a>
+                                    <a href="/user/shop/product-details/<%= similarProducts[i]._id %>" class="add-to-cart text-center py-2 mr-1"><span>Add to cart <i class="ion-ios-add ml-1"></i></span></a>
                                     <a href="#" class="buy-now text-center py-2">Buy now<span><i class="ion-ios-cart ml-1"></i></span></a>
                                 </p>
                             </div>
@@ -418,34 +423,34 @@
       <div class="row">
         <div class="col-md-12 text-center">
 
-          <p><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-                        Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="icon-heart color-danger" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
-                        <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-                      </p>
         </div>
       </div>
     </div>
   </footer>
   <script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-  const swiper = new Swiper('.swiper-container', {
-    loop: true,
-    slidesPerView: 1,
-    pagination: {
-      el: '.swiper-pagination',
-      clickable: true,
-    },
-    navigation: {
-      nextEl: '.swiper-button-next',
-      prevEl: '.swiper-button-prev',
-    },
-    // autoplay: {
-    //   delay: 3000,
-    //   disableOnInteraction: false,
-    // },
-  });
-});
+
+    document.addEventListener('DOMContentLoaded', function () {
+      const swiper = new Swiper('.swiper-container', {
+        loop: true,
+        slidesPerView: 1,
+        pagination: {
+          el: '.swiper-pagination',
+          clickable: true,
+        },
+        navigation: {
+          nextEl: '.swiper-button-next',
+          prevEl: '.swiper-button-prev',
+        },
+        // autoplay: {
+        //   delay: 3000,
+        //   disableOnInteraction: false,
+        // },
+      });
+    });
 
             const containers = document.querySelectorAll('.image-container');
 
@@ -469,6 +474,106 @@ document.addEventListener('DOMContentLoaded', function () {
             image.style.transform = 'scale(1)';
         });
     });
+
+    const sizeData = JSON.parse(document.querySelector('.inputDiv').getAttribute('data-sizes'));
+
+    document.getElementById('decreaseBtn').addEventListener('click', (event) => {
+      event.preventDefault();
+      const quantity = document.getElementById('quantity');
+      if (quantity.value != '1') {
+        quantity.value = parseInt(quantity.value) - 1;
+      }
+    });
+
+    document.getElementById('increaseBtn').addEventListener('click', (event) => {
+      event.preventDefault();
+      const quantity = document.getElementById('quantity');
+      const size = document.querySelector('.size.active')?.value;
+      const stock = sizeData[size];
+      if (parseInt(quantity.value) < 5 && parseInt(quantity.value) < stock) {
+        quantity.value = parseInt(quantity.value) + 1;
+      }
+    });
+
+    document.querySelectorAll('.size').forEach((sizeElement) => {
+      sizeElement.addEventListener('click', () => {
+        const size = sizeElement.value;
+        const stock = sizeData[size];
+        document.getElementById('stockCount').innerText = `${stock} stocks left`;
+
+        const quantity = document.getElementById('quantity');
+        quantity.value = '1';
+
+        document.querySelectorAll('.size').forEach((el) => el.classList.remove('active'));
+        sizeElement.classList.add('active');
+      });
+    });
+
+
+
+    const addToCart = (productId, event) => {
+      event.preventDefault()
+      const size=document.querySelector('input[name="size"]:checked')?.value    
+      const quantity=document.getElementById('quantity').value
+      let isValid=true
+
+      if(!size){
+        document.getElementById('selectSize').style.display='block'
+        isValid=false
+      }else{
+        document.getElementById('selectSize').style.display='none'
+      }
+
+      if(!quantity){
+        document.getElementById('selectStock').style.display='block'
+        isValid=false
+      }else{
+        document.getElementById('selectSize').style.display='none'
+      }
+
+      if(!isValid){
+        return
+      }
+
+      fetch(`/user/product/addToCart?product=${productId}&&size=${size}&&quantity=${quantity}`,{
+        method:'GET'
+      })
+      .then(response=>response.json())
+      .then(data=>{
+        if(data.success){
+          Swal.fire({
+            icon:'success',
+            title:'Add to Cart',
+            text:'Item Added to Cart successfully'
+          })
+        }else if(data.cartLimit){
+          Swal.fire({
+            icon:'error',
+            title:'Add to Cart',
+            text:'Cart Limit has reached'
+          })
+        }else if(data.quantityLimit){
+          Swal.fire({
+            icon:'error',
+            title:'Add to Cart',
+            text:'The quantity exceeds the total stock count. Please reduce the quantity or check the cart'
+          })
+        }else if(data.needLogin){
+          window.location.href='/user/login'
+        }else{
+          Swal.fire({
+            icon:'error',
+            title:'Add to Cart',
+            text:'Failed to add to Cart'
+          })
+        }
+      })
+    }
+
+    setTimeout(()=>{
+      document.querySelector('.quantityErr').innerText=''
+    },5000)
+
 </script>
 
 <%-include('partials/userFooter')%>

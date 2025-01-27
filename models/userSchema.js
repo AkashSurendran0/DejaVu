@@ -9,15 +9,22 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: false
     },
+    phone:{
+        type: Number,
+        required: false
+    },
     email:{
         type: String,
         required: true
     },
-    addresses:[{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'addresses',
+    dob:{
+        type: String,
+        required:false
+    },
+    gender:{
+        type: String,
         required: false
-    }],
+    },
     password:{
         type: String,
         required: false

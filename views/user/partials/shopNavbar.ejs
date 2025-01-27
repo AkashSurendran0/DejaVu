@@ -2,57 +2,276 @@
     .panel-title a{
         color: grey;
     }
+    .price-slider {
+        width: 150px;
+        font-size: 14px;
+    }
+
+    .slider-values {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+
+    .slider-container {
+        position: relative;
+        height: 30px;
+    }
+
+    input[type="range"] {
+        -webkit-appearance: none;
+        position: absolute;
+        width: 100%;
+        height: 5px;
+        background: teal;
+        border-radius: 5px;
+        outline: none;
+        pointer-events: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        background: teal;
+        border-radius: 50%;
+        pointer-events: auto;
+        cursor: pointer;
+    }
+
+    input[type="range"]:nth-child(1) {
+        z-index: 1;
+    }
+
+    input[type="range"]:nth-child(2) {
+        z-index: 2;
+    }
+
+    .priceBtn{
+        width: 100%;
+        border: none;
+        border-radius: 20px;
+        background-color: rgba(219, 204, 143, 1);
+        color: white;
+    }
+
+    #sortOption{
+        height: 40px;
+        border: none;
+        border-radius: 20px;
+        background-color: rgba(219, 204, 143, 1);
+        color: white;
+        margin-right: 10px;
+        padding-left: 10px;
+    }
+
+    .sidebar {
+        position: sticky;
+        top: 70px;
+        max-height: calc(100vh - 70px);
+        overflow-y: scroll; /* Enable scrolling */
+        background: #f8f9fa;
+        width: 300px;
+        border-right: 1px solid #ddd;
+        padding: 10px;
+        scrollbar-width: none; /* Firefox */
+    }
+
+    .sidebar::-webkit-scrollbar {
+        display: none; /* Chrome, Safari, Edge */
+    }
+    input[type="checkbox"] {
+    width: 20px;   /* Increase checkbox size */
+    height: 20px;  /* Increase checkbox size */
+    accent-color: #007bff;  /* Add accent color for a more modern look */
+}
+
+label {
+    font-size: 16px;  /* Make the font size a bit larger */
+    font-weight: bold; /* Make the label text bold */
+    color: #333;  /* A darker text color for readability */
+    cursor: pointer;  /* Change cursor to pointer to indicate it's clickable */
+    margin-bottom: 0;  /* Remove bottom margin */
+}
+
+label:hover {
+    color: #0056b3;  /* Change text color on hover */
+}
+
+input[type="checkbox"]:focus {
+    outline: none;  /* Remove default focus outline */
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.5);  /* Add a subtle blue glow on focus */
+}
 </style>
 
 <div class="col-md-4 col-lg-2">
     <div class="sidebar">
-            <div class="sidebar-box-2">
-                <h2 class="heading"><u>Categories</u></h2>
-                <div class="fancy-collapse-panel">
-
-<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-    <% if(allCategories){ %>
-        <% for(let i=0;i<allCategories.length;i++){ %>
-            <div class="panel panel-default">
-                <div class="panel-heading" role="tab" id="headingOne">
-                    <h4 class="panel-title">
-                        <a data-toggle="collapse" data-parent="#accordion" href="/user/shop?category=<%= allCategories[i].name.toLowerCase() %>" aria-expanded="true" aria-controls="collapseOne"><%= allCategories[i].name %>
-                        </a>
-                    </h4>
+        <div class="sidebar-box-2">
+            <h2 class="heading"><u>Categories</u></h2>
+            <div class="fancy-collapse-panel">
+                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                    <% if(allCategories){ %>
+                    <% for(let i=0;i<allCategories.length;i++){ %>
+                        <div class="panel panel-default">
+                            <div class="panel-heading" role="tab" id="headingOne">
+                                <h4 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#accordion" href="/user/shop?category=<%= allCategories[i].name.toLowerCase() %>" aria-expanded="true" aria-controls="collapseOne"><%= allCategories[i].name %>
+                                </a>
+                                </h4>
+                            </div>
+                        </div>
+                        <% } %>
+                        <% }else{ %>
+                        <h4>No categories</h4>
+                        <% } %>
+                    </div>
                 </div>
             </div>
-        <% } %>
-    <% }else{ %>
-        <h4>No categories</h4>
-    <% } %>
-</div>
-</div>
+            <div class="sidebar-box-2">
+                <h2 class="heading"><u>Sort by Price</u></h2>
+                <div class="fancy-collapse-panel">
+                    <div class="mt-3 panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                        <div class="price-slider">
+                            <div class="slider-values">
+                                <span id="min-price">₹0</span>
+                                <span id="max-price">₹10000</span>
+                            </div>
+                            <div class="slider-container">
+                                <input type="range" id="min-range" min="0" value="0" max="10000" step="10">
+                                <input type="range" id="max-range" min="0" value="10000" max="10000" step="10">
+                            </div>
+                            <div>
+                                <button class="mt-3 priceBtn" onclick="productsOnMoneyLimit()">FILTER</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="sidebar-box-2">
+                <h2 class="heading"><u>Filter</u></h2>
+                <div class="fancy-collapse-panel d-flex flex-column">
+                    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                        <select class="mt-3" name="sortOption" id="sortOption">
+                            <option value="" selected disabled>Select Sorting Option</option>
+                            <option value="newArrival">New Arrivals</option>
+                            <option value="a2z">A to Z</option>
+                            <option value="z2a">Z to A</option>
+                            <option value="popHigh2Low">Popularity - High to Low</option>
+                            <option value="popLow2High">Popularity - Low to High</option>
+                            <option value="priceHigh2Low">Price - High to Low</option>
+                            <option value="priceLow2High">Price - Low to High</option>
+                        </select>
+                    </div>
+                    <!-- <div class="mt-4 d-flex align-items-center">
+                        <div class="mr-3">
+                            <input type="checkbox" id="excludeOutOfStock">
+                        </div>
+                        <label for="excludeOutOfStock" class="font-weight-bold">Exclude Out of Stock <br> Products</label>
+                    </div>                     -->
+                </div>
             </div>
         </div>
-</div>
+    </div>
 
 
 <script>
-const currentURL = window.location.href;
+    const currentURL = window.location.href;
 
-let isMatched=false
+    let isMatched=false
 
-const navLinks = document.querySelectorAll(".panel-title a");
+    const navLinks = document.querySelectorAll(".panel-title a");
 
-navLinks.forEach(link => {
-    if (link.href === currentURL) {
-        link.classList.add("active");
-        isMatched=true
-    } else {
-        link.classList.remove("active");
+    navLinks.forEach(link => {
+        if (link.href === currentURL) {
+            link.classList.add("active");
+            isMatched=true
+        } else {
+            link.classList.remove("active");
+        }
+    });
+
+    if(!isMatched){
+        const link=document.querySelector(".panel-title a")
+        if(link){
+            link.classList.add("active")
+        }
     }
-});
 
-if(!isMatched){
-    const link=document.querySelector(".panel-title a")
-    if(link){
-        link.classList.add("active")
+    const minRange=document.getElementById('min-range')
+    const maxRange=document.getElementById('max-range')
+    const minPrice=document.getElementById('min-price')
+    const maxPrice=document.getElementById('max-price')
+
+    minRange.addEventListener('input', ()=>{
+        const minValue=parseInt(minRange.value)
+        const maxValue=parseInt(maxRange.value)
+
+        if(minValue>=maxValue){
+            minRange.value=maxValue-10
+            return minPrice.textContent=`₹${maxValue-10}`
+        }
+
+        minPrice.textContent=`₹${minValue}`
+    })
+
+    maxRange.addEventListener('input', ()=>{
+        const minValue=parseInt(minRange.value)
+        const maxValue=parseInt(maxRange.value)
+
+        if(maxValue<=minValue){
+            maxRange.value=minValue+10
+            return maxPrice.textContent=`₹${minValue+10}`
+        }
+
+        maxPrice.textContent=`₹${maxValue}`
+    })
+
+    const productsOnMoneyLimit = () =>{
+        const value=document.getElementById('sortOption').value
+        const activeLink=document.querySelector('a.active')
+        const url=new URL(activeLink)
+        const firstCategory=url.searchParams.get('category');
+
+        const urlParams=new URLSearchParams(window.location.search)
+        const currentCategory=urlParams.get('category')
+
+        const category = currentCategory?? firstCategory
+
+        const leastAmount=document.getElementById('min-range').value
+        const highestAmount=document.getElementById('max-range').value
+        window.location.href=`/user/shop?category=${category}&&leastAmount=${leastAmount}&&highestAmount=${highestAmount}`
     }
-}
+
+    document.getElementById('sortOption').addEventListener('change', ()=>{
+        const value=document.getElementById('sortOption').value
+        const activeLink=document.querySelector('a.active')
+        const url=new URL(activeLink)
+        const firstCategory=url.searchParams.get('category');
+
+        const urlParams=new URLSearchParams(window.location.search)
+        const currentCategory=urlParams.get('category')
+
+        const category = currentCategory?? firstCategory
+
+        const leastAmount=document.getElementById('min-range').value
+        const highestAmount=document.getElementById('max-range').value
+
+        if(value=='newArrival'){
+            window.location.href=`/user/shop?category=${category}&&leastAmount=${leastAmount}&&highestAmount=${highestAmount}&&sort=newArrival&&type=1`
+        }else if(value=='a2z'){
+            window.location.href=`/user/shop?category=${category}&&leastAmount=${leastAmount}&&highestAmount=${highestAmount}&&sort=atoz&&type=1`
+        }else if(value=='z2a'){
+            window.location.href=`/user/shop?category=${category}&&leastAmount=${leastAmount}&&highestAmount=${highestAmount}&&sort=ztoa&&type=-1`
+        }else if(value=='popHigh2Low'){
+            window.location.href=`/user/shop?category=${category}&&leastAmount=${leastAmount}&&highestAmount=${highestAmount}&&sort=popHightoLow&&type=1`
+        }else if(value=='popLow2High'){
+            window.location.href=`/user/shop?category=${category}&&leastAmount=${leastAmount}&&highestAmount=${highestAmount}&&sort=popLowtoHigh&&type=-1`
+        }else if(value=='priceHigh2Low'){
+            window.location.href=`/user/shop?category=${category}&&leastAmount=${leastAmount}&&highestAmount=${highestAmount}&&sort=priceHightoLow&&type=1`
+        }else if(value=='priceLow2High'){
+            window.location.href=`/user/shop?category=${category}&&leastAmount=${leastAmount}&&highestAmount=${highestAmount}&&sort=priceLowtoHigh&&type=-1`
+        }
+    })
 
 </script>

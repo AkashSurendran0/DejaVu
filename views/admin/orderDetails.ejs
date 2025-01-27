@@ -1,0 +1,137 @@
+<%-include('partials/header')%>
+<%-include('partials/navbar')%>
+
+<style>
+    .productTable img{
+        width: 80px;
+        height: 100px;
+    }
+    select{
+        height: 40px;
+        width: 250px;
+        border-radius: 20px;
+        padding-left: 10px;
+    }
+</style>
+
+<main class="h-full pb-16 overflow-y-auto">
+    <div class="container grid px-6 mx-auto">
+        <div class="row">
+            <div style="display: flex;justify-content: space-between;padding-top: 20px;">
+                <div style="display: flex; flex-direction: column;">
+                    <h2 class="my-6 text-2xl font-semibold text-gray-700 dark:text-gray-200">
+                        <u>Order Details</u>
+                    </h2>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <h2 class="text-xl font-semibold text-gray-700 dark:text-gray-200">
+                    Order Id : #<%= order[0]._id %>
+                </h2>
+                <p class="mt-3"><b>Ordered By:</b> <%= order[0].resultUsers[0].name %></p>
+                <p class="mt-3"><b>Delivery Address:</b></p>
+                <p class="mt-2"><%= order[0].resultAddress.address.name %></p>
+                <p><%= order[0].resultAddress.address.state %></p>
+                <p><%= order[0].resultAddress.address.streetAddress %>, <%= order[0].resultAddress.address.city %>, <% if(order[0].resultAddress.address.apartment){ %> <%= order[0].resultAddress.address.apartment %> <% } %></p>
+                <p><%= order[0].resultAddress.address.postcode %>, <%= order[0].resultAddress.address.phone %></p>
+                <p class="mt-3"><b>Delivery Status:</b></p>
+                <p class="py-3 text-sm"><span class="btn btn-<%= 
+                    order[0].status === 'Pending' ? 'warning' :
+                    order[0].status === 'Shipped' ? 'primary' :
+                    order[0].status === 'Out for Delivery' ? 'info' :
+                    order[0].status === 'Delivered' ? 'success' :
+                    order[0].status === 'Cancelled' ? 'danger' : 
+                    'dark' 
+                %>">
+                    <%= order[0].status %>
+                </span></p>
+            </div>
+            <div class="col-md-6">
+                <p class="mt-3"><b>Order Amount:</b>&nbsp;&nbsp;₹&nbsp;<%= order[0].totalAmount %></p>
+                <p class="mt-3"><b>Total Quantity:</b>&nbsp;<%= order[0].quantity %></p>
+                <p class="mt-3"><b>Payment Method:</b>&nbsp;<%= order[0].paymentmethod %></p>
+                <% if(order[0].status!='Cancelled'){ %>
+                    <p class="mt-3"><b>Change Delivery Status:</b></p>
+                    <select class="mt-2" name="" id="orderStatus">
+                        <option value="Pending"
+                        <%= order[0].status=='Pending'? 'selected':'' %>>Pending</option>
+                        <option value="Shipped"
+                        <%= order[0].status=='Shipped'? 'selected':'' %>>Shipped</option>
+                        <option value="Out for Delivery"
+                        <%= order[0].status=='Out for Delivery'? 'selected':'' %>>Out for Delivery</option>
+                        <option value="Delivered"
+                        <%= order[0].status=='Delivered'? 'selected':'' %>>Delivered</option>
+                    </select>
+                <% }else{ %>
+                    <p class="mt-3"><b>Cancellation Reason:</b>&nbsp;&nbsp;<%= order[0].cancelReason %></p>
+                <% } %>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <p class="mt-3"><b>Product Details:</b></p>
+            <div class="mt-3 w-full overflow-hidden rounded-lg shadow-xs">
+                <div class="w-full overflow-x-auto">
+                    <table class="w-full whitespace-no-wrap productTable">
+                        <thead>
+                            <tr class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
+                                <th class=" px-4 py-3">Product</th>
+                                <th class="px-4 py-3">Name</th>
+                                <th class="px-4 py-3">Amount</th>
+                                <th class="px-4 py-3">Quantity</th>
+                                <th class="px-4 py-3">Size</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
+                            <% for(let i=0;i<order[0].resultProducts.length;i++){ %>
+                                <tr class="text-gray-700 dark:text-gray-400">
+                                    <td class="px-4 py-3 text-sm d-flex">
+                                        <img src="<%= order[0].resultProducts[i].images[0] %>" alt="Product Image">
+                                    </td>
+                                    <td class="px-4 py-3 text-sm"><%= order[0].resultProducts[i].productName %></td>
+                                    <td class="px-4 py-3 text-sm"><%= order[0].products[i].productAmount %></td>
+                                    <td class="px-4 py-3 text-sm"><%= order[0].products[i].quantity %></td>
+                                    <td class="px-4 py-3 text-sm"><%= order[0].products[i].size %></td>
+                                </tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+
+    document.getElementById('orderStatus').addEventListener('change', ()=>{
+        const status=document.getElementById('orderStatus').value
+        fetch(`/admin/orderManagement/changeStatus/${status}/<%= order[0]._id %>`, {
+            method:'GET'
+        })
+        .then(response=>response.json())
+        .then(data=>{
+            if(data.success){
+                Swal.fire({
+                    icon:'success',
+                    title:'Order Status',
+                    text:'Order status changed Successfully'
+                })
+                .then((result)=>{
+                    if(result.isConfirmed){
+                        window.location.href=`/admin/orderManagement/order-details/<%= order[0]._id %>`
+                    }
+                })
+            }else{
+                Swal.fire({
+                    icon:'error',
+                    title:'Order Status',
+                    text:'Error while changing order status'
+                })
+            }
+        })
+    })
+
+</script>
+
+<%-include('partials/footer')%>

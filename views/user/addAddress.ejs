@@ -1,0 +1,157 @@
+<%- include('partials/userHeader') %>
+<%- include('partials/userNavbar') %>
+
+<div class="hero-wrap hero-bread" style="background-image: url('/uploads/settingsbanner.PNG');">
+    <div class="container">
+      <div class="row no-gutters slider-text align-items-center justify-content-center">
+        <div class="col-md-9 ftco-animate text-center">
+            <h1 class="mb-0 bread" style="background: white;">Add Address</h1>
+        </div>
+      </div>
+    </div>
+</div>
+
+<section class="ftco-section bg-light">
+    <div class="container">
+        <div class="row">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                  <li><a href="/user" style="color: rgba(33, 37, 41, 0.75);">Home&nbsp;&nbsp;>&nbsp;&nbsp;</a></li>
+                  <li><a href="/user/shop" style="color: rgba(33, 37, 41, 0.75);">Shop&nbsp;&nbsp;>&nbsp;&nbsp;</a></li>
+                  <li>Add Address</li>
+                </ol>
+              </nav>
+            <div class="col-md-10 order-md-last">
+                <h2 class="mb-4" style="font-weight: bold;">ADD ADDRESS</h2>
+
+                <form action="/user/settings/addAddress" method="POST" class="p-4 rounded">
+                    <div class="form-group mb-4">
+                        <label for="name" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+
+                    <div class="form-group mb-4">
+                        <label for="state" class="form-label">State</label>
+                        <select class="form-control" id="state" name="state" required>
+                            <option value="" selected disabled>Select State</option>
+                            <option value="Andhra Pradesh">Andhra Pradesh</option>
+                            <option value="Karnataka">Karnataka</option>
+                            <option value="Kerala">Kerala</option>
+                            <option value="Tamil Nadu">Tamil Nadu</option>
+                            <option value="Telangana">Telangana</option>
+                            <option value="Lakshadweep">Lakshadweep</option>
+                            <option value="Goa">Goa</option>
+                            <option value="Gujarat">Gujarat</option>
+                            <option value="Haryana">Haryana</option>
+                            <option value="Himachal Pradesh">Himachal Pradesh</option>
+                            <option value="Jharkhand">Jharkhand</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group mb-4">
+                        <label class="form-label">Street Address</label>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <input type="text" class="form-control" name="street" placeholder="House number and street name" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <input type="text" class="form-control" name="apartment" placeholder="Apartment, suite, unit etc. (optional)">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="city" class="form-label">Town / City</label>
+                                <input type="text" class="form-control" id="city" name="city" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="postcode" class="form-label">Postcode / ZIP *</label>
+                                <input type="text" class="form-control" id="postcode" name="postcode" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="phone" class="form-label">Phone</label>
+                                <input type="tel" class="form-control" id="phone" name="phone" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="altphone" class="form-label">Alternative Phone</label>
+                                <input type="tel" class="form-control" id="altphone" name="altphone">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center">
+                        <button class="mt-2" style="background-color: #e3ca82;border-radius: 50px;width: 20%;height: 40px;border: none;color: white;" onclick="validate()">Add Address</button>
+                    </div>
+                </form>
+
+                <div class="row mt-5">
+              <div class="col text-center">
+              </div>
+            </div>
+            </div>
+            <%- include('partials/settingsNavbar') %>
+        </div>
+    </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+
+    const validate = () =>{
+
+        const name = document.getElementById("name").value.trim();
+        if (name.length < 3) {
+        event.preventDefault();
+        return Swal.fire({
+            icon:'error',
+            title:'Input Error',
+            text:'Name must be at least 3 characters long'
+        })
+        }
+
+        const postcode = document.getElementById("postcode").value.trim();
+        if (!/^\d{5,6}$/.test(postcode)) {
+        event.preventDefault();
+        return Swal.fire({
+            icon:'error',
+            title:'Input Error',
+            text:'Postcode must be 5-6 digits long'
+        })
+        }
+
+        const phone = document.getElementById("phone").value.trim();
+        if (!/^\d{10}$/.test(phone)) {
+        event.preventDefault();
+        return Swal.fire({
+            icon:'error',
+            title:'Input Error',
+            text:'Phone number must be 10 digits'
+        })
+        }
+
+        const altphone = document.getElementById("altphone").value.trim();
+        if (altphone && !/^\d{10}$/.test(altphone)) {
+        event.preventDefault();
+        return Swal.fire({
+            icon:'error',
+            title:'Input Error',
+            text:'Alternative phone number must be 10 digits if provided'
+        })
+        }
+
+    }
+
+</script>
+
+<%- include('partials/userFooter') %>

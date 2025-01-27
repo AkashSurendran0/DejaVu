@@ -1,234 +1,15 @@
-const products=require('../models/productSchema')
-const banners=require('../models/bannerSchema')
 const users=require('../models/userSchema')
 const env=require('dotenv').config()
-const {ObjectId}=require('mongodb')
-const offers = require('../models/offerSchema')
-const categories = require('../models/categorySchema')
-const cron = require('node-cron')
 const sendMail=require('../helpers/mailHelper')
 const bcrypt=require('../helpers/bcrypt')
+const address = require('../models/addressSchema')
 
 const STATUS_SERVER_ERROR=parseInt(process.env.STATUS_SERVER_ERROR)
 const STATUS_NOT_FOUND=parseInt(process.env.STATUS_NOT_FOUND)
 
-cron.schedule('*/1 * * * *',async (req,res)=>{
-    const allOffers=await offers.find()
-    for(let i=0;i<allOffers.length;i++){
-        if(new Date() > new Date(allOffers[i].endDate)){
-            await offers.deleteOne(
-                {endDate: allOffers[i].endDate}
-            )
-        }else if(new Date() > new Date(allOffers[i].startDate)){
-            if(!allOffers[i].isActive){
-                await offers.updateMany(
-                    {_id: allOffers[i].id},
-                    {$set: {isActive:true}}
-                )
-            }
-        }
-    }
-})
-
 const loadHomePage = async (req,res)=>{
     try {
        res.render('home') 
-    } catch (error) {
-        res.status(STATUS_SERVER_ERROR).send('Server not responding')
-        console.log(error.message);
-    }
-}
-
-const loadShopPage = async (req,res)=>{
-    try {
-        const page=parseInt(req.query.page) || 1
-        const limit=parseInt(req.query.limit) || 3
-        const skip=(page-1)*limit
-        const banner=await banners.findOne({category: 'shirts'})
-        const allCategories=await categories.find({isDeleted:false})
-        let category=false
-        if(allCategories.length>0){
-            category=req.query.category || allCategories[0].name
-        }
-
-        let allProducts=await products.aggregate([
-            {$lookup:{
-                from: 'categories',
-                foreignField: '_id',
-                localField: 'category',
-                as: 'resultProducts'
-            }},
-            {
-                $unwind: '$resultProducts'
-            },
-            {
-                $match: {
-                    'resultProducts.name':{$regex:`^${category}`, $options:'i'},
-                    isDeleted:false
-                }
-            }
-        ])
-
-        let productList=await products.aggregate([
-            {$lookup:{
-                from: 'categories',
-                foreignField: '_id',
-                localField: 'category',
-                as: 'resultProducts'
-            }},
-            {
-                $unwind: '$resultProducts'
-            },
-            {
-                $match: {
-                    'resultProducts.name':{$regex:`^${category}`, $options:'i'},
-                    isDeleted:false
-                }
-            },
-            {
-                $skip: skip
-            },
-            {
-                $limit: limit
-            }
-        ])
-
-        let totalCount=0
-        let totalPages=0
-        if(allProducts){
-            totalCount=allProducts.length
-            totalPages=Math.ceil(totalCount/limit)
-        }
-
-        if (!productList || productList.length === 0) {
-            productList = false;
-          }
-        
-          let categoryName = productList && productList[0]?.resultProducts?.name;
-          if (!categoryName) {
-            categoryName=false;
-          }
-        const allOffers=await offers.findOne({category: categoryName})
-        let minPrice=false
-        let maxPrice=false
-        let offer=false
-        if(allOffers && allOffers.isActive){
-            minPrice=allOffers.minAmount
-            maxPrice=allOffers.maxAmount
-            offer=allOffers.offer
-        }      
-          
-        res.render('shop', {
-            product: productList, 
-            banner:banner,
-            minPrice: minPrice,
-            maxPrice: maxPrice,
-            offer: offer,
-            category: category,
-            allCategories: allCategories,
-            currentPage: page,
-            totalPages: totalPages,
-            limit: limit
-        })
-    } catch (error) {
-        res.status(STATUS_SERVER_ERROR).send('Server not responding')
-        console.log(error.message);
-    }
-}
-
-const loadProductDetailsPage = async (req,res)=>{
-    try {
-        const id=req.params.id
-        const singleProduct=await products.findById(id)
-        let avgRating
-        if(singleProduct.review.length>0){
-            avgRating=await products.aggregate([
-                {$match:{_id: new ObjectId(id)}},
-                {$unwind:'$review'},
-                {$group:{_id:null, rating:{$avg:'$review.rating'}}}
-            ])
-        }
-
-        const productCategory=await categories.findOne({_id: singleProduct.category})
-        const offerPrices=await offers.aggregate([
-            {$match: {
-                $and:[
-                    {category: productCategory.name},
-                    {isActive: true}
-                ]
-            }},
-            {$project:{_id:0, maxAmount:1, minAmount:1, offer:1}}
-        ])        
-        
-        let productRating=0
-        if(avgRating){
-            productRating=Math.floor(avgRating[0].rating)
-        }
-        
-        const similarProducts=await products.aggregate([
-            {$lookup:{
-                from: 'categories',
-                foreignField: '_id',
-                localField: 'category',
-                as: 'resultProducts'
-            }},
-            {
-                $unwind: '$resultProducts'
-            },
-            {
-                $match: {
-                    'resultProducts._id':singleProduct.category,
-                    isDeleted:false
-                }
-            }
-        ])
-
-        const randomNumbers=new Set()
-        while (randomNumbers.size<3){
-            const randomNum=Math.floor(Math.random()*10)+1
-            if(randomNum<=similarProducts.length){
-                randomNumbers.add(randomNum)
-            }
-        }
-        let simProducts=[]
-        const randomNums=Array.from(randomNumbers)
-        for(let i=0;i<randomNums.length;i++){
-            simProducts[i]=similarProducts[randomNums[i]-1]
-        }
-        
-        res.render('singleProduct', {
-            product:singleProduct, 
-            similarProducts: simProducts, 
-            rating: productRating,
-            offerPrices: offerPrices
-        })
-    } catch (error) {
-        res.status(STATUS_SERVER_ERROR).send('Server not responding')
-        console.log(error.message);
-    }
-}
-
-const addProductReview = async (req,res)=>{
-    try {
-        console.log(req.session);
-        if(req.session.userEmail){
-            const id=req.params.id
-            const product=await products.findById(id)
-            const user=await users.findOne({email:req.session.userEmail})
-            console.log(user);
-            let data={
-                user:user.name,
-                rating:req.body.rating,
-                desc:req.body.comment
-            }
-            await products.updateOne(
-                {_id: product.id},
-                {$push:{review:data}}
-            )
-            res.redirect(`/user/shop/product-details/${id}`)
-        }else{
-            res.redirect('/user/login')
-        }
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).send('Server not responding')
         console.log(error.message);
@@ -508,10 +289,115 @@ const changePassword = async (req,res)=>{
     }
 }
 
+const loadBasicInfoPage = async (req,res)=>{
+    try {
+        const user=await users.findOne({email: req.session.userEmail})
+        res.render('userInfo', {
+            user: user, 
+            msg:req.flash('msg'), 
+            msg2:req.flash('msg2'),
+            msg3:req.flash('msg3')
+        })
+    } catch (error) {
+        res.status(STATUS_SERVER_ERROR).send('Server not responding')
+        console.log(error.message);
+    }
+}
+
+const updateUser = async (req,res)=>{
+    try {
+        const id=req.params.id
+        const imagePath=req.file ? `/uploads/${req.file.filename}` : null;
+        const date=new Date(req.body.dob)
+        const data={
+            image: imagePath?? req.body.userExistingImage,
+            phone: req.body.phone,
+            name: req.body.name,
+            gender: req.body.gender,
+            dob: date.toLocaleDateString("en-US")
+        }
+        
+        await users.updateOne(
+            {_id: id},
+            {$set: data}
+        )
+        req.flash('msg', 'User Updated Successfully')
+        res.redirect('/user/settings/basicInfo')
+    } catch (error) {
+        res.status(STATUS_SERVER_ERROR).send('Server not responding')
+        console.log(error.message);
+    }
+}
+
+const changePasswordFromSettings = async (req,res)=>{
+    try {
+        const id=req.params.id
+        const user=await users.findById(id)
+        const {oldPass,newPass,confirmNewPass}=req.body
+        const check=await bcrypt.check(oldPass,user.password)
+        const passwordPattern=/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])[A-Za-z0-9!@#$%^&*]{8,}$/
+        if(!check){
+            req.flash('msg2', 'Incorrect Password')
+            return res.redirect('/user/settings/basicInfo')
+        }
+        if(newPass != confirmNewPass){
+            req.flash('msg2', 'Password doesnt match')
+            return res.redirect('/user/settings/basicInfo')
+        }
+        if(!passwordPattern.test(newPass)){
+            req.flash('msg2', 'Password doesnt meet the criteria')
+            return res.redirect('/user/settings/basicInfo')
+        }
+        const hashedPass=await bcrypt.hashPassword(newPass)
+        await users.updateOne(
+            {_id: id},
+            {$set: {password:hashedPass}}
+        )
+        req.flash('msg3', 'Password updated successfully')
+        res.redirect('/user/settings/basicInfo')
+    } catch (error) {
+        res.status(STATUS_SERVER_ERROR).send('Server not responding')
+        console.log(error.message);
+    }
+}
+
+const deleteAccount = async (req,res)=>{
+    try {
+        const id=req.params.id
+        await users.deleteOne(
+            {_id: id}
+        )
+        await address.deleteMany(
+            {user: id}
+        )
+        req.session.destroy(()=>{
+            res.redirect('/user')
+        })
+    } catch (error) {
+        res.status(STATUS_SERVER_ERROR).send('Server not responding')
+        console.log(error.message);
+    }
+}
+
+const validatePassword = async (req,res)=>{
+    try {
+        const {userId,password}=req.body
+        console.log(req.body);
+        
+        const user=await users.findById(userId)
+        const isMatch=await bcrypt.check(password,user.password)
+        if(!isMatch){
+            return res.status(400).json({success:false})
+        }
+        res.json({success:true})
+    } catch (error) {
+        res.status(STATUS_SERVER_ERROR).send('Server not responding')
+        console.log(error.message);
+    }
+}
+
 module.exports={
     loadHomePage,
-    loadShopPage,
-    loadProductDetailsPage,
     loadLoginPage,
     loadEmailSignupPage,
     sendOTP,
@@ -524,7 +410,11 @@ module.exports={
     sendVerifyOTP,
     verifyRecoverOTP,
     loadSignupPage,
-    addProductReview,
     changePassword,
-    loadChangePassword
+    loadChangePassword,
+    loadBasicInfoPage,
+    updateUser,
+    changePasswordFromSettings,
+    deleteAccount,
+    validatePassword
 }

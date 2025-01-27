@@ -150,6 +150,9 @@ input[type="submit"]:hover{
     background-color: #fff;
     cursor: pointer;
 }
+#logoImg{
+    cursor: pointer;
+}
 </style>
 
 <div class="container">
@@ -170,7 +173,7 @@ input[type="submit"]:hover{
        </div>
     </div>
     <div class="register">
-        <img src="/login_page_bgimages/store logo.jpg" alt="" style="height: 50%;">
+        <img id="logoImg" src="/login_page_bgimages/store logo.jpg" alt="" style="height: 50%;">
     </div>  
   </div>
 
@@ -222,6 +225,10 @@ input[type="submit"]:hover{
         })
         return false
     }
+
+    document.getElementById('logoImg').addEventListener('click', ()=>{
+        window.location.href='/user'
+    })
 </script>
 
 <%-include('partials/userFooter')%>

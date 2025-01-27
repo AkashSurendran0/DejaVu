@@ -14,9 +14,9 @@ const app=express()
 app.use(session({
     secret: 'batman',
     resave: true,
-    saveUninitialized: false,
+    saveUninitialized: true,
     cookie:{
-        maxAge: null
+        maxAge: 86400000
     }
 }))
 app.use((req, res, next) => {

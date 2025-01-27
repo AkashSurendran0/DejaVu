@@ -1,0 +1,112 @@
+<%- include('partials/userHeader') %>
+<%- include('partials/userNavbar') %>
+<style>
+.address-item .card {
+    border: 1px solid #ddd;
+    box-shadow: none;
+}
+
+.address-item .card-body {
+    padding: 1rem;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+    border-color: #bd2130;
+}
+</style>
+
+<div class="hero-wrap hero-bread" style="background-image: url('/uploads/settingsbanner.PNG');">
+    <div class="container">
+      <div class="row no-gutters slider-text align-items-center justify-content-center">
+        <div class="col-md-9 ftco-animate text-center">
+            <h1 class="mb-0 bread" style="background: white;">Manage Address</h1>
+        </div>
+      </div>
+    </div>
+</div>
+
+<section class="ftco-section bg-light">
+    <div class="container">
+        <div class="row">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                  <li><a href="/user" style="color: rgba(33, 37, 41, 0.75);">Home&nbsp;&nbsp;>&nbsp;&nbsp;</a></li>
+                  <li><a href="/user/shop" style="color: rgba(33, 37, 41, 0.75);">Shop&nbsp;&nbsp;>&nbsp;&nbsp;</a></li>
+                  <li>Manage Address</li>
+                </ol>
+              </nav>
+            <div class="col-md-10 order-md-last">
+                <h2 class="mb-4" style="font-weight: bold;">MY ADDRESSES</h2>
+                <% if(msg.length>0){ %>
+                    <span class="text-success noti mb-2"><%= msg %></span>
+                <% } %>
+                <div class="address-container">
+                    <% if(foundAddress.length==0){ %>
+                        <h6>No saved Address</h6>
+                    <% }else{ %>
+                        <% for(let i=0;i<foundAddress.address.length;i++){ %>
+                            <div class="address-item mb-3">
+                                <div class="card">
+                                    <div class="card-body d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-1"><%= foundAddress.address[i].name %></h6>
+                                            <p class="mb-0"><%= foundAddress.address[i].state %>, <%= foundAddress.address[i].streetAddress %>, <%= foundAddress.address[i].city %>, <%= foundAddress.address[i].postcode %>, <%= foundAddress.address[i].phone %></p>
+                                        </div>
+                                        <div>
+                                            <button class="btn btn-primary"><a href="/user/settings/editAddress/<%= foundAddress.address[i]._id %>" style="color: white;">Edit</a></button>
+                                            <button class="btn btn-danger"><a href="/user/settings/deleteAddress/<%= foundAddress.address[i]._id %>" style="color: white;" onclick="confirm('<%= foundAddress.address[i]._id %>', event)">Delete</a></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <% } %>
+                    <% } %>
+
+                    <button class="mt-2" style="background-color: rgb(31, 255, 19);border-radius: 50px;width: 20%;height: 40px;border: none;"><a href="/user/settings/addAddress" style="color: white;">Add Address</a></button>
+                </div>
+                <div class="row mt-5">
+              <div class="col text-center">
+              </div>
+            </div>
+            </div>
+            <%- include('partials/settingsNavbar') %>
+        </div>
+    </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    const noti=document.querySelectorAll('.noti')
+    if(noti.length>0){
+      noti.forEach(msg=>{
+        setTimeout(()=>{
+          msg.innerHTML=''
+        },1500)
+      })
+    }
+
+    const confirm = (addressId,event)=>{
+        event.preventDefault()
+        Swal.fire({
+            icon:'warning',
+            title:'Are you sure?',
+            text:'Do you want to delete this address?',
+            showCancelButton:true,
+            cancelButtonText:'Cancel',
+            confirmButtonText:'Delete',
+        }).then((result)=>{
+            if(result.isConfirmed){
+                window.location.href=`/user/settings/deleteAddress/${addressId}`
+            }
+        })
+    }
+</script>
+
+<%- include('partials/userFooter') %>

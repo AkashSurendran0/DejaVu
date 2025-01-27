@@ -1,0 +1,48 @@
+<style>
+    .panel-title a{
+        color: grey;
+    }
+</style>
+
+<div class="col-md-2">
+    <div class="sidebar">
+            <div class="sidebar-box-2">
+                <h2 class="heading"><u>Settings</u></h2>
+                <div class="fancy-collapse-panel">
+
+<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="headingOne">
+                    <h4 class="panel-title">
+                        <a data-toggle="collapse" data-parent="#accordion" href="/user/settings/basicInfo" aria-expanded="true" aria-controls="collapseOne">Basic Info
+                        </a>
+                        <a data-toggle="collapse" data-parent="#accordion" href="/user/settings/manageAddress" aria-expanded="true" aria-controls="collapseOne">Your Addresses
+                        </a>
+                        <a data-toggle="collapse" data-parent="#accordion" href="/user/settings/orders" aria-expanded="true" aria-controls="collapseOne">Orders
+                        </a>
+                    </h4>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+</div>
+</div>
+
+
+<script>
+const currentURL = window.location.href;
+
+const navLinks = document.querySelectorAll(".panel-title a");
+
+navLinks.forEach(link => {
+    if (link.href === currentURL) {
+        link.classList.add("active");
+        isMatched=true
+    } else {
+        link.classList.remove("active");
+    }
+});
+
+
+</script>

@@ -1,0 +1,422 @@
+<%- include('partials/userHeader') %>
+<%- include('partials/userNavbar') %>
+<link
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+  rel="stylesheet"
+/>
+
+<style>
+
+    /* Modal Background */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Modal Content */
+.modal-content {
+  background: #fff;
+  padding: 20px;
+  width: 400px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.modal-content h2 {
+  margin-top: 0;
+  margin-bottom: 15px;
+}
+
+.modal-content textarea {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  resize: none;
+}
+
+.modal-actions {
+  margin-top: 20px;
+}
+
+.modal-actions .btn {
+  padding: 10px 15px;
+  margin: 0 5px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.modal-actions .btn {
+  background-color: #6a0dad; /* Purple color */
+  color: #fff;
+}
+
+.modal-actions .btn-secondary {
+  background-color: #ccc;
+  color: #000;
+}
+
+
+.tracking {
+  display: flex;
+  flex-direction: column; /* Stack items vertically */
+  align-items: flex-end;
+  position: relative;
+}
+
+.trackingStatus p{
+    margin-top: 31px;
+}
+
+.trackingStatus{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.step {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.step .circle {
+    margin-top: 40px;
+    width: 30px; /* Size of the circle */
+    height: 30px;
+    background-color: #ccc;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 16px;
+    z-index: 1; /* Keep circles above lines */
+}
+
+.step.completed .circle {
+  background-color: #dbcc8f; /* Purple for completed steps */
+}
+
+.step .line {
+  width: 4px; /* Line width */
+  height: 100px; /* Line height to connect circles */
+  background-color: #ccc;
+  position: absolute;
+  top: 40px; /* Place line below the circle */
+  z-index: 0; /* Keep lines below circles */
+}
+
+.step.completed .line {
+  background-color: #dbcc8f; /* Purple for completed steps */
+}
+
+.step:last-child .line {
+  display: none; /* Remove the line for the last step */
+}
+
+.orderProducts img{
+    width: 60px;
+    height: 80px;
+}
+
+.cancelBtn{
+    margin-top: 10px;
+    width: 100%;
+    height: 40px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    background-color: #d7d7d7;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.cancelBtn:hover{
+    background-color: #c4c4c4;
+}
+
+
+</style>
+
+<div class="hero-wrap hero-bread" style="background-image: url('/uploads/checkoutbanner.PNG');">
+    <div class="container">
+      <div class="row no-gutters slider-text align-items-center justify-content-center">
+        <div class="col-md-9 ftco-animate text-center">
+            <h1 class="mb-0 bread" style="background: white;">Order Summary</h1>
+        </div>
+      </div>
+    </div>
+</div>
+
+<section class="ftco-section bg-light">
+    <div class="container">
+        <div class="row">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                  <li><a href="/user" style="color: rgba(33, 37, 41, 0.75);">Home&nbsp;&nbsp;>&nbsp;&nbsp;</a></li>
+                  <li><a href="/user/shop" style="color: rgba(33, 37, 41, 0.75);">Shop&nbsp;&nbsp;>&nbsp;&nbsp;</a></li>
+                  <li>Order Summary</li>
+                </ol>
+            </nav>
+            <div class="col-md-12">
+                <h2 class="mb-4" style="font-weight: bold;">ORDER SUMMARY</h2>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4><b>Order Id: # <%= order[0]._id %></b></h4>
+                        <p>Ordered by : <%= order[0].userFound[0].name %></p>
+                        <h5><b>Delivery Address:</b></h5>
+                        <p><b><%= order[0].resultAddress.address.name %></b></p>
+                        <p><%= order[0].resultAddress.address.state %></p>
+                        <p><%= order[0].resultAddress.address.streetAddress %>, <%= order[0].resultAddress.address.city %>, <% if(order[0].resultAddress.address.apartment){ %> <%= order[0].resultAddress.address.apartment %> <% } %></p>
+                        <p><%= order[0].resultAddress.address.postcode %>, <%= order[0].resultAddress.address.phone %></p>
+                        <h5><b>Delivery Details:</b></h5>
+                        <p><b>Total Amount:</b>&nbsp;&nbsp;&nbsp;₹<%= order[0].totalAmount %></p>
+                        <p><b>Total Quantity:</b>&nbsp;&nbsp;&nbsp;<%= order[0].quantity %></p>
+                        <p><b>Payment:</b>&nbsp;&nbsp;&nbsp;<%= order[0].paymentmethod %></p>
+                    </div>
+                    <div class="col-md-6 d-flex">
+                      <% if(order[0].status=='Cancelled'){ %>
+                        <div class="col-md-3">
+                          <div class="tracking">
+                            <div class="step completed">
+                              <div class="circle"><i class="fas fa-check"></i></div>
+                              <div class="line"></div>
+                            </div>
+                            <div class="step completed">
+                              <div class="circle"><i class="fas fa-check"></i></div>
+                              <div class="line"></div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-md-3">
+                          <div class="trackingStatus">
+                            <div>
+                                <p>Order Placed</p>
+                            </div>
+                            <div>
+                                <p>Cancelled</p>
+                            </div>
+                        </div>
+                        </div>
+                      <% }else{ %>
+                        <div class="col-md-3">
+                            <div class="tracking">
+                                <div class="step">
+                                  <div class="circle"></div>
+                                  <div class="line"></div>
+                                </div>
+                                <div class="step">
+                                  <div class="circle"></div>
+                                  <div class="line"></div>
+                                </div>
+                                <div class="step">
+                                  <div class="circle"></div>
+                                  <div class="line"></div>
+                                </div>
+                                <div class="step">
+                                  <div class="circle"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="trackingStatus">
+                                <div>
+                                    <p>Order Placed</p>
+                                </div>
+                                <div>
+                                    <p>Shipped</p>
+                                </div>
+                                <div>
+                                    <p>Out for Delivery</p>
+                                </div>
+                                <div>
+                                    <p>Delivered</p>
+                                </div>
+                            </div>
+                        </div>
+                      <% } %>
+                    </div>
+                    <div class="col-md-12">
+                        <h2 class="mb-4 mt-3" style="font-weight: bold;">PRODUCT DETAILS</h2>
+                        <table class="table orderProducts" style="overflow-y: scroll;overflow: hidden;">
+                            <thead>
+                              <tr class="text-center">
+                                <th class="image-prod">Products</th>
+                                <th class="product-name">Product Name</th>
+                                <th class="quantity">Size</th>
+                                <th class="price">Quantity</th>
+                                <th class="price">Amount Per Piece</th>                                
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <% for(let i=0;i<order[0].resultProducts.length;i++){ %>
+                                <tr class="text-center">
+                                  <td>
+                                    <img src="<%= order[0].resultProducts[i].images[0] %>" alt="">
+                                  </td>
+                                  <td class="image-prod">
+                                    <p><%= order[0].resultProducts[i].productName %></p>
+                                  </td>
+                                  <td class="product-name">
+                                    <p><%= order[0].products[i].size %></p>
+                                  </td>
+                                  <td class="price">
+                                    <p><%= order[0].products[i].quantity %></p>
+                                  </td>
+                                  <td class="size">
+                                    <p><p><%= order[0].products[i].productAmount %></p></p>
+                                  </td>
+                                </tr>
+                              <% } %>
+                            </tbody>
+                          </table>
+                          <% if(order[0].status!='Cancelled'){ %>
+                            <button id="openModal" class="cancelBtn">CANCEL ORDER</button>
+                          <% } %>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<div id="cancelModal" class="modal">
+    <div class="modal-content">
+      <h2>Cancel Product</h2>
+      <textarea id="cancelReason" placeholder="Type your reason for cancellation..." rows="5"></textarea>
+      <div class="modal-actions">
+        <button id="submitReason" class="btn">Submit</button>
+        <button id="closeModal" class="btn btn-secondary">Close</button>
+      </div>
+    </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+
+    const deliveryStatus='<%= order[0].status %>'
+    if(deliveryStatus=='Pending'){
+        const targetDiv=document.querySelectorAll('.step')[0]
+        const targetCircle=document.querySelectorAll('.circle')[0]
+        targetDiv.classList.add('completed')    
+        targetCircle.innerHTML='<i class="fas fa-check"></i>'
+    }else if(deliveryStatus=='Shipped'){
+        const targetDiv=document.querySelectorAll('.step')[1]
+        let currentDiv=targetDiv
+        while(currentDiv){
+            currentDiv.classList.add('completed')  
+            const circle=currentDiv.querySelector('.circle')
+            if(circle){
+                circle.innerHTML='<i class="fas fa-check"></i>'
+            }  
+
+            currentDiv=currentDiv.previousElementSibling
+
+            if(currentDiv && !currentDiv.classList.contains('step')){
+                break;
+            }
+        }
+    }else if(deliveryStatus=='Out for Delivery'){
+        const targetDiv=document.querySelectorAll('.step')[2]
+        let currentDiv=targetDiv
+        while(currentDiv){
+            currentDiv.classList.add('completed')  
+            const circle=currentDiv.querySelector('.circle')
+            if(circle){
+                circle.innerHTML='<i class="fas fa-check"></i>'
+            }  
+
+            currentDiv=currentDiv.previousElementSibling
+
+            if(currentDiv && !currentDiv.classList.contains('step')){
+                break;
+            }
+        }
+    }else if(deliveryStatus=='Delivered'){
+        const targetDiv=document.querySelectorAll('.step')[3]
+        let currentDiv=targetDiv
+        while(currentDiv){
+            currentDiv.classList.add('completed')  
+            const circle=currentDiv.querySelector('.circle')
+            if(circle){
+                circle.innerHTML='<i class="fas fa-check"></i>'
+            }  
+
+            currentDiv=currentDiv.previousElementSibling
+
+            if(currentDiv && !currentDiv.classList.contains('step')){
+                break;
+            }
+        }
+    }
+
+    const modal = document.getElementById("cancelModal");
+    const openModal = document.getElementById("openModal");
+    const closeModal = document.getElementById("closeModal");
+    const submitReason = document.getElementById("submitReason");
+
+    openModal.addEventListener("click", () => {
+    modal.style.display = "flex";
+    });
+
+    closeModal.addEventListener("click", () => {
+    modal.style.display = "none";
+    });
+
+    submitReason.addEventListener("click", () => {
+    const reason = document.getElementById("cancelReason").value;
+    if (reason.trim() === "") {
+        alert("Please enter a reason for cancellation.");
+    } else {
+        fetch(`/user/order/cancel-order/<%= order[0]._id %>/${reason}`,{
+          method:'GET'
+        })
+        .then(response=>response.json())
+        .then(data=>{
+          if(data.success){
+            Swal.fire({
+              icon:'success',
+              title:'Order Cancelled',
+              text:'Orders has been cancelled successfully'
+            })
+            .then(result=>{
+              if(result.isConfirmed){
+                window.location.href=`/user/settings/orders`
+              }
+            })
+          }else{
+            Swal.fire({
+              icon:'error',
+              title:'Order Cancelled',
+              text:'Error cancelling Order'
+            })
+          }
+        })
+    }
+    });
+
+    window.addEventListener("click", (event) => {
+    if (event.target === modal) {
+        modal.style.display = "none";
+    }
+    });
+
+
+</script>
+
+<%- include('partials/userFooter') %>
