@@ -3,11 +3,11 @@
 
 <style>
     input[type="radio"] {
-    appearance: none; /* Removes default browser styling */
+    appearance: none; 
     width: 20px;
     height: 20px;
     border: 2px solid #dbcc8f;
-    border-radius: 50%; /* Makes it a circle */
+    border-radius: 50%; 
     outline: none;
     cursor: pointer;
   }
@@ -16,23 +16,47 @@
     border-color: #dbcc8f;
   }
   .modal {
-  display: none; /* Hidden by default */
-  position: fixed; /* Stay in place */
-  z-index: 1; /* Sit on top */
+  display: none; 
+  position: fixed; 
+  z-index: 1; 
   left: 0;
   top: 0;
-  width: 100%; /* Full width */
-  height: 100%; /* Full height */
-  overflow: auto; /* Enable scroll if needed */
-  background-color: rgba(0, 0, 0, 0.5); /* Black w/ opacity */
+  width: 100%;
+  height: 100%; 
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.5); 
+}
+
+.couponModal{
+  display: none; 
+  position: fixed; 
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%; 
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+#closeCoupon{
+  color: #aaa;
+  float: right;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#closeCoupon:hover{
+  color: red;
 }
 
 .modal-content {
   background-color: #fff;
-  margin: 15% auto; /* 15% from the top and centered */
+  margin: 15% auto;
   padding: 20px;
   border-radius: 8px;
-  width: 80%; /* Could be more or less, depending on screen size */
+  width: 80%; 
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
   text-align: center;
 }
@@ -118,6 +142,60 @@
   cursor: pointer;
 }
 
+#coupon{
+  width: 70%;
+  height: 50px;
+  border: 1px solid rgb(206, 206, 206);
+  border-radius: 5px;
+  padding: 0 10px;
+}
+
+#couponApply:hover{
+  background-color: #dadada;
+}
+
+#couponApply{
+  height: 50px;
+  width: 20%;
+  border-radius: 5px;
+  border: none;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.removeCoupon{
+  height: 50px;
+  width: 20%;
+  border-radius: 5px;
+  border: none;
+  background-color: #ff5959;
+  color: white;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.removeCoupon:hover{
+  background-color: red;
+}
+
+.viewCoupons{
+  cursor: pointer;
+}
+
+.couponDivs{
+  cursor: pointer;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #aaa;
+  border-radius: 5px;
+  padding: 10px;
+  margin-left: 10px;
+  margin-bottom: 10px;
+  transition: border 0.3s ease, transform 0.3s ease;
+}
+
+.couponDivs:hover{
+  border: 1px solid #ffd736;
+}
 
 </style>
 
@@ -173,7 +251,7 @@
                             </div>
                 
 
-                    <button onclick="openModal('<%= products._id %>')" id="openModal" class="mt-2" style="background-color: rgb(31, 255, 19);border-radius: 50px;width: 20%;height: 40px;border: none;color: white;">Add Address</button>
+                    <button onclick="openModal('<%= products._id %>')" id="openModal" class="mt-2" style="background-color: rgb(31, 255, 19);border-radius: 5px;width: 20%;height: 40px;border: none;color: white;">Add Address</button>
                 </div>
 
 
@@ -211,7 +289,7 @@
                 <h2 class="mb-4 mt-5" style="font-weight: bold;">CHECKOUT</h2>
                 <div style="display: flex;justify-content: space-between;">
                   <p>Cart total:</p>
-                  <p>₹<%= products.totalAmount %></p>
+                  <p id="cartTotal">₹<%= products.totalAmount %></p>
                 </div>
                 <div style="display: flex;justify-content: space-between;">
                   <p>Discount:</p>
@@ -220,8 +298,16 @@
                 <hr>
                 <div style="display: flex;justify-content: space-between;">
                   <p><b>Total:</b></p>
-                  <p><b>₹<%= products.totalAmount %></b></p>
+                  <p id="totalAmount"><b id="boldAmount">₹<%= products.totalAmount %></b></p>
                 </div>
+              </div>
+              <div class="col-md-10">
+                <h2 class="mb-4 mt-5" style="font-weight: bold;">APPLY COUPONS</h2>
+                <div id="addCoupon">
+                  <input id="coupon" type="text" name="coupon">
+                  <button id="couponApply" onclick="applyCoupon()">APPLY</button>
+                </div>
+                <a id="viewCoupons" class="viewCoupons" style="color: #aaa;">View all Coupons ></a>
               </div>
             </div>
             
@@ -251,6 +337,34 @@
         </div>
     </div>
 </section>
+
+<div id="couponModal" class="couponModal">
+  <div class="container">
+    <div class="row">
+      <div class="modal-content">
+        <span id="closeCoupon">&times;</span>
+        <div>
+          <h3><b>Available Coupons</b></h3>
+        </div>
+        <% if(coupons.length==0){ %>
+          <div>
+            <h5><b>Sorry..No coupons Available right now :(</b></h5>
+          </div>
+        <% }else{ %>
+          <div style="margin: 50px 10px;display: flex;flex-wrap: wrap;">
+            <% for(let i=0;i<coupons.length;i++){ %>
+              <div class="col-md-3 couponDivs" onclick="applyCoupon('<%= coupons[i]._id %>')">
+                <h5><b><%= coupons[i].code %></b></h5>
+                <hr>
+                <span><%= coupons[i].description %></span>
+              </div>
+            <% } %>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
 
 
 <div id="myModal" class="modal">
@@ -452,7 +566,6 @@ window.addEventListener("click", (event) => {
   }
 });
 
-
 setTimeout(()=>{
   document.getElementById('msg').innerText=''
 },2500)
@@ -529,8 +642,11 @@ const orderBtn = () =>{
   }
   const paymentMethod=payment.value
   
-
-  fetch(`/user/placeOrder?address=${address}&&cart=<%= products._id %>&&method=${paymentMethod}`,{
+  let couponApplied=false
+  if(document.getElementById('couponApply').style.display='none'){
+    couponApplied=document.getElementById('coupon').value
+  }
+  fetch(`/user/placeOrder?address=${address}&&cart=<%= products._id %>&&method=${paymentMethod}&&coupon=${couponApplied}`,{
     method:'GET'
   })
   .then(response=>response.json())
@@ -558,6 +674,57 @@ const orderBtn = () =>{
   })
 
 }
+
+const couponModal=document.getElementById('couponModal')
+const closeCouponModal=document.getElementById('closeCoupon')
+document.getElementById('viewCoupons').addEventListener('click', ()=>{
+  couponModal.style.display='block'
+})
+closeCouponModal.addEventListener('click', ()=>{
+  couponModal.style.display='none'
+})
+
+const applyCoupon = (couponId) =>{
+  const couponCode=document.getElementById('coupon').value
+  fetch(`/user/getCouponDetails?couponId=${couponId}&&couponCode=${couponCode}`, {
+    method:'GET'
+  })
+  .then(response=>response.json())
+  .then(data=>{
+    if(data.success){      
+      document.getElementById('coupon').value=data.coupon.code
+      document.getElementById('coupon').style.backgroundColor='#dadada'
+      const totalAmount=parseInt(document.getElementById('totalAmount').innerText.split('').filter(item=>item!='₹').join(''))      
+      const reducedAmount=(totalAmount*data.coupon.offer)/100    
+      
+      if(reducedAmount < data.coupon.maxPrice){
+        const finalAmount=totalAmount-reducedAmount        
+        document.getElementById('boldAmount').innerText=`₹${finalAmount}`
+      }else{
+        const finalAmount=totalAmount-data.coupon.maxPrice
+        document.getElementById('boldAmount').innerText=`₹${finalAmount}`
+      }
+      document.getElementById('viewCoupons').style.display='none'
+      document.getElementById('couponApply').style.display='none'
+      couponModal.style.display='none'
+      const newElement=document.createElement('button')
+      newElement.classList.add('removeCoupon')
+      newElement.textContent="Remove"
+      document.getElementById('addCoupon').appendChild(newElement)
+      newElement.addEventListener('click', ()=>{
+        window.location.href=`/user/checkout/<%= products._id %>`
+      })
+    }else{
+      Swal.fire({
+        icon:'error',
+        title:'Invalid Coupon',
+        text:'Coupon code is wrong or has been already used'
+      })
+    }
+
+  })
+}
+
 
   </script>
 

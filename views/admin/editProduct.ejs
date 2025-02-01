@@ -298,8 +298,20 @@ input[type="file"] {
   
     function handleImageUpload(event, index) {
   
-      const file = event.target.files[0];
+      const fileInput = event.target;
+      const file = fileInput.files[0]
       if (!file) return;
+
+      const validTypes=['image/jpeg', 'image/png', 'image/gif', 'image/webp']
+      if(!validTypes.includes(file.type)){
+        Swal.fire({
+          icon:'error',
+          title:'Invalid Format',
+          text:'Only images are allowed'
+        })
+        fileInput.value=''
+        return
+      }
   
       const reader = new FileReader();
       reader.onload = () => {

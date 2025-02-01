@@ -7,7 +7,7 @@ const blockCheck = async (req,res,next)=>{
         }
         const user=await users.findOne({email: req.session.userEmail})
         if (user && user.isBlocked) {
-            return res.status(403).send('Your account is blocked.');
+            return res.render('blockedPage');
         }
         next()
     } catch (error) {

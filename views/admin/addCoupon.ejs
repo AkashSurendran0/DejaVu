@@ -1,0 +1,117 @@
+<%- include('partials/header') %>
+<%- include('partials/navbar') %>
+<style>
+    input{
+        padding: 6px;
+        width: 100%;
+        margin: 10px 0 15px 0;
+        border: 1px solid black;
+    }
+
+    label {
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+
+    .btn {
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    select {
+        margin: 10px 0 15px 0;
+        width: 100%;
+        border: 1px solid black;
+        padding: 6px;
+  }
+</style>
+<main class="h-full pb-16 overflow-y-auto">
+    <h2 class="my-6 text-2xl font-semibold text-gray-700 dark:text-gray-200 ml-6">
+        Add Coupon
+    </h2>
+    <form id="couponForm" action="/admin/coupon/addCoupon" method="post">
+        <div class="container grid px-6 mx-auto">
+            <div class="row">
+                <div class="col-md-6">
+                    <label for="">Enter Code:</label>
+                    <input type="text" name="code" id="code" required>
+                    <label for="">Min Price:</label>
+                    <input type="number" name="minPrice" id="minPrice" required>
+                    <label for="">Description:</label>
+                    <input type="text" name="desc" id="desc" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="">Offer:</label>
+                    <input type="number" name="offer" id="offer" required>
+                    <label for="">Max Price:</label>
+                    <input type="number" name="maxPrice" id="maxPrice" required>
+                </div>
+                <div class="d-flex justify-content-center mt-4">
+                    <input style="width: 300px;" id="submitBtn" class="btn btn-success" type="submit" value="Add Coupon">
+                </div>
+            </div>
+        </div>
+    </form>
+    </div>
+</main>
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+
+    document.getElementById('couponForm').addEventListener('submit', (event)=>{
+        event.preventDefault()
+        const code=document.getElementById('code').value.split(' ')
+        const minPrice=parseInt(document.getElementById('minPrice').value)
+        console.log(minPrice);
+        
+        const desc=document.getElementById('desc').value
+        const offer=parseInt(document.getElementById('offer').value)
+        const maxPrice=parseInt(document.getElementById('maxPrice').value)
+
+        if(!code || code.length>1){
+            Swal.fire({
+                icon:'error',
+                title:'Error',
+                text:'Please enter a valid code without spaces'
+            })
+            return
+        }else if(minPrice<0){
+            Swal.fire({
+                icon:'error',
+                title:'Error',
+                text:'Please enter a valid price'
+            })
+            return
+        }else if(!desc || desc.length<=5){
+            Swal.fire({
+                icon:'error',
+                title:'Error',
+                text:'Desciption must be of  minimum 5 words'
+            })
+            return
+        }else if(!offer || offer>=100 || offer<=0){
+            Swal.fire({
+                icon:'error',
+                title:'Error',
+                text:'Offer must be between 0 and 100'
+            })
+            return
+        }else if(!maxPrice || maxPrice<100 || maxPrice<0){
+            Swal.fire({
+                icon:'error',
+                title:'Error',
+                text:'Max Price must be minimum 100'
+            })
+            return
+        }
+
+        event.target.submit()
+    })
+
+</script>
+
+
+<%- include('partials/footer') %>

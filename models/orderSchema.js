@@ -23,12 +23,23 @@ const orderSchema=new mongoose.Schema({
             quantity:{
                 type:Number,
                 required:true
+            },
+            status:{
+                type:String,
+                enum:['Pending','Delivered','Cancelled','Return requested', 'Returned', 'Return Cancelled'],
+                default: 'Pending',
+                required: true
+            },
+            cancelReason:{
+                type:String,
+                required:false
             }
         }],
     status:{
         type:String,
-        enum:['Pending','Delivered','Cancelled','Shipped','Out for Delivery'],
-        default: 'Pending'
+        enum:['Pending','Delivered','Shipped','Cancelled','Out for Delivery'],
+        default: 'Pending',
+        required: true
     },
     quantity:{
         type:Number,
@@ -47,10 +58,6 @@ const orderSchema=new mongoose.Schema({
         type:mongoose.Schema.Types.ObjectId,
         ref:'addresses',
         required:true
-    },
-    cancelReason:{
-        type:String,
-        required:false
     }
 },{timestamps:true})
 

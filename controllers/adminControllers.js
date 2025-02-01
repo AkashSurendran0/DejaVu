@@ -11,7 +11,7 @@ const loadAdminPage = async (req,res)=>{
         res.render('login', ({messageInvalid:req.flash('invalidAdmin'), messageWrong:req.flash('invalidPassword')}))
         console.log('At admin login page');
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).send('Server not responding')
+        res.status(STATUS_SERVER_ERROR).render('404page')
         console.log(error.message);
     }
 }
@@ -32,7 +32,7 @@ const adminAuthenticate = async (req,res)=>{
         req.session.adminLogged=true
         res.redirect('/admin/dashboard')
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).send('Server not responding')
+        res.status(STATUS_SERVER_ERROR).render('404page')
         console.log(error.message);
     }
 }
@@ -41,7 +41,7 @@ const showDashboard = async (req,res)=>{
     try {
         res.render('dashboard')
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).send('Server not responding')
+        res.status(STATUS_SERVER_ERROR).render('404page')
         console.log(error.message);
     }
     
@@ -67,7 +67,7 @@ const showUserManagement = async (req,res)=>{
             limit: limit
         }) 
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).send('Server not responding')
+        res.status(STATUS_SERVER_ERROR).render('404page')
         console.log(error.message);
     }
 } 
@@ -89,7 +89,7 @@ const manageUser = async (req,res)=>{
         )}
         res.redirect('/admin/usersManagement')
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).send('Server not responding')
+        res.status(STATUS_SERVER_ERROR).render('404page')
         console.log(error.message);
     }
 }
@@ -100,7 +100,7 @@ const adminLogout = async (req,res)=>{
             res.redirect('/admin');
         })
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).send('Server not responding')
+        res.status(STATUS_SERVER_ERROR).render('404page')
         console.log(error.message);
     }
 }

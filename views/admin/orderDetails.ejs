@@ -62,8 +62,6 @@
                         <option value="Delivered"
                         <%= order[0].status=='Delivered'? 'selected':'' %>>Delivered</option>
                     </select>
-                <% }else{ %>
-                    <p class="mt-3"><b>Cancellation Reason:</b>&nbsp;&nbsp;<%= order[0].cancelReason %></p>
                 <% } %>
             </div>
         </div>
@@ -79,18 +77,44 @@
                                 <th class="px-4 py-3">Amount</th>
                                 <th class="px-4 py-3">Quantity</th>
                                 <th class="px-4 py-3">Size</th>
+                                <th class="px-4 py-3">Status</th>
+                                <th class="px-4 py-3">Cancel Reason</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
-                            <% for(let i=0;i<order[0].resultProducts.length;i++){ %>
+                            <% for(let i=0;i<order.length;i++){ %>
                                 <tr class="text-gray-700 dark:text-gray-400">
                                     <td class="px-4 py-3 text-sm d-flex">
-                                        <img src="<%= order[0].resultProducts[i].images[0] %>" alt="Product Image">
+                                        <img src="<%= order[i].resultProducts[0].images[0] %>" alt="Product Image">
                                     </td>
-                                    <td class="px-4 py-3 text-sm"><%= order[0].resultProducts[i].productName %></td>
-                                    <td class="px-4 py-3 text-sm"><%= order[0].products[i].productAmount %></td>
-                                    <td class="px-4 py-3 text-sm"><%= order[0].products[i].quantity %></td>
-                                    <td class="px-4 py-3 text-sm"><%= order[0].products[i].size %></td>
+                                    <td class="px-4 py-3 text-sm"><%= order[i].resultProducts[0].productName %></td>
+                                    <td class="px-4 py-3 text-sm"><%= order[i].products.productAmount %></td>
+                                    <td class="px-4 py-3 text-sm"><%= order[i].products.quantity %></td>
+                                    <td class="px-4 py-3 text-sm"><%= order[i].products.size %></td>
+                                    <td class="px-4 py-3 text-sm">
+                                        <% if(order[i].products.status==='Return requested'){ %>
+                                            <button onclick="confirmReturn('<%= order[i].products._id %>')" class="btn btn-primary">Return Requested</button>
+                                        <% }else{ %>
+                                            <span class="btn btn-<%= 
+                                            order[i].products.status === 'Pending' ? 'warning' :
+                                            order[i].products.status === 'Returned' ? 'info' :
+                                            order[i].products.status === 'Delivered' ? 'success' :
+                                            order[i].products.status === 'Cancelled' ? 'danger' : 
+                                            'dark' 
+                                            %>">
+                                            <%= order[i].products.status %>
+                                            </span>
+                                        <% } %>
+                                    </td>
+                                    <% if(order[i].products.status === 'Cancelled'){ %>
+                                        <td class="px-4 py-3 text-sm">
+                                            <%= order[i].products.cancelReason %>
+                                        </td>
+                                    <% }else{ %>
+                                        <td class="px-4 py-3 text-sm">
+                                            None
+                                        </td>
+                                    <% } %>
                                 </tr>
                             <% } %>
                         </tbody>
@@ -104,6 +128,13 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 
+    const selectedIndex=document.getElementById('orderStatus').selectedIndex
+    const options=document.getElementById('orderStatus').options
+    for(let i=0;i<options.length;i++){
+        if(i<selectedIndex){
+            options[i].disabled=true
+        }
+    }
     document.getElementById('orderStatus').addEventListener('change', ()=>{
         const status=document.getElementById('orderStatus').value
         fetch(`/admin/orderManagement/changeStatus/${status}/<%= order[0]._id %>`, {
@@ -131,6 +162,68 @@
             }
         })
     })
+
+    const confirmReturn = (orderProductId) =>{
+        Swal.fire({
+            icon:'warning',
+            title:'Confirm Return',
+            text:'User has requested a return for this product. Please confirm',
+            showCancelButton:true,
+            cancelButtonText:'Decline',
+            confirmButtonText:'Confirm'
+        })
+        .then(result=>{
+            if(result.isConfirmed){
+                fetch(`/admin/order/confirmReturn?order=<%= order[0]._id %>&&orderProductId=${orderProductId}&&confirm=${1}`, {
+                    method:'GET'
+                })
+                .then(response=>response.json())
+                .then(data=>{
+                    if(data.confirm){
+                        Swal.fire({
+                            icon:'success',
+                            title:'Return Product',
+                            text:'The product has been confirmed for return'
+                        }).then(result=>{
+                            if(result.isConfirmed){
+                                window.location.href=`/admin/orderManagement/order-details/<%= order[0]._id %>`
+                            }
+                        })
+                    }else{
+                        Swal.fire({
+                            icon:'error',
+                            title:'Error',
+                            text:'An unexpected error occured. Please try again later'
+                        })
+                    }
+                })
+            }else{
+                fetch(`/admin/order/confirmReturn?order=<%= order[0]._id %>&&orderProductId=${orderProductId}&&confirm=${0}`, {
+                    method:'GET'
+                })
+                .then(response=>response.json())
+                .then(data=>{
+                    if(data.decline){
+                        Swal.fire({
+                            icon:'success',
+                            title:'Return Product',
+                            text:'The product has been declined for return'
+                        }).then(result=>{
+                            if(result.isConfirmed){
+                                window.location.href=`/admin/orderManagement/order-details/<%= order[0]._id %>`
+                            }
+                        })
+                    }else{
+                        Swal.fire({
+                            icon:'error',
+                            title:'Error',
+                            text:'An unexpected error occured. Please try again later'
+                        })
+                    }
+                })
+            }
+        })
+    }
 
 </script>
 

@@ -1,6 +1,17 @@
 <%- include('partials/userHeader') %>
 <%- include('partials/userNavbar') %>
 
+<style>
+
+  .decreaseBtn,
+  .increaseBtn{
+    background-color: white;
+    color: #dbcc8f;
+    border: none;
+  }
+
+</style>
+
 <div class="hero-wrap hero-bread" style="background-image: url('/uploads/cartbanner.PNG');">
     <div class="container">
         <div class="row no-gutters slider-text align-items-center justify-content-center">
@@ -46,8 +57,8 @@
                     </td>
                     <td class="price">₹<%= cart.products[i].productId.amount %></td>
                     <td class="size"><%= cart.products[i].size %></td>
-                    <td class="quantity"><%= cart.products[i].quantity %></td>
-                    <td class="total">₹<%= (cart.products[i].productId.amount)*(cart.products[i].quantity) %></td>
+                    <td class="quantity"><div style="display: flex;justify-content: center;"><button id="decreaseBtn<%= cart.products[i]._id %>" onclick="changeQuantity('<%= cart._id %>','<%= cart.products[i].productId._id %>','decrease', '<%= cart.products[i].productId.amount %>', '<%= cart.products[i]._id %>')" class="d-flex align-items-center decreaseBtn"><b>-</b></button><input style="background-color: white;text-align: center;width: 50px;border: none;" type="text" value="<%= cart.products[i].quantity %>" name="quantity" id="quantity<%= cart.products[i]._id %>" disabled><button id="increaseBtn<%= cart.products[i]._id %>" onclick="changeQuantity('<%= cart._id %>','<%= cart.products[i].productId._id %>','increase', '<%= cart.products[i].productId.amount %>', '<%= cart.products[i]._id %>')" class="d-flex align-items-center increaseBtn"><b>+</b></button></div></td>
+                    <td class="total" id="amountData<%= cart.products[i]._id %>">₹<%= (cart.products[i].productId.amount)*(cart.products[i].quantity) %></td>
                   </tr>
                 <% } %>
               </tbody>
@@ -62,20 +73,20 @@
               </div>
               <div style="display: flex;justify-content: space-between;">
                   <p>SubTotal</p>
-                  <p>₹<%= cart.totalAmount %></p>
+                  <p id="subTotal">₹<%= cart.totalAmount %></p>
               </div>
               <div style="display: flex;justify-content: space-between;">
                   <p>Delivery</p>
-                  <p>₹0</p>
+                  <p id="delivery">₹0</p>
               </div>
               <div style="display: flex;justify-content: space-between;">
                   <p>Discount</p>
-                  <p>₹0</p>
+                  <p id="discount">₹0</p>
               </div>
               <hr>
               <div style="display: flex;justify-content: space-between;">
                   <p><b>Total</b></p>
-                  <p><b>₹<%= cart.totalAmount %></b></p>
+                  <p id="totalAmount"><b>₹<%= cart.totalAmount %></b></p>
               </div>
               <button style="width: 100%;border-radius: 20px;background-color: #dbcc8f;border: none;color: white;height: 35px;" onclick="goToCheckout('<%= cart._id %>')">Proceed to checkout</button>
           </div>
@@ -159,6 +170,37 @@
 
     const goToCheckout=(cartId)=>{
       window.location.href=`/user/checkout/${cartId}`
+    }
+
+    const changeQuantity = (cartId,cartProductId,action,productAmount,productId) =>{
+      const quantityInput=document.getElementById(`quantity${productId}`)
+      let currentQuantity=parseInt(quantityInput.value)
+      
+      if(currentQuantity>=1 && currentQuantity<=5){
+        fetch(`/user/shop/cart/changeQuantity?cart=${cartId}&&cartProduct=${cartProductId}&&action=${action}&&quantity=${currentQuantity}&&cartProductId=${productId}`,{
+        method:'GET'
+      })
+      .then(response=>response.json())
+      .then(data=>{
+        const cart=data.updatedCart
+        console.log(cart);
+
+        if(data.increase && action==='increase'){                    
+          if(currentQuantity<5){
+            currentQuantity++
+            quantityInput.value=currentQuantity
+          } 
+        }else if(data.decrease && action==='decrease'){
+          if(currentQuantity>1){
+            currentQuantity--
+            quantityInput.value=currentQuantity 
+          }
+        }
+        document.getElementById(`amountData${productId}`).innerText=`₹${productAmount*currentQuantity}`
+        document.getElementById('subTotal').innerText=`₹${cart.totalAmount}`
+        document.getElementById('totalAmount').innerText=`₹${cart.totalAmount}`
+      })
+      }
     }
 
   </script>

@@ -133,19 +133,19 @@
 }
 
 .cancelBtn{
-    margin-top: 10px;
-    width: 100%;
+    width: 50%;
     height: 40px;
     border: none;
     border-radius: 20px;
     cursor: pointer;
-    background-color: #d7d7d7;
     transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
 .cancelBtn:hover{
     background-color: #c4c4c4;
 }
+
+
 
 
 </style>
@@ -257,34 +257,47 @@
                                 <th class="product-name">Product Name</th>
                                 <th class="quantity">Size</th>
                                 <th class="price">Quantity</th>
-                                <th class="price">Amount Per Piece</th>                                
+                                <th class="price">Amount Per Piece</th>    
+                                <th>Cancel Product</th>                            
                               </tr>
                             </thead>
                             <tbody>
-                              <% for(let i=0;i<order[0].resultProducts.length;i++){ %>
+                              <% for(let i=0;i<order.length;i++){ %>
                                 <tr class="text-center">
                                   <td>
-                                    <img src="<%= order[0].resultProducts[i].images[0] %>" alt="">
+                                    <img src="<%= order[i].resultProducts[0].images[0] %>" alt="">
                                   </td>
                                   <td class="image-prod">
-                                    <p><%= order[0].resultProducts[i].productName %></p>
+                                    <p><%= order[i].resultProducts[0].productName %></p>
                                   </td>
                                   <td class="product-name">
-                                    <p><%= order[0].products[i].size %></p>
+                                    <p><%= order[i].products.size %></p>
                                   </td>
                                   <td class="price">
-                                    <p><%= order[0].products[i].quantity %></p>
+                                    <p><%= order[i].products.quantity %></p>
                                   </td>
                                   <td class="size">
-                                    <p><p><%= order[0].products[i].productAmount %></p></p>
+                                    <p><%= order[i].products.productAmount %></p>
+                                  </td>
+                                  <td>
+                                    <% if(order[i].products.status == 'Return Cancelled'){ %>
+                                      <span class="btn btn-info">Return Cancelled</span>
+                                    <% }else if(order[i].products.status == 'Returned'){ %>
+                                      <span class="btn btn-danger">Returned</span>
+                                    <% }else if(order[i].products.status == 'Return requested'){ %>
+                                      <span class="btn btn-warning">Return requested</span>
+                                    <% }else if(order[i].products.status == 'Delivered'){ %>
+                                      <button class="cancelBtn btn-info" onclick="requestReturn('<%= order[i].products._id %>')">Return</button>
+                                    <% }else if(order[i].products.status == 'Cancelled'){ %>
+                                      <span class="btn btn-danger">Cancelled</span>
+                                    <% }else{ %>
+                                      <button class="cancelBtn" onclick="openReasonInput('<%= order[i].products._id %>')">Cancel</button>
+                                    <% } %>
                                   </td>
                                 </tr>
                               <% } %>
                             </tbody>
                           </table>
-                          <% if(order[0].status!='Cancelled'){ %>
-                            <button id="openModal" class="cancelBtn">CANCEL ORDER</button>
-                          <% } %>
                     </div>
                 </div>
                 
@@ -366,49 +379,82 @@
     }
 
     const modal = document.getElementById("cancelModal");
-    const openModal = document.getElementById("openModal");
+    const openModal = document.getElementById("cancelBtn");
     const closeModal = document.getElementById("closeModal");
     const submitReason = document.getElementById("submitReason");
-
-    openModal.addEventListener("click", () => {
-    modal.style.display = "flex";
-    });
 
     closeModal.addEventListener("click", () => {
     modal.style.display = "none";
     });
 
-    submitReason.addEventListener("click", () => {
-    const reason = document.getElementById("cancelReason").value;
-    if (reason.trim() === "") {
-        alert("Please enter a reason for cancellation.");
-    } else {
-        fetch(`/user/order/cancel-order/<%= order[0]._id %>/${reason}`,{
-          method:'GET'
-        })
-        .then(response=>response.json())
-        .then(data=>{
-          if(data.success){
-            Swal.fire({
-              icon:'success',
-              title:'Order Cancelled',
-              text:'Orders has been cancelled successfully'
+    const openReasonInput = (orderProductId) =>{
+      modal.style.display = "flex";
+      document.getElementById('submitReason').addEventListener('click', ()=>{
+        const reason = document.getElementById("cancelReason").value;        
+        if (reason.trim() === "") {
+            alert("Please enter a reason for cancellation.");
+        } else {
+            fetch(`/user/order/cancel-order?order=<%= order[0]._id %>&&reason=${reason}&&orderProductId=${orderProductId}`,{
+              method:'GET'
             })
-            .then(result=>{
-              if(result.isConfirmed){
-                window.location.href=`/user/settings/orders`
+            .then(response=>response.json())
+            .then(data=>{
+              if(data.success){
+                Swal.fire({
+                  icon:'success',
+                  title:'Order Cancelled',
+                  text:'Orders has been cancelled successfully'
+                })
+                .then(result=>{
+                  if(result.isConfirmed){
+                    window.location.href=`/user/settings/orders`
+                  }
+                })
+              }else{
+                Swal.fire({
+                  icon:'error',
+                  title:'Order Cancelled',
+                  text:'Error cancelling Order'
+                })
               }
             })
-          }else{
-            Swal.fire({
-              icon:'error',
-              title:'Order Cancelled',
-              text:'Error cancelling Order'
-            })
           }
-        })
+      })
     }
-    });
+
+    const requestReturn = (orderProductId) =>{
+      modal.style.display='flex'
+      document.getElementById('submitReason').addEventListener('click', ()=>{
+        const reason=document.getElementById('cancelReason').value
+        if(reason.trim()===""){
+          alert('Please enter a reason for return')
+        }else{
+          fetch(`/user/order/returnOrder?order=<%= order[0]._id %>&&reason=${reason}&&orderProductId=${orderProductId}`, {
+            method:'GET'
+          })
+          .then(response=>response.json())
+          .then(data=>{
+            if(data.success){
+              Swal.fire({
+                icon:'success',
+                title:'Return Product',
+                text:'The return request has been send.'
+              }).then(result=>{
+                if(result.isConfirmed){
+                  window.location.href=`/user/order/order-summary/<%= order[0]._id %>`
+                }
+              })
+            }else{
+              Swal.fire({
+                icon:'error',
+                title:'Error',
+                text:'There was an error while returning the product'
+              })
+            }
+          })
+        }
+      })
+    }
 
     window.addEventListener("click", (event) => {
     if (event.target === modal) {

@@ -28,7 +28,7 @@ const showCategories = async (req,res)=>{
             message: req.flash('categoryExistsMessage')
         })
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).send('Server not responding')
+        res.status(STATUS_SERVER_ERROR).render('404page')
         console.log(error.message);
     }
 }
@@ -37,7 +37,7 @@ const addCategoriesForm = async (req,res)=>{
     try {
         res.render('addCategories', {message: req.flash('categoryExistsMessage')})
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).send('Server not responding')
+        res.status(STATUS_SERVER_ERROR).render('404page')
         console.log(error.message);
     }
 }
@@ -58,7 +58,7 @@ const addCategory = async (req,res)=>{
         req.flash('categoryAdded', 'Category added Successfully.')
         res.redirect('/admin/categories')
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).send('Server not responding')
+        res.status(STATUS_SERVER_ERROR).render('404page')
         console.log(error.message);
     }
 }
@@ -69,7 +69,7 @@ const editCategoryForm = async(req,res)=>{
         const category= await categories.findById(id)
         res.render('editCategory', {category: category})
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).send('Server not responding')
+        res.status(STATUS_SERVER_ERROR).render('404page')
         console.log(error.message);
     }
 }
@@ -77,7 +77,7 @@ const editCategoryForm = async(req,res)=>{
 const editCategory = async(req,res)=>{
     try {
         const id=req.params.id
-        const sameCategory = await categories.findOne({name:{$regex:new RegExp(req.body.category, 'i')}})
+        const sameCategory = await categories.findOne({name:{$regex:`^${req.body.category}`, $options:'i'}, _id:{$ne:id}})
         if(sameCategory){
             req.flash('categoryExistsMessage', 'Category already exists.')
             return res.redirect('/admin/categories')
@@ -93,7 +93,7 @@ const editCategory = async(req,res)=>{
         req.flash('categoryEdited', 'Category Edited Successfully.')
         res.redirect('/admin/categories')
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).send('Server not responding')
+        res.status(STATUS_SERVER_ERROR).render('404page')
         console.log(error.message);
     }  
 }
@@ -114,7 +114,7 @@ const deleteCategory = async(req,res)=>{
         req.flash('categoryDeleted', 'Category Deleted Successfully.')
         res.redirect('/admin/categories')
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).send('Server not responding')
+        res.status(STATUS_SERVER_ERROR).render('404page')
         console.log(error.message);
     }
     

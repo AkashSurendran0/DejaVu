@@ -12,7 +12,7 @@ const manageAddress = async (req,res)=>{
         const foundAddress=await address.findOne({user: user._id})
         res.render('manageAddress', {msg:req.flash('msg'), foundAddress: foundAddress})
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).send('Server not responding')
+        res.status(STATUS_SERVER_ERROR).render('404page')
         console.log(error.message);
     }
 }
@@ -21,7 +21,7 @@ const getAddAddressForm = async (req,res)=>{
     try {
         res.render('addAddress')
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).send('Server not responding')
+        res.status(STATUS_SERVER_ERROR).render('404page')
         console.log(error.message);
     }
 }
@@ -47,7 +47,7 @@ const addAddress = async (req,res)=>{
         req.flash('msg', 'Address added Successfully')
         res.redirect('/user/settings/manageAddress')
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).send('Server not responding')
+        res.status(STATUS_SERVER_ERROR).render('404page')
         console.log(error.message);
     }
 }
@@ -62,7 +62,7 @@ const deleteAddress = async (req,res)=>{
         req.flash('msg', 'Address deleted successfully')
         res.redirect('/user/settings/manageAddress')
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).send('Server not responding')
+        res.status(STATUS_SERVER_ERROR).render('404page')
         console.log(error.message);
     }
 }
@@ -83,7 +83,7 @@ const getEditAddressForm = async (req,res)=>{
         ])
         res.render('editAddress', {address:foundAddress})
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).send('Server not responding')
+        res.status(STATUS_SERVER_ERROR).render('404page')
         console.log(error.message); 
     }
 }
@@ -108,7 +108,7 @@ const editAddress = async (req,res)=>{
         req.flash('msg', 'Address Updated Succesfully')
         res.redirect('/user/settings/manageAddress')
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).send('Server not responding')
+        res.status(STATUS_SERVER_ERROR).render('404page')
         console.log(error.message);
     }
 }
@@ -147,7 +147,7 @@ const addAddressFromCheckout = async (req,res)=>{
         req.flash('msg', 'Address added successfully')
         res.redirect(`/user/checkout/${cart}`)
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).send('Server not responding')
+        res.status(STATUS_SERVER_ERROR).render('404page')
         console.log(error.message);
     }
 }

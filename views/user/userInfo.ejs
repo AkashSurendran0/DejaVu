@@ -249,6 +249,16 @@
     const inputDiv=document.querySelector('.inputDiv')
     inputFile.addEventListener('change', ()=>{
       const file=inputFile.files[0]
+      const validTypes=['image/jpeg', 'image/png', 'image/gif', 'image/webp']
+      if(!validTypes.includes(file.type)){
+        Swal.fire({
+          icon:'error',
+          title:'Invalid Format',
+          text:'Only images are allowed'
+        })
+        inputFile.value=''
+        return
+      }
       if(file){
         const reader=new FileReader()
         reader.onload=(event)=>{

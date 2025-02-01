@@ -28,7 +28,7 @@
     }
 </style>
 
-    <div class="hero-wrap hero-bread" style="background-image: url(<%= banner.image %>);">
+    <div class="hero-wrap hero-bread" style="background-image: url('<%= banner.image %>');">
       <div class="container">
         <div class="row no-gutters slider-text align-items-center justify-content-center">
           <div class="col-md-9 ftco-animate text-center">
@@ -95,12 +95,8 @@
 			    					</div>
 		    						<h3><a href="/user/shop/product-details/<%= product[i]._id %>"><%= product[i].productName %></a></h3>
 		    						<div class="pricing">
-										<% if(offer){ %>
-											<% if(product[i].amount>minPrice && product[i].amount<maxPrice){ %>
-			    								<p class="price" id="price"><span class="mr-2" style="color: red;"><del>₹<%= product[i].amount %></del></span><span class="mr-2">₹<%= product[i].amount - (((offer*product[i].amount)/100).toFixed(2)) %></span><span style="font-size: 12px;color: white;background-color: red; padding-left: 2px;padding-right: 2px;"><%= offer %>% off</span></p>
-											<% }else{ %>
-												<p class="price" id="price"><span>₹<%= product[i].amount %></span></p>
-											<% } %>
+										<% if(product[i].regularPrice){ %>
+			    							<p class="price" id="price"><span class="mr-2" style="color: red;"><del>₹<%= product[i].regularPrice %></del></span><span class="mr-2">₹<%= product[i].amount  %></span><span style="font-size: 12px;color: white;background-color: red; padding-left: 2px;padding-right: 2px;"><%= Math.floor(((product[i].regularPrice-product[i].amount)/product[i].regularPrice)*100) %>% off</span></p>
 										<% }else{ %>
 											<p class="price" id="price"><span>₹<%= product[i].amount %></span></p>
 										<% } %>
@@ -120,7 +116,11 @@
 		            <div class="block-27">
 		              <ul>
 						<% for(let i=0;i<totalPages;i++){ %>
-							<li><a href="/user/shop?category=<%= category %>&&page=<%= i+1 %>&&limit=<%= limit %>"><%= i+1 %></a></li>
+							<% if(category){ %>
+								<li><a href="/user/shop?category=<%= category %>&&page=<%= i+1 %>&&limit=<%= limit %>"><%= i+1 %></a></li>
+							<% }else{ %>
+								<li><a href="/user/shop?page=<%= i+1 %>&&limit=<%= limit %>"><%= i+1 %></a></li>
+							<% } %>
 		                <% } %>
 		              </ul>
 		            </div>
@@ -265,26 +265,16 @@
 
 		<script>
 			const currentURL = window.location.href;
-			
-			let isMatched=false
-			
+						
 			const navLinks = document.querySelectorAll(".block-27 a");
 			
 			navLinks.forEach(link => {
 				if (link.href === currentURL) {
 					link.classList.add("active");
-					isMatched=true
 				} else {
 					link.classList.remove("active");
 				}
 			});
-			
-			if(!isMatched){
-				const link=document.querySelector(".block-27 a")
-				if(link){
-					link.classList.add("active")
-				}
-			}
 			
 			
 			</script>

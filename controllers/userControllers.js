@@ -11,7 +11,7 @@ const loadHomePage = async (req,res)=>{
     try {
        res.render('home') 
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).send('Server not responding')
+        res.status(STATUS_SERVER_ERROR).render('404page')
         console.log(error.message);
     }
 }
@@ -20,7 +20,7 @@ const loadLoginPage = async (req,res)=>{
     try {
         res.render('userlogin', {loginErr: req.flash('invalidUser'), userLogin: req.flash('userLogin')})
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).send('Server not responding')
+        res.status(STATUS_SERVER_ERROR).render('404page')
         console.log(error.message);
     }
 }
@@ -29,7 +29,7 @@ const loadEmailSignupPage = async (req,res)=>{
     try {
         res.render('userEmailLogin', {emailReq:req.flash('emailReq'), otpExp: req.flash('otpExpired')})
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).send('Server not responding')
+        res.status(STATUS_SERVER_ERROR).render('404page')
         console.log(error.message);
     }
 }
@@ -72,7 +72,7 @@ const sendOTP = async (req,res)=>{
         console.log(storeOTP[email]);
         res.render('verify-otp', {OTPerr: req.flash('OTPerr'), storedOTP: storeOTP[email]})
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).send('Server not responding')
+        res.status(STATUS_SERVER_ERROR).render('404page')
         console.log(error.message);
     }
 }
@@ -91,7 +91,7 @@ const verifyOTP = async (req,res)=>{
             res.status(STATUS_NOT_FOUND).json({success:false})
         }
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).send('Server not responding')
+        res.status(STATUS_SERVER_ERROR).render('404page')
         console.log(error.message);
     }
 }
@@ -100,7 +100,7 @@ const loadSignupPage = async (req,res)=>{
     try {
         res.render('userSignup', {err:false})
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).send('Server not responding')
+        res.status(STATUS_SERVER_ERROR).render('404page')
         console.log(error.message);
     }
 }
@@ -123,7 +123,7 @@ const resendOTP = async (req,res)=>{
         },60000)
         res.render('verify-otp', {OTPerr: req.flash('OTPerr')})
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).send('Server not responding')
+        res.status(STATUS_SERVER_ERROR).render('404page')
         console.log(error.message);
     }
 }
@@ -151,7 +151,7 @@ const userSignup = async (req,res)=>{
         req.session.isLogged=true
         res.redirect('/user')
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).send('Server not responding')
+        res.status(STATUS_SERVER_ERROR).render('404page')
         console.log(error.message);
     }
 }
@@ -162,7 +162,7 @@ const userLogout = async (req,res)=>{
             res.redirect('/user')
         })
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).send('Server not responding')
+        res.status(STATUS_SERVER_ERROR).render('404page')
         console.log(error.message);
     }
 }
@@ -189,7 +189,7 @@ const userLogin = async (req,res)=>{
         req.session.isLogged = true
         res.redirect('/user')
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).send('Server not responding')
+        res.status(STATUS_SERVER_ERROR).render('404page')
         console.log(error.message);
     }
 }
@@ -198,7 +198,7 @@ const loadEmailVerificationPage = async (req,res)=>{
     try {
         res.render('verifyEmail', {emailErr: req.flash('noUser')})
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).send('Server not responding')
+        res.status(STATUS_SERVER_ERROR).render('404page')
         console.log(error.message);
     }
 }
@@ -230,7 +230,7 @@ const sendVerifyOTP = async (req,res)=>{
         },60000)
         res.render('recoverPasswordOTP', {OTPerr: req.flash('OTPerr')})
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).send('Server not responding')
+        res.status(STATUS_SERVER_ERROR).render('404page')
         console.log(error.message);
     }
 }
@@ -250,7 +250,7 @@ const verifyRecoverOTP = async (req,res)=>{
             res.status(STATUS_NOT_FOUND).json({success:false})
         }
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).send('Server not responding')
+        res.status(STATUS_SERVER_ERROR).render('404page')
         console.log(error.message);
     }
 }
@@ -259,7 +259,7 @@ const loadChangePassword = async (req,res)=>{
     try {
         res.render('recoverPassword', {err:false})
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).send('Server not responding')
+        res.status(STATUS_SERVER_ERROR).render('404page')
         console.log(error.message);
     }
 }
@@ -284,7 +284,7 @@ const changePassword = async (req,res)=>{
         req.flash('userLogin', 'Login using new Credentials')
         res.redirect('/user/login')
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).send('Server not responding')
+        res.status(STATUS_SERVER_ERROR).render('404page')
         console.log(error.message);
     }
 }
@@ -299,7 +299,7 @@ const loadBasicInfoPage = async (req,res)=>{
             msg3:req.flash('msg3')
         })
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).send('Server not responding')
+        res.status(STATUS_SERVER_ERROR).render('404page')
         console.log(error.message);
     }
 }
@@ -324,7 +324,7 @@ const updateUser = async (req,res)=>{
         req.flash('msg', 'User Updated Successfully')
         res.redirect('/user/settings/basicInfo')
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).send('Server not responding')
+        res.status(STATUS_SERVER_ERROR).render('404page')
         console.log(error.message);
     }
 }
@@ -356,7 +356,7 @@ const changePasswordFromSettings = async (req,res)=>{
         req.flash('msg3', 'Password updated successfully')
         res.redirect('/user/settings/basicInfo')
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).send('Server not responding')
+        res.status(STATUS_SERVER_ERROR).render('404page')
         console.log(error.message);
     }
 }
@@ -374,7 +374,7 @@ const deleteAccount = async (req,res)=>{
             res.redirect('/user')
         })
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).send('Server not responding')
+        res.status(STATUS_SERVER_ERROR).render('404page')
         console.log(error.message);
     }
 }
@@ -391,7 +391,7 @@ const validatePassword = async (req,res)=>{
         }
         res.json({success:true})
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).send('Server not responding')
+        res.status(STATUS_SERVER_ERROR).render('404page')
         console.log(error.message);
     }
 }

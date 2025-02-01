@@ -58,8 +58,8 @@
                                         <img src="<%= product.images[0] %>" alt="">
                                     <% }) %></td>
                                     <td><div>
-                                        <p class="mb-1"><b><%= allOrders[i].resultAddress.address[i].name %></b></p>
-                                        <p class="mb-0"><%= allOrders[i].resultAddress.address[i].state %>, <%= allOrders[i].resultAddress.address[i].streetAddress %>, <%= allOrders[i].resultAddress.address[i].city %>, <%= allOrders[i].resultAddress.address[i].postcode %>, <%= allOrders[i].resultAddress.address[i].phone %></p>
+                                        <p class="mb-1"><b><%= allOrders[i].resultAddress.address.name %></b></p>
+                                        <p class="mb-0"><%= allOrders[i].resultAddress.address.state %>, <%= allOrders[i].resultAddress.address.streetAddress %>, <%= allOrders[i].resultAddress.address.city %>, <%= allOrders[i].resultAddress.address.postcode %>, <%= allOrders[i].resultAddress.address.phone %></p>
                                     </div></td>
                                     <td><%= allOrders[i].createdAt.toLocaleDateString() %></td>
                                     <td><%= allOrders[i].quantity %></td>

@@ -37,7 +37,7 @@ const showProducts = async (req,res)=>{
             limit: limit    
         })
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).send('Server not responding')
+        res.status(STATUS_SERVER_ERROR).render('404page')
         console.log(error.message);
     }
 }
@@ -49,7 +49,7 @@ const addProductForm = async (req,res)=>{
             messageInvalid: req.flash('authError')
         })
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).send('Server not responding')
+        res.status(STATUS_SERVER_ERROR).render('404page')
         console.log(error.message);
     }  
 }
@@ -88,7 +88,7 @@ const addProduct = async (req,res)=>{
         req.flash('addedSuccess', 'Product Added Successfully')
         res.redirect('/admin/products')
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).send('Server not responding')
+        res.status(STATUS_SERVER_ERROR).render('404page')
         console.log(error.message);
     }
 }
@@ -101,7 +101,7 @@ const editProductForm = async (req,res)=>{
         console.log(product);
         res.render('editProduct', {product: product, category: categoryList})
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).send('Server not responding')
+        res.status(STATUS_SERVER_ERROR).render('404page')
         console.log(error.message);
     }  
 }
@@ -145,7 +145,7 @@ const editProduct = async(req,res)=>{
         req.flash('editSuccess', 'Product Edited Successfully')
         res.redirect('/admin/products')
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).send('Server not responding')
+        res.status(STATUS_SERVER_ERROR).render('404page')
         console.log(error.message);
     }
 }
@@ -169,7 +169,7 @@ const deleteProduct = async (req,res)=>{
         }
         res.redirect('/admin/products')
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).send('Server not responding')
+        res.status(STATUS_SERVER_ERROR).render('404page')
         console.log(error.message);
     }
 }
@@ -179,7 +179,7 @@ const loadShopPage = async (req,res)=>{
         const highestPrice=parseInt(req.query.highestAmount) || 10000
         const leastPrice=parseInt(req.query.leastAmount) || 0     
         const page=parseInt(req.query.page) || 1
-        const limit=parseInt(req.query.limit) || 10
+        const limit=parseInt(req.query.limit) || 6
         const skip=(page-1)*limit
         const banner=await banners.findOne({category: 'shirts'})
         const allCategories=await categories.find({isDeleted:false})
@@ -203,110 +203,155 @@ const loadShopPage = async (req,res)=>{
 
         let category=false
         if(allCategories.length>0){
-            category=req.query.category || allCategories[0].name
+            category=req.query.category || false
         }
+        let allProducts
+        let productList
 
-        let allProducts=await products.aggregate([
-            {$lookup:{
-                from: 'categories',
-                foreignField: '_id',
-                localField: 'category',
-                as: 'resultProducts'
-            }},
-            {
-                $unwind: '$resultProducts'
-            },
-            {
-                $match: {
-                    'resultProducts.name':{$regex:`^${category}`, $options:'i'},
-                    isDeleted:false
-                }
-            }
-        ])
-
-        let productList=await products.aggregate([
-            {$lookup:{
-                from: 'categories',
-                foreignField: '_id',
-                localField: 'category',
-                as: 'resultProducts'
-            }},
-            {
-                $unwind: '$resultProducts'
-            },
-            {
-                $match: {
-                    'resultProducts.name':{$regex:`^${category}`, $options:'i'},
-                    isDeleted:false
-                }
-            },
-            {
-                $addFields:{
-                    avgRating:{
-                        $avg:'$review.rating'
+        if(category){
+            allProducts=await products.aggregate([
+                {$lookup:{
+                    from: 'categories',
+                    foreignField: '_id',
+                    localField: 'category',
+                    as: 'resultProducts'
+                }},
+                {
+                    $unwind: '$resultProducts'
+                },
+                {
+                    $match: {
+                        'resultProducts.name':{$regex:`^${category}`, $options:'i'},
+                        isDeleted:false
                     }
                 }
-            },
-            {
-                $skip: skip
-            },
-            {
-                $limit: limit
-            },
-            {
-                $match:{
-                    $and:[
-                        {
-                            amount:{
-                                $gte:leastPrice
-                            }
-                        },
-                        {
-                            amount:{
-                                $lte:highestPrice
-                            }
+            ])
+    
+            productList=await products.aggregate([
+                {$lookup:{
+                    from: 'categories',
+                    foreignField: '_id',
+                    localField: 'category',
+                    as: 'resultProducts'
+                }},
+                {
+                    $unwind: '$resultProducts'
+                },
+                {
+                    $match: {
+                        'resultProducts.name':{$regex:`^${category}`, $options:'i'},
+                        isDeleted:false
+                    }
+                },
+                {
+                    $addFields:{
+                        avgRating:{
+                            $avg:'$review.rating'
                         }
-                    ]
-                }   
-            },
-            {
-                $sort:{
-                    [field]:type
+                    }
+                },
+                {
+                    $skip: skip
+                },
+                {
+                    $limit: limit
+                },
+                {
+                    $match:{
+                        $and:[
+                            {
+                                amount:{
+                                    $gte:leastPrice
+                                }
+                            },
+                            {
+                                amount:{
+                                    $lte:highestPrice
+                                }
+                            }
+                        ]
+                    }   
+                },
+                {
+                    $sort:{
+                        [field]:type
+                    }
                 }
-            }
-        ])        
+            ])
+        }else{
+            allProducts=await products.find({isDeleted:false})
 
+            productList=await products.aggregate([
+                {$lookup:{
+                    from: 'categories',
+                    foreignField: '_id',
+                    localField: 'category',
+                    as: 'resultProducts'
+                }},
+                {
+                    $unwind: '$resultProducts'
+                },
+                {
+                    $match: {
+                        isDeleted:false
+                    }
+                },
+                {
+                    $addFields:{
+                        avgRating:{
+                            $avg:'$review.rating'
+                        }
+                    }
+                },
+                {
+                    $skip: skip
+                },
+                {
+                    $limit: limit
+                },
+                {
+                    $match:{
+                        $and:[
+                            {
+                                amount:{
+                                    $gte:leastPrice
+                                }
+                            },
+                            {
+                                amount:{
+                                    $lte:highestPrice
+                                }
+                            }
+                        ]
+                    }   
+                },
+                {
+                    $sort:{
+                        [field]:type
+                    }
+                }
+            ])
+        }
+                        
         let totalCount=0
         let totalPages=0
         if(allProducts){
             totalCount=allProducts.length
             totalPages=Math.ceil(totalCount/limit)
         }
-
+        
         if (!productList || productList.length === 0) {
             productList = false;
           }
         
-          let categoryName = productList && productList[0]?.resultProducts?.name;
-          if (!categoryName) {
-            categoryName=false;
-          }
-        const allOffers=await offers.findOne({category: categoryName})
-        let minPrice=false
-        let maxPrice=false
-        let offer=false
-        if(allOffers && allOffers.isActive){
-            minPrice=allOffers.minAmount
-            maxPrice=allOffers.maxAmount
-            offer=allOffers.offer
-        }      
+          let categoryId = productList && productList[0]?.resultProducts?._id;
+          if (!categoryId) {
+            categoryId=false;
+          }      
           
         res.render('shop', {
             product: productList, 
             banner:banner,
-            minPrice: minPrice,
-            maxPrice: maxPrice,
-            offer: offer,
             category: category,
             allCategories: allCategories,
             currentPage: page,
@@ -314,7 +359,7 @@ const loadShopPage = async (req,res)=>{
             limit: limit
         })
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).send('Server not responding')
+        res.status(STATUS_SERVER_ERROR).render('404page')
         console.log(error.message);
     }
 }
@@ -330,18 +375,7 @@ const loadProductDetailsPage = async (req,res)=>{
                 {$unwind:'$review'},
                 {$group:{_id:null, rating:{$avg:'$review.rating'}}}
             ])
-        }
-
-        const productCategory=await categories.findOne({_id: singleProduct.category})
-        const offerPrices=await offers.aggregate([
-            {$match: {
-                $and:[
-                    {category: productCategory.name},
-                    {isActive: true}
-                ]
-            }},
-            {$project:{_id:0, maxAmount:1, minAmount:1, offer:1}}
-        ])        
+        }       
         
         let productRating=0
         if(avgRating){
@@ -383,11 +417,10 @@ const loadProductDetailsPage = async (req,res)=>{
             product:singleProduct, 
             similarProducts: simProducts, 
             rating: productRating,
-            offerPrices: offerPrices,
             quantityErr: req.flash('quantityErr')
         })
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).send('Server not responding')
+        res.status(STATUS_SERVER_ERROR).render('404page')
         console.log(error.message);
     }
 }
@@ -408,7 +441,7 @@ const addProductReview = async (req,res)=>{
         )
         res.redirect(`/user/shop/product-details/${id}`)
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).send('Server not responding')
+        res.status(STATUS_SERVER_ERROR).render('404page')
         console.log(error.message);
     }
 }

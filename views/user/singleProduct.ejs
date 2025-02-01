@@ -214,14 +214,10 @@
                               <a href="#" class="mr-2" style="color: #000;"><%= product.review?.length || '0' %> <span style="color: #bbb;">Ratings</span></a>
                           </p>
                       </div>
-                      <% if(offerPrices.length==0){ %>
-                        <p class="price"><span>₹<%= product.amount %></span></p>
+                      <% if(product.regularPrice){ %>
+                        <p class="price"><span class="mr-3" style="color: red;"><del>₹<%= product.regularPrice %></del></span><span class="mr-3">₹<%= product.amount %></span><span style="font-size: 12px;color: white;background-color: red; padding-left: 2px;padding-right: 2px;"><%= Math.floor(((product.regularPrice-product.amount)/product.regularPrice)*100) %>% off</span></p>
                       <% }else{ %>
-                        <% if(product.amount>offerPrices[0].minAmount && product.amount<offerPrices[0].maxAmount){ %>
-                          <p class="price"><span class="mr-3" style="color: red;"><del>₹<%= product.amount %></del></span><span class="mr-3">₹<%= product.amount - (((offerPrices[0].offer*product.amount)/100).toFixed(2)) %></span><span style="font-size: 12px;color: white;background-color: red; padding-left: 2px;padding-right: 2px;"><%= offerPrices[0].offer %>% off</span></p>
-                        <% }else{ %>
-                          <p class="price"><span>₹<%= product.amount %></span></p>
-                        <% } %>
+                        <p class="price"><span>₹<%= product.amount %></span></p>
                       <% } %>
                   <h5><u>Product Description</u></h5>
                       <ul>
@@ -264,7 +260,7 @@
                       </div>
                     </div>
                     <% if(product.stock!=0){ %>
-                      <p><input type="submit" class="btn btn-black py-3 px-5 mr-2" value="Add to Cart" onclick="addToCart('<%= product._id %>', event)"><input type="submit" class="btn btn-primary py-3 px-5" value="Buy now"></p> 
+                      <p><input type="submit" class="btn btn-black py-3 px-5 mr-2" value="Add to Cart" onclick="addToCart('<%= product._id %>', event)"><input type="submit" class="btn btn-primary py-3 px-5" value="Add to Wishlist" onclick="addtoWishlist('<%= product._id %>', event)"></p> 
                     <% } %>
           </form>
               </div>
@@ -336,14 +332,10 @@
                                 </div>
                                 <h3><a href="/user/shop/product-details/<%= similarProducts[i]._id %>"><%= similarProducts[i].productName %></a></h3>
                                 <div class="pricing">
-                                  <% if(offerPrices.length==0){ %>
-                                    <p class="price"><span>₹<%= similarProducts[i].amount %></span></p>
+                                  <% if(similarProducts[i].regularPrice){ %>
+                                    <p class="price"><span class="mr-2" style="color: red;"><del>₹<%= similarProducts[i].regularPrice %></del></span><span class="mr-2">₹<%= similarProducts[i].regularPrice %></span><span style="font-size: 12px;color: white;background-color: red; padding-left: 2px;padding-right: 2px;"><%= Math.floor(((similarProducts[i].regularPrice-similarProducts[i].amount)/similarProducts[i].regularPrice)*100) %>% off</span></p>
                                   <% }else{ %>
-                                    <% if(similarProducts[i].amount>offerPrices[0].minAmount && similarProducts[i].amount<offerPrices[0].maxAmount){ %>
-                                      <p class="price"><span class="mr-2" style="color: red;"><del>₹<%= similarProducts[i].amount %></del></span><span class="mr-2">₹<%= similarProducts[i].amount - (((offerPrices[0].offer*similarProducts[i].amount)/100).toFixed(2)) %></span><span style="font-size: 12px;color: white;background-color: red; padding-left: 2px;padding-right: 2px;"><%= offerPrices[0].offer %>% off</span></p>
-                                    <% }else{ %>
-                                      <p class="price"><span>₹<%= similarProducts[i].amount %></span></p>
-                                    <% } %>
+                                    <p class="price"><span>₹<%= similarProducts[i].amount %></span></p>
                                   <% } %>
                                 </div>
                                 <p class="bottom-area d-flex px-3">
@@ -445,10 +437,6 @@
           nextEl: '.swiper-button-next',
           prevEl: '.swiper-button-prev',
         },
-        // autoplay: {
-        //   delay: 3000,
-        //   disableOnInteraction: false,
-        // },
       });
     });
 
@@ -558,6 +546,12 @@
             title:'Add to Cart',
             text:'The quantity exceeds the total stock count. Please reduce the quantity or check the cart'
           })
+        }else if(data.quantityFive){
+          Swal.fire({
+            icon:'error',
+            title:'Add to Cart',
+            text:'The maximum quantity for a product is 5. Please reduce the quantity or check the cart'
+          })
         }else if(data.needLogin){
           window.location.href='/user/login'
         }else{
@@ -566,6 +560,45 @@
             title:'Add to Cart',
             text:'Failed to add to Cart'
           })
+        }
+      })
+    }
+
+    const addtoWishlist =  (productId,event)=>{
+      event.preventDefault()
+      const size=document.querySelector('input[name="size"]:checked')?.value
+      let isValid=true
+
+      if(!size){
+        document.getElementById('selectSize').style.display='block'
+        isValid=false
+      }else{
+        document.getElementById('selectSize').style.display='none'
+      }
+
+      if(!isValid){
+        return
+      }
+
+      fetch(`/user/product/addToWishlist?product=${productId}&&size=${size}`,{
+        method:"GET"
+      })
+      .then(response=>response.json())
+      .then(data=>{
+        if(data.success){
+          Swal.fire({
+            icon:'success',
+            title:'Add to Wishlist',
+            text:'Product has been successfully added to wishist'
+          })
+        }else if(data.alreadyExist){
+          Swal.fire({
+            icon:'error',
+            title:'Add to Wishlist',
+            text:'Item already Exists in your Wishlist'
+          })
+        }else if(data.needLogin){
+          window.location.href='/user/login'
         }
       })
     }
