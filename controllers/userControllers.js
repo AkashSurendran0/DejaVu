@@ -1,8 +1,11 @@
+const mongoose=require('mongoose')
+
 const users=require('../models/userSchema')
 const env=require('dotenv').config()
 const sendMail=require('../helpers/mailHelper')
 const bcrypt=require('../helpers/bcrypt')
 const address = require('../models/addressSchema')
+const orders = require('../models/orderSchema')
 
 const STATUS_SERVER_ERROR=parseInt(process.env.STATUS_SERVER_ERROR)
 const STATUS_NOT_FOUND=parseInt(process.env.STATUS_NOT_FOUND)
@@ -396,6 +399,52 @@ const validatePassword = async (req,res)=>{
     }
 }
 
+const loadWalletPage = async (req,res)=>{
+    try {
+        const userEmail=req.session.userEmail
+        const user=await users.findOne({email:userEmail})
+        const refundOrders=await orders.aggregate([
+            {
+                $match:{
+                    user:new mongoose.Types.ObjectId(user._id)
+                }
+            },
+            {
+                $unwind:'$products'
+            },
+            {
+                $match:{
+                    'products.status':{
+                        $in:['Cancelled','Returned']
+                    },
+                    paymentmethod:'Online Payment'
+                }
+            },
+            {
+                $lookup: {
+                  from: "products",
+                  localField: "products.productId", 
+                  foreignField: "_id",
+                  as: "resultProducts"
+                }
+            },
+            {
+                $unwind:'$resultProducts'
+            }
+              
+        ])
+        console.log(refundOrders);
+        
+        res.render('wallet', {
+            refundOrders:refundOrders,
+            user:user
+        })
+    } catch (error) {
+        res.status(STATUS_SERVER_ERROR).render('404page')
+        console.log(error.message);
+    }
+}
+
 module.exports={
     loadHomePage,
     loadLoginPage,
@@ -416,5 +465,6 @@ module.exports={
     updateUser,
     changePasswordFromSettings,
     deleteAccount,
-    validatePassword
+    validatePassword,
+    loadWalletPage
 }

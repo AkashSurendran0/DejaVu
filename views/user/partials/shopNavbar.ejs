@@ -176,22 +176,33 @@ input[type="checkbox"]:focus {
 
 
 <script>
-    const currentURL = window.location.href;
+    const nowURL = window.location.href;
 
-    const navLinks = document.querySelectorAll(".panel-title a");
+    const nowLinks = document.querySelectorAll(".panel-title a");
 
-    navLinks.forEach(link => {
-        if (link.href === currentURL) {
+    nowLinks.forEach(link => {
+        if (link.href === nowURL) {
             link.classList.add("active");
         } else {
             link.classList.remove("active");
         }
     });
 
+    const urlParams=new URLSearchParams(window.location.search)
+    const leastAmount=urlParams.get('leastAmount')
+    const highestAmount=urlParams.get('highestAmount')
+
     const minRange=document.getElementById('min-range')
     const maxRange=document.getElementById('max-range')
     const minPrice=document.getElementById('min-price')
     const maxPrice=document.getElementById('max-price')
+
+    if(leastAmount && highestAmount){
+        minRange.value=leastAmount
+        maxRange.value=highestAmount
+        minPrice.innerText=`₹${leastAmount}`
+        maxPrice.innerText=`₹${highestAmount}`
+    }
 
     minRange.addEventListener('input', ()=>{
         const minValue=parseInt(minRange.value)
@@ -253,58 +264,73 @@ input[type="checkbox"]:focus {
         const currentCategory=urlParams.get('category')
         const page=urlParams.get('page')
         const limit=urlParams.get('limit')
-
-        const leastAmount=document.getElementById('min-range').value
-        const highestAmount=document.getElementById('max-range').value
+        const leastAmount=urlParams.get('leastAmount')?? 0
+        const highestAmount=urlParams.get('highestAmount')?? 1000
 
         if(currentCategory){
             if(value=='newArrival'){
-                window.location.href=`/user/shop?category=${currentCategory}&&sort=newArrival&&type=1`
+                window.location.href=`/user/shop?leastAmount=${leastAmount}&&highestAmount=${highestAmount}&&category=${currentCategory}&&sort=newArrival&&type=1`
             }else if(value=='a2z'){
-                window.location.href=`/user/shop?category=${currentCategory}&&sort=atoz&&type=1`
+                window.location.href=`/user/shop?leastAmount=${leastAmount}&&highestAmount=${highestAmount}&&category=${currentCategory}&&sort=atoz&&type=1`
             }else if(value=='z2a'){
-                window.location.href=`/user/shop?category=${currentCategory}&&sort=ztoa&&type=-1`
+                window.location.href=`/user/shop?leastAmount=${leastAmount}&&highestAmount=${highestAmount}&&category=${currentCategory}&&sort=ztoa&&type=-1`
             }else if(value=='popHigh2Low'){
-                window.location.href=`/user/shop?category=${currentCategory}&&sort=popHightoLow&&type=1`
+                window.location.href=`/user/shop?leastAmount=${leastAmount}&&highestAmount=${highestAmount}&&category=${currentCategory}&&sort=popHightoLow&&type=1`
             }else if(value=='popLow2High'){
-                window.location.href=`/user/shop?category=${currentCategory}&&sort=popLowtoHigh&&type=-1`
+                window.location.href=`/user/shop?leastAmount=${leastAmount}&&highestAmount=${highestAmount}&&category=${currentCategory}&&sort=popLowtoHigh&&type=-1`
             }else if(value=='priceHigh2Low'){
-                window.location.href=`/user/shop?category=${currentCategory}&&sort=priceHightoLow&&type=1`
+                window.location.href=`/user/shop?leastAmount=${leastAmount}&&highestAmount=${highestAmount}&&category=${currentCategory}&&sort=priceHightoLow&&type=1`
             }else if(value=='priceLow2High'){
-                window.location.href=`/user/shop?category=${currentCategory}&&sort=priceLowtoHigh&&type=-1`
+                window.location.href=`/user/shop?leastAmount=${leastAmount}&&highestAmount=${highestAmount}&&category=${currentCategory}&&sort=priceLowtoHigh&&type=-1`
             }
         }else if(currentCategory && page && limit){
             if(value=='newArrival'){
-                window.location.href=`/user/shop?category=${currentCategory}&&page=${page}&&limit=${limit}&&sort=newArrival&&type=1`
+                window.location.href=`/user/shop?leastAmount=${leastAmount}&&highestAmount=${highestAmount}&&category=${currentCategory}&&page=${page}&&limit=${limit}&&sort=newArrival&&type=1`
             }else if(value=='a2z'){
-                window.location.href=`/user/shop?category=${currentCategory}&&page=${page}&&limit=${limit}&&sort=atoz&&type=1`
+                window.location.href=`/user/shop?leastAmount=${leastAmount}&&highestAmount=${highestAmount}&&category=${currentCategory}&&page=${page}&&limit=${limit}&&sort=atoz&&type=1`
             }else if(value=='z2a'){
-                window.location.href=`/user/shop?category=${currentCategory}&&page=${page}&&limit=${limit}&&sort=ztoa&&type=-1`
+                window.location.href=`/user/shop?leastAmount=${leastAmount}&&highestAmount=${highestAmount}&&category=${currentCategory}&&page=${page}&&limit=${limit}&&sort=ztoa&&type=-1`
             }else if(value=='popHigh2Low'){
-                window.location.href=`/user/shop?category=${currentCategory}&&page=${page}&&limit=${limit}&&sort=popHightoLow&&type=1`
+                window.location.href=`/user/shop?leastAmount=${leastAmount}&&highestAmount=${highestAmount}&&category=${currentCategory}&&page=${page}&&limit=${limit}&&sort=popHightoLow&&type=1`
             }else if(value=='popLow2High'){
-                window.location.href=`/user/shop?category=${currentCategory}&&page=${page}&&limit=${limit}&&sort=popLowtoHigh&&type=-1`
+                window.location.href=`/user/shop?leastAmount=${leastAmount}&&highestAmount=${highestAmount}&&category=${currentCategory}&&page=${page}&&limit=${limit}&&sort=popLowtoHigh&&type=-1`
             }else if(value=='priceHigh2Low'){
-                window.location.href=`/user/shop?category=${currentCategory}&&page=${page}&&limit=${limit}&&sort=priceHightoLow&&type=1`
+                window.location.href=`/user/shop?leastAmount=${leastAmount}&&highestAmount=${highestAmount}&&category=${currentCategory}&&page=${page}&&limit=${limit}&&sort=priceHightoLow&&type=1`
             }else if(value=='priceLow2High'){
-                window.location.href=`/user/shop?category=${currentCategory}&&page=${page}&&limit=${limit}&&sort=priceLowtoHigh&&type=-1`
+                window.location.href=`/user/shop?leastAmount=${leastAmount}&&highestAmount=${highestAmount}&&category=${currentCategory}&&page=${page}&&limit=${limit}&&sort=priceLowtoHigh&&type=-1`
             }
         }else if(page && limit){
             if(value=='newArrival'){
-                window.location.href=`/user/shop?page=${page}&&limit=${limit}&&sort=newArrival&&type=1`
+                window.location.href=`/user/shop?leastAmount=${leastAmount}&&highestAmount=${highestAmount}&&page=${page}&&limit=${limit}&&sort=newArrival&&type=1`
             }else if(value=='a2z'){
-                window.location.href=`/user/shop?page=${page}&&limit=${limit}&&sort=atoz&&type=1`
+                window.location.href=`/user/shop?leastAmount=${leastAmount}&&highestAmount=${highestAmount}&&page=${page}&&limit=${limit}&&sort=atoz&&type=1`
             }else if(value=='z2a'){
-                window.location.href=`/user/shop?page=${page}&&limit=${limit}&&sort=ztoa&&type=-1`
+                window.location.href=`/user/shop?leastAmount=${leastAmount}&&highestAmount=${highestAmount}&&page=${page}&&limit=${limit}&&sort=ztoa&&type=-1`
             }else if(value=='popHigh2Low'){
-                window.location.href=`/user/shop?page=${page}&&limit=${limit}&&sort=popHightoLow&&type=1`
+                window.location.href=`/user/shop?leastAmount=${leastAmount}&&highestAmount=${highestAmount}&&page=${page}&&limit=${limit}&&sort=popHightoLow&&type=1`
             }else if(value=='popLow2High'){
-                window.location.href=`/user/shop?page=${page}&&limit=${limit}&&sort=popLowtoHigh&&type=-1`
+                window.location.href=`/user/shop?leastAmount=${leastAmount}&&highestAmount=${highestAmount}&&page=${page}&&limit=${limit}&&sort=popLowtoHigh&&type=-1`
             }else if(value=='priceHigh2Low'){
-                window.location.href=`/user/shop?page=${page}&&limit=${limit}&&sort=priceHightoLow&&type=1`
+                window.location.href=`/user/shop?leastAmount=${leastAmount}&&highestAmount=${highestAmount}&&page=${page}&&limit=${limit}&&sort=priceHightoLow&&type=1`
             }else if(value=='priceLow2High'){
-                window.location.href=`/user/shop?page=${page}&&limit=${limit}&&sort=priceLowtoHigh&&type=-1`
+                window.location.href=`/user/shop?leastAmount=${leastAmount}&&highestAmount=${highestAmount}&&page=${page}&&limit=${limit}&&sort=priceLowtoHigh&&type=-1`
             }
+        }else{
+            if(value=='newArrival'){
+                window.location.href=`/user/shop?leastAmount=${leastAmount}&&highestAmount=${highestAmount}&&sort=newArrival&&type=1`
+            }else if(value=='a2z'){
+                window.location.href=`/user/shop?leastAmount=${leastAmount}&&highestAmount=${highestAmount}&&sort=atoz&&type=1`
+            }else if(value=='z2a'){
+                window.location.href=`/user/shop?leastAmount=${leastAmount}&&highestAmount=${highestAmount}&&sort=ztoa&&type=-1`
+            }else if(value=='popHigh2Low'){
+                window.location.href=`/user/shop?leastAmount=${leastAmount}&&highestAmount=${highestAmount}&&sort=popHightoLow&&type=1`
+            }else if(value=='popLow2High'){
+                window.location.href=`/user/shop?leastAmount=${leastAmount}&&highestAmount=${highestAmount}&&sort=popLowtoHigh&&type=-1`
+            }else if(value=='priceHigh2Low'){
+                window.location.href=`/user/shop?leastAmount=${leastAmount}&&highestAmount=${highestAmount}&&sort=priceHightoLow&&type=1`
+            }else if(value=='priceLow2High'){
+                window.location.href=`/user/shop?leastAmount=${leastAmount}&&highestAmount=${highestAmount}&&sort=priceLowtoHigh&&type=-1`
+            } 
         }
         
     })

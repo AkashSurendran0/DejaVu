@@ -45,5 +45,10 @@ routes.post('/coupon/editCoupon/:id', adminAuth, couponRoutes.editCoupon)
 routes.get('/coupon/changeStatus/:id', adminAuth, couponRoutes.changeCouponStatus)
 routes.get('/coupon/deleteCoupon/:id', adminAuth, couponRoutes.deleteCoupon)
 routes.get('/order/confirmReturn', adminAuth, orderRoutes.confirmReturn)
+routes.get('/getSalesReport', adminAuth, adminRoutes.getSalesReport)
+routes.get('/downloadSalesReport', adminAuth, adminRoutes.downloadSalesReport)
+routes.get('/downloadSalesExcelReport', adminAuth, adminRoutes.downloadSalesExcelReport)
+routes.get('/addProductOffer', adminAuth, offerRoutes.addSingleProductOffer)
+routes.get('/removeProductOffer', adminAuth, offerRoutes.removeSingleProductOffer)
 
 module.exports=routes;

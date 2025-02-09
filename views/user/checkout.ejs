@@ -289,11 +289,11 @@
                 <h2 class="mb-4 mt-5" style="font-weight: bold;">CHECKOUT</h2>
                 <div style="display: flex;justify-content: space-between;">
                   <p>Cart total:</p>
-                  <p id="cartTotal">₹<%= products.totalAmount %></p>
+                  <p id="cartTotal">₹<%= totalAmount %></p>
                 </div>
                 <div style="display: flex;justify-content: space-between;">
                   <p>Discount:</p>
-                  <p>₹0</p>
+                  <p>₹<%= products.offerDiscount?? 0 %></p>
                 </div>
                 <hr>
                 <div style="display: flex;justify-content: space-between;">
@@ -315,21 +315,33 @@
         </div>
         <div class="col-md-12">
           <h2 class="mb-4 mt-4" style="font-weight: bold;">SELECT PAYMENT OPTION</h2>
-          <div class="card mb-2 codDiv" onclick="codDiv()">
-            <div class="card-body d-flex align-items-center">
-              <input value="Cash On Delivery" type="radio" class="mr-3 codRadio" name="payment">
-              <div>
-                <b>Cash On Delivery</b>
-                <p>Pay at your doorstep once you got your product.</p>
+          <% if(products.totalAmount > 1000){ %>
+            <div class="card mb-2 codDiv">
+              <div class="card-body d-flex align-items-center" style="opacity: 50%;">
+                <input value="Cash On Delivery" type="radio" class="mr-3 codRadio" name="payment" disabled>
+                <div>
+                  <b>Cash On Delivery</b>
+                  <p>Pay at your doorstep once you got your product.</p>
+                </div>
               </div>
             </div>
-          </div>
-          <div class="card">
+          <% }else{ %>
+            <div class="card mb-2 codDiv" onclick="codDiv()">
+              <div class="card-body d-flex align-items-center">
+                <input value="Cash On Delivery" type="radio" class="mr-3 codRadio" name="payment">
+                <div>
+                  <b>Cash On Delivery</b>
+                  <p>Pay at your doorstep once you got your product.</p>
+                </div>
+              </div>
+            </div>
+          <% } %>
+          <div class="card razorpayDiv" onclick="razorpayDiv()">
             <div class="card-body d-flex align-items-center">
-              <input value="Online Payment" type="radio" class="mr-3" name="payment">
+              <input value="Online Payment" type="radio" class="mr-3 razorRadio" name="payment">
               <div>
-                <b>Other Payment Method</b>
-                <p>Other online payment methods.</p>
+                <b>Online Payment</b>
+                <p>Get non contact delivery at your doorstep</p>
               </div>
             </div>
           </div>
@@ -521,6 +533,7 @@
 
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
   <script>
 
@@ -589,7 +602,13 @@ const codDiv = () =>{
   const codDiv = document.querySelector('.codDiv');
   codDiv.style.transition = "border-color 0.5s ease";
   codDiv.style.borderColor = "gold";
+}
 
+const razorpayDiv = () =>{
+  document.querySelector('.razorRadio').checked=true
+  const razorpayDiv = document.querySelector('.razorpayDiv');
+  razorpayDiv.style.transition = "border-color 0.5s ease";
+  razorpayDiv.style.borderColor = "gold";
 }
 
 const editAddress = (id,name,state,street,apartment,city,postcode,phone,altPhone,cartId) =>{
@@ -621,7 +640,7 @@ const editAddress = (id,name,state,street,apartment,city,postcode,phone,altPhone
   document.querySelector('.addressForm').action=`/user/settings/addAddressFromCheckout/${cartId}?address=${id}`
 }
 
-const orderBtn = () =>{
+const orderBtn = async () =>{
   const selectedAddress=document.querySelector('input[name="address"]:checked')
   if(!selectedAddress || selectedAddress==null){
     return Swal.fire({
@@ -640,39 +659,190 @@ const orderBtn = () =>{
       title:'Payment Error'
     })
   }
-  const paymentMethod=payment.value
-  
-  let couponApplied=false
-  if(document.getElementById('couponApply').style.display='none'){
-    couponApplied=document.getElementById('coupon').value
-  }
-  fetch(`/user/placeOrder?address=${address}&&cart=<%= products._id %>&&method=${paymentMethod}&&coupon=${couponApplied}`,{
-    method:'GET'
-  })
-  .then(response=>response.json())
-  .then(data=>{
-    if(data.success){
-      Swal.fire({
-        title:'Order Confirmed',
-        text:'Your order has been successfully placed!',
-        icon:'success',
-        confirmButtonText:'Done'
-      })
-      .then(result=>{
-        if(result.isConfirmed){
-          window.location.href=`/user/settings/orders`
-        }
-      })
-    }else{
-      Swal.fire({
-        title:'Order Error',
-        text:'There was an error while placing the order',
-        icon:'error',
-        confirmButtonText:'Ok'
-      })
+  let paymentMethod=payment.value
+  if(paymentMethod=='Online Payment'){
+    await fetch(`/user/razorPayment?cart=<%= products._id %>`, {
+      method:'GET'
+    })
+    .then(response=>response.json())
+    .then(data=>{
+      if(!data.success){
+        Swal.fire({
+          icon:'error',
+          title:'Error',
+          text:'Server is busy right now. Please try again later'
+        })
+      }else{
+        const options={
+          key:'rzp_test_8RKWZFiJMDAIeS',
+          amount:data.orders.amount,
+          currency:data.orders.currency,
+          name:'DejaVu Mens Store',
+          description:'Purchase from DejaVu store',
+          order_id:data.orders.id,
+          handler:async function(response){
+            console.log(response);
+            const verifyResponse=await fetch('/user/razorpay/verify-payment', {
+              method:'POST',
+              headers:{
+                'Content-Type':'application/json'
+              },
+              body:JSON.stringify({
+                payment_id:response.razorpay_payment_id,
+                order_id:response.razorpay_order_id,
+                signature:response.razorpay_signature
+              })
+            })
+            .then(response=>response.json())
+            .then(data=>{
+              if(data.success){                
+                let couponApplied=false
+                if(document.getElementById('couponApply').style.display='none'){
+                  couponApplied=document.getElementById('coupon').value
+                }
+                fetch(`/user/placeOrder?address=${address}&&cart=<%= products._id %>&&method=${paymentMethod}&&coupon=${couponApplied}`,{
+                  method:'GET'
+                })
+                .then(response=>response.json())
+                .then(data=>{
+                  if(data.success){
+                    Swal.fire({
+                      title:'Order Confirmed',
+                      text:'Your order has been successfully placed!',
+                      icon:'success',
+                      confirmButtonText:'Done'
+                    })
+                    .then(result=>{
+                      if(result.isConfirmed){
+                        return window.location.href=`/user/settings/orders`
+                      }
+                    })
+                  }else{
+                    return Swal.fire({
+                      title:'Order Error',
+                      text:'There was an error while placing the order',
+                      icon:'error',
+                      confirmButtonText:'Ok'
+                    })
+                  }
+                })
+              }else{
+                return Swal.fire({
+                    title:'Order Error',
+                    text:'There was an error while placing the order',
+                    icon:'error',
+                    confirmButtonText:'Ok'
+                })
+              }
+            })
+          },
+          prefill:{
+            name:'Akash Surendran',
+            email:'akash@gmail.com',
+            contact:'1232655498'
+          },
+          theme:{color:"#0072C6"},
+          modal:{
+            escape:false,
+            ondismiss:function(){
+              Swal.fire({
+                icon:'error',
+                title:'Payment Failed',
+                text:'The payment failed. Either place order or retry payment',
+                showCancelButton:true,
+                cancelButtonText:'Place Order',
+                confirmButtonText:'Retry Payment',
+                didRender:()=>{
+                  const thirdButton=Swal.getPopup().querySelector('.swal2-actions')
+                  const newButton=document.createElement('button')
+                  newButton.innerText='Cancel'
+                  newButton.className='swal2-confirm swal2-styled'
+                  newButton.style.background='#C7C7C8'
+                  newButton.onclick=()=>{
+                    isClicked=true
+                    Swal.close()
+                  }
+                  thirdButton.appendChild(newButton)
+                }
+              })
+              .then(result=>{
+                if(isClicked){
+                  return
+                }else if(result.isConfirmed){
+                  razorpayObject.open()
+                }else if(result.isDismissed){
+                  paymentMethod='Payment Failed'
+                  let couponApplied=false
+                  if(document.getElementById('couponApply').style.display='none'){
+                    couponApplied=document.getElementById('coupon').value
+                  }
+                  fetch(`/user/placeOrder?address=${address}&&cart=<%= products._id %>&&method=${paymentMethod}&&coupon=${couponApplied}`,{
+                    method:'GET'
+                  })
+                  .then(response=>response.json())
+                  .then(data=>{
+                    if(data.success){
+                      Swal.fire({
+                        title:'Order Confirmed',
+                        text:'Your order has been successfully placed!',
+                        icon:'success',
+                        confirmButtonText:'Done'
+                      })
+                      .then(result=>{
+                        if(result.isConfirmed){
+                          return window.location.href=`/user/settings/orders`
+                        }
+                      })
+                    }else{
+                      return Swal.fire({
+                        title:'Order Error',
+                        text:'There was an error while placing the order',
+                        icon:'error',
+                        confirmButtonText:'Ok'
+                      })
+                    }
+                  })
+                }
+              })
+            }
+          }
+        }        
+        const razorpayObject=new Razorpay(options)        
+        razorpayObject.open()
+      }
+    })
+  }else{
+    let couponApplied=false
+    if(document.getElementById('couponApply').style.display='none'){
+      couponApplied=document.getElementById('coupon').value
     }
-  })
-
+    fetch(`/user/placeOrder?address=${address}&&cart=<%= products._id %>&&method=${paymentMethod}&&coupon=${couponApplied}`,{
+      method:'GET'
+    })
+    .then(response=>response.json())
+    .then(data=>{
+      if(data.success){
+        Swal.fire({
+          title:'Order Confirmed',
+          text:'Your order has been successfully placed!',
+          icon:'success',
+          confirmButtonText:'Done'
+        })
+        .then(result=>{
+          if(result.isConfirmed){
+            window.location.href=`/user/settings/orders`
+          }
+        })
+      }else{
+        Swal.fire({
+          title:'Order Error',
+          text:'There was an error while placing the order',
+          icon:'error',
+          confirmButtonText:'Ok'
+        })
+      }
+    })
+    }
 }
 
 const couponModal=document.getElementById('couponModal')

@@ -10,8 +10,22 @@ const STATUS_NOT_FOUND=parseInt(process.env.STATUS_NOT_FOUND)
 const loadCartPage = async (req,res)=>{
     try {
         const user=await users.findOne({email:req.session.userEmail})       
-        const productDetails=await carts.findOne({user:user._id}).populate('products.productId')       
-        res.render('cart', {cart:productDetails})
+        const productDetails=await carts.findOne({user:user._id}).populate('products.productId')   
+        let totalAmount=0 
+        if(productDetails!=null){
+            productDetails.products.forEach(product=>{
+                if(product.productId.regularPrice){
+                  totalAmount+=(product.productId.regularPrice*product.quantity)
+                }else{
+                  totalAmount+=(product.productId.amount*product.quantity)
+                }
+              })  
+        }       
+                  
+        res.render('cart', {
+            cart:productDetails,
+            totalAmount:totalAmount
+        })
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
         console.log(error.message);
@@ -27,6 +41,18 @@ const addToCart = async (req,res)=>{
         const quantity=parseInt(req.query.quantity) || 1        
         const user=await users.findOne({email: req.session.userEmail})
         const count=await carts.findOne({user:user._id})
+
+        const sizeAvailable = await products.find(
+            {
+                _id:product,
+                [`sizeAvailable.${size}`]:{
+                    $gt:0
+                }
+            }
+        )
+        if(sizeAvailable.length==0){
+            return res.json({noStock:true})
+        }
         
         let itemAlreadyExist
         if(count){
@@ -52,7 +78,6 @@ const addToCart = async (req,res)=>{
                 }
             ])
         } 
-        console.log(itemAlreadyExist);
         
         if(itemAlreadyExist && itemAlreadyExist.length>0){
             if(fromWishlist){                
@@ -75,6 +100,19 @@ const addToCart = async (req,res)=>{
                         }
                     }
                 )
+                const offerAmount=foundProduct.regularPrice-foundProduct.amount
+                if(foundProduct.hasOffer){
+                    await carts.updateOne(
+                        {
+                            user:user._id
+                        },
+                        {
+                            $inc:{
+                                offerDiscount:offerAmount
+                            }
+                        }
+                    )
+                }
                 await carts.updateOne(
                     {
                         user:user._id
@@ -92,7 +130,6 @@ const addToCart = async (req,res)=>{
             }            
             return res.json({success:true})
         }  
-        console.log('oombbbb');
         
         await carts.updateOne(
             {user: user._id},   
@@ -111,6 +148,23 @@ const addToCart = async (req,res)=>{
             },
             {upsert:true}
         )
+        if(foundProduct.regularPrice){
+            const offerAmount=(foundProduct.regularPrice-foundProduct.amount).toFixed(2)
+            console.log(offerAmount);
+            
+            if(foundProduct.hasOffer){
+                await carts.updateOne(
+                    {
+                        user:user._id
+                    },
+                    {
+                        $inc:{
+                            offerDiscount:offerAmount
+                        }
+                    }
+                )
+            }
+        }
         await carts.updateOne(
             {
                 user:user._id
@@ -152,6 +206,19 @@ const removeProduct = async (req,res)=>{
             }
         ])
         const foundProduct=await products.findOne({_id: productInCart[0].products.productId})
+        if(foundProduct.hasOffer){
+            const offerAmount=foundProduct.regularPrice-foundProduct.amount
+            await carts.updateOne(
+                {
+                    _id: cartId
+                },
+                {
+                    $inc:{
+                        offerDiscount:-offerAmount
+                    }
+                }
+            )
+        }
         
         await carts.updateOne(
             {_id: cartId},
@@ -215,9 +282,6 @@ const changeQuantity = async (req,res)=>{
                 }
             }
         ])
-        console.log(action);
-        console.log(currentQuantity);
-        console.log(stockAvailable);
         
         if(action==='increase'){
             if(currentQuantity < stockAvailable[0].sizeAvailable[size[0].products.size] && currentQuantity<5){

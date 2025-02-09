@@ -28,7 +28,7 @@ const showCategories = async (req,res)=>{
             message: req.flash('categoryExistsMessage')
         })
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).render('404page')
+        res.status(STATUS_SERVER_ERROR).render('admin404')
         console.log(error.message);
     }
 }
@@ -37,7 +37,7 @@ const addCategoriesForm = async (req,res)=>{
     try {
         res.render('addCategories', {message: req.flash('categoryExistsMessage')})
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).render('404page')
+        res.status(STATUS_SERVER_ERROR).render('admin404')
         console.log(error.message);
     }
 }
@@ -58,7 +58,7 @@ const addCategory = async (req,res)=>{
         req.flash('categoryAdded', 'Category added Successfully.')
         res.redirect('/admin/categories')
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).render('404page')
+        res.status(STATUS_SERVER_ERROR).render('admin404')
         console.log(error.message);
     }
 }
@@ -69,7 +69,7 @@ const editCategoryForm = async(req,res)=>{
         const category= await categories.findById(id)
         res.render('editCategory', {category: category})
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).render('404page')
+        res.status(STATUS_SERVER_ERROR).render('admin404')
         console.log(error.message);
     }
 }
@@ -93,7 +93,7 @@ const editCategory = async(req,res)=>{
         req.flash('categoryEdited', 'Category Edited Successfully.')
         res.redirect('/admin/categories')
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).render('404page')
+        res.status(STATUS_SERVER_ERROR).render('admin404')
         console.log(error.message);
     }  
 }
@@ -114,7 +114,7 @@ const deleteCategory = async(req,res)=>{
         req.flash('categoryDeleted', 'Category Deleted Successfully.')
         res.redirect('/admin/categories')
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).render('404page')
+        res.status(STATUS_SERVER_ERROR).render('admin404')
         console.log(error.message);
     }
     

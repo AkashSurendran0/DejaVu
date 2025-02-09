@@ -145,7 +145,33 @@
     background-color: #c4c4c4;
 }
 
+.invoiceBtn{
+  border-radius: 15px;
+  width: 20%;
+  border: none;
+  background-color: gold;
+  color: white;
+  height: 40px;
+  transition: background-color 0.3s ease;
+}
 
+.invoiceBtn:hover{
+  background-color: rgb(255, 229, 79);
+}
+
+.paymentBtn{
+  border-radius: 15px;
+  width: 25%;
+  border: none;
+  background-color: rgb(97, 145, 255);
+  color: white;
+  height: 40px;
+  transition: background-color 0.3s ease;
+}
+
+.paymentBtn:hover{
+  background-color: rgb(55, 115, 255);
+}
 
 
 </style>
@@ -185,6 +211,12 @@
                         <p><b>Total Amount:</b>&nbsp;&nbsp;&nbsp;₹<%= order[0].totalAmount %></p>
                         <p><b>Total Quantity:</b>&nbsp;&nbsp;&nbsp;<%= order[0].quantity %></p>
                         <p><b>Payment:</b>&nbsp;&nbsp;&nbsp;<%= order[0].paymentmethod %></p>
+                        <% if(order[0].status=='Delivered'){ %>
+                          <p><button class="mt-2 invoiceBtn" onclick="downloadInvoice('<%= order[0]._id %>')">Get Invoice</button></p>
+                        <% } %>
+                        <% if(order[0].paymentmethod=='Payment Failed'){ %>
+                          <p><button class="mt-2 paymentBtn" onclick="retryPayment('<%= order[0]._id %>')">Retry Payment</button></p>
+                        <% } %>
                     </div>
                     <div class="col-md-6 d-flex">
                       <% if(order[0].status=='Cancelled'){ %>
@@ -320,7 +352,12 @@
 
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
+
+    const downloadInvoice = (orderId) =>{
+      window.location.href=`/user/order/downloadInvoice?order=${orderId}`
+    }
 
     const deliveryStatus='<%= order[0].status %>'
     if(deliveryStatus=='Pending'){
@@ -452,6 +489,105 @@
               })
             }
           })
+        }
+      })
+    }
+
+    const retryPayment = (orderId) =>{
+      fetch(`/user/razorPayment?order=${orderId}`, {
+        method:'GET'
+      })
+      .then(response=>response.json())
+      .then(data=>{
+        if(!data.success){
+          Swal.fire({
+            icon:'error',
+            title:'Error',
+            text:'Server is busy right now. Please try again later'
+          })
+        }else{
+          const options={
+            key:'rzp_test_8RKWZFiJMDAIeS',
+            amount:data.orders.amount,
+            currency:data.orders.currency,
+            name:'DejaVu Mens Store',
+            description:'Purchase from DejaVu store',
+            order_id:data.orders.id,
+            handler:async function(response){
+              const verifyResponse=await fetch('/user/razorpay/verify-payment', {
+                method:'POST',
+                headers:{
+                  'Content-Type':'application/json'
+                },
+                body:JSON.stringify({
+                  payment_id:response.razorpay_payment_id,
+                  order_id:response.razorpay_order_id,
+                  signature:response.razorpay_signature
+                })
+              })
+              .then(response=>response.json())
+                .then(data=>{
+                  if(data.success){
+                    fetch(`/user/completePayment?order=${orderId}`, {
+                      method:'GET'
+                    })
+                    .then(response=>response.json())
+                    .then(data=>{
+                      if(data.success){
+                        Swal.fire({
+                          icon:'success',
+                          title:'Payment Done',
+                          text:'Payment has been completed successfully'
+                        })
+                        .then(result=>{
+                          if(result.isConfirmed){
+                            window.location.href=`/user/order/order-summary/${orderId}`
+                          }
+                        })
+                      }else{
+                        Swal.fire({
+                          icon:'error',
+                          title:'Payment Error',
+                          text:'The server is busy right now. Please try again later'
+                        })
+                      }
+                    })
+                  }else{
+                    return Swal.fire({
+                      title:'Order Error',
+                      text:'There was an error while placing the order',
+                      icon:'error',
+                      confirmButtonText:'Ok'
+                    })
+                  }
+                })
+            },
+            prefill:{
+              name:'Akash Surendran',
+              email:'akash@gmail.com',
+              contact:'1232655498'
+            },
+            theme:{color:'#0072C6'},
+            modal:{
+              escape:false,
+              ondismiss:function(){
+                Swal.fire({
+                  icon:'error',
+                  title:'Payment Failed',
+                  text:'Something unexpected happened. Please try again.',
+                  showCancelButton:true,
+                  confirmButtonText:'Try again'
+                })
+                .then(result=>{
+                  if(result.isConfirmed){
+                    razorpayObject.open()
+                  }
+                })
+              }
+            }
+          }
+          const razorpayObject=new Razorpay(options)
+          razorpayObject.open()
         }
       })
     }

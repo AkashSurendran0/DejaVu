@@ -26,6 +26,27 @@
       flex-direction: row-reverse;
       justify-content: flex-end;
     }
+
+	.productSearch{
+		margin-left: 40px;
+	}
+
+	.search-input {
+        width: 400px;
+        padding: 10px 40px 10px 35px;
+        border: 2px solid #555;
+        border-radius: 25px;
+        background-color: #ffffff;
+        color: black;
+        font-size: 16px;
+        outline: none;
+        transition: 0.3s;
+    }
+
+	.search-input:focus {
+        border-color: #dbcc8f;
+    }
+
 </style>
 
     <div class="hero-wrap hero-bread" style="background-image: url('<%= banner.image %>');">
@@ -57,12 +78,13 @@
 					  <li><a href="/user" style="color: rgba(33, 37, 41, 0.75);">Home&nbsp;&nbsp;>&nbsp;&nbsp;</a></li>
 					  <li><a href="/user/shop" style="color: rgba(33, 37, 41, 0.75);">Shop&nbsp;&nbsp;>&nbsp;&nbsp;</a></li>
 					  <li><%= product[0].resultProducts.name %></li>
+					  <li class='productSearch'><input type="text" id="searchField" class="search-input" placeholder="Search for products..."></li>
 					</ol>
 				  </nav>
     			<div class="col-md-8 col-lg-10 order-md-last">
-    				<div class="row">
+    				<div class="row" id="productImages">
                         <% for(let i=0;i<product.length;i++){ %>
-		    			<div class="col-sm-12 col-md-12 col-lg-4 ftco-animate d-flex">
+		    			<div class="col-sm-12 col-md-12 col-lg-4 ftco-animate d-flex mt-3">
 		    				<div class="product d-flex flex-column">
 		    					<a href="/user/shop/product-details/<%= product[i]._id %>" class="img-prod"><img class="img-fluid" src="<%= product[i].images[0] %>" alt="Colorlib Template">
 		    						<div class="overlay"></div>
@@ -252,18 +274,99 @@
 			  </div>
 			</div>
 		  </div>
-		  <div class="row">
-			<div class="col-md-12 text-center">
-	
-			  <p><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-							Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="icon-heart color-danger" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
-							<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-						  </p>
-			</div>
-		  </div>
 		</div>
 
 		<script>
+
+			const newUrlParams=new URLSearchParams(window.location.search)
+			const currentCategory=newUrlParams.get('category')
+
+			document.getElementById('searchField').addEventListener('input', ()=>{
+				const name=document.getElementById('searchField').value
+				// if(name.trim()==''){
+				// 	window.location.href='/user/shop'
+				// }
+				fetch(`/user/findProducts?name=${name}&&category=${currentCategory}`, {
+					method:"GET"
+				})
+				.then(response=>response.json())
+				.then(data=>{
+					const product=data.products
+					const productImages=document.getElementById('productImages')
+					productImages.innerHTML=''
+					let eachProduct=''
+					for (let i = 0; i < product.length; i++) {
+						let ratingStars = '';
+						if (!product[i].avgRating || product[i].avgRating == null) {
+							for (let j = 5; j >= 1; j--) {
+								ratingStars += `
+									<input type="radio" name="rating" id="review-star${j}" value="${j}" disabled>
+									<label for="review-star${j}" style="color: #ddd;">★</label>
+								`;
+							}
+						} else {
+							for (let j = 5; j >= 1; j--) {
+								if (j <= Math.floor(product[i].avgRating)) {
+									ratingStars += `
+										<input type="radio" name="rating" id="review-star${j}" value="${j}" disabled>
+										<label for="review-star${j}" style="color: #dbcc8f;">★</label>
+									`;
+								} else {
+									ratingStars += `
+										<input type="radio" name="rating" id="review-star${j}" value="${j}" disabled>
+										<label for="review-star${j}" style="color: #ddd;">★</label>
+									`;
+								}
+							}
+						}
+
+						eachProduct += `
+							<div class="col-sm-12 col-md-12 col-lg-4 ftco-animate d-flex mt-3">
+								<div class="product d-flex flex-column">
+									<a href="/user/shop/product-details/${product[i]._id}" class="img-prod">
+										<img class="img-fluid" src="${product[i].images[0]}" alt="Colorlib Template">
+										<div class="overlay"></div>
+									</a>
+									<div class="text py-3 pb-4 px-3">
+										<div class="d-flex" style="justify-content: space-between;">
+											<div class="cat">
+											</div>
+											<div class="review-stars">
+												${ratingStars}
+											</div>
+										</div>
+										<h3><a href="/user/shop/product-details/${product[i]._id}">${product[i].productName}</a></h3>
+										<div class="pricing">
+											${product[i].regularPrice ? `
+												<p class="price" id="price">
+													<span class="mr-2" style="color: red;"><del>₹${product[i].regularPrice}</del></span>
+													<span class="mr-2">₹${product[i].amount}</span>
+													<span style="font-size: 12px;color: white;background-color: red; padding-left: 2px;padding-right: 2px;">
+														${Math.floor(((product[i].regularPrice - product[i].amount) / product[i].regularPrice) * 100)}% off
+													</span>
+												</p>
+											` : `
+												<p class="price" id="price"><span>₹${product[i].amount}</span></p>
+											`}
+										</div>
+										<p class="bottom-area d-flex px-3">
+											<a href="/user/shop/product-details/${product[i]._id}" class="add-to-cart text-center py-2 mr-1">
+												<span>Add to cart <i class="ion-ios-add ml-1"></i></span>
+											</a>
+											<a href="#" class="buy-now text-center py-2">Buy now<span><i class="ion-ios-cart ml-1"></i></span></a>
+										</p>
+									</div>
+								</div>
+							</div>
+						`;
+					}
+
+					productImages.innerHTML=eachProduct
+
+				})
+			})			
+
+
 			const currentURL = window.location.href;
 						
 			const navLinks = document.querySelectorAll(".block-27 a");
@@ -275,8 +378,6 @@
 					link.classList.remove("active");
 				}
 			});
-			
-			
 			</script>
 		
 	  </footer>

@@ -51,6 +51,14 @@ const productSchema=new mongoose.Schema({
         type:String,
         required: false
     }],
+    hasOffer:{
+        type:Boolean,
+        required:false
+    },
+    singleProductOffer:{
+        type:Boolean,
+        required:false
+    },
     review:[{
         user:{
             type:mongoose.Schema.Types.String,

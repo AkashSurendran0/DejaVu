@@ -41,6 +41,14 @@ const orderSchema=new mongoose.Schema({
         default: 'Pending',
         required: true
     },
+    offerDiscount:{
+        type:Number,
+        required:false
+    },
+    couponDiscount:{
+        type:Number,
+        required:false
+    },
     quantity:{
         type:Number,
         required:true
@@ -48,7 +56,7 @@ const orderSchema=new mongoose.Schema({
     paymentmethod:{
         type:String,
         required:true,
-        enum:['Cash On Delivery','other payment']
+        enum:['Cash On Delivery','Online Payment','Payment Failed']
     },
     totalAmount:{
         type:Number,

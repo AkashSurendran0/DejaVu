@@ -42,18 +42,14 @@
                             <option value="<%= categories[i].name %>"><%= categories[i].name %></option>
                         <% } %>
                     </select>
+                    <label for="">Offer:</label>
+                    <input type="number" name="offer" id="offer" required>
+                </div>
+                <div class="col-md-6">
                     <label for="">Min Price:</label>
                     <input type="number" name="minPrice" id="minPrice" required>
                     <label for="">Max Price</label>
                     <input type="number" name="maxPrice" id="maxPrice" required>
-                </div>
-                <div class="col-md-6">
-                    <label for="">Start Date:</label>
-                    <input type="datetime-local" name="startDate" id="startDate" required>
-                    <label for="">End Date:</label>
-                    <input type="datetime-local" name="endDate" id="endDate" required>
-                    <label for="">Offer:</label>
-                    <input type="number" name="offer" id="offer" required>
                 </div>
                 <div class="d-flex justify-content-center mt-4">
                     <input style="width: 300px;" id="submitBtn" class="btn btn-success" type="submit" value="Add offer">
@@ -69,25 +65,6 @@
 <script>
 
     document.getElementById('submitBtn').addEventListener('click', ()=>{
-        const startDate=document.getElementById('startDate').value
-        const endDate=document.getElementById('endDate').value
-        if(new Date(startDate) >= new Date(endDate)){
-            event.preventDefault()
-            Swal.fire({
-                icon: 'error',
-                title: 'Error!',
-                text: 'Start Date should not be greater than End date',
-            })
-            return
-        }else if(new Date(startDate) < new Date()){
-            event.preventDefault()
-            Swal.fire({
-                icon: 'error',
-                title: 'Error!',
-                text: 'Start Date should not be in the past',
-            })
-            return
-        }
 
         const amountPattern=/^[0-9]+$/
         const offerPattern=/^[0-9]{2}$/

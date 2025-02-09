@@ -73,15 +73,11 @@
               </div>
               <div style="display: flex;justify-content: space-between;">
                   <p>SubTotal</p>
-                  <p id="subTotal">₹<%= cart.totalAmount %></p>
-              </div>
-              <div style="display: flex;justify-content: space-between;">
-                  <p>Delivery</p>
-                  <p id="delivery">₹0</p>
+                  <p id="subTotal">₹<%= totalAmount?? cart.totalAmount %></p>
               </div>
               <div style="display: flex;justify-content: space-between;">
                   <p>Discount</p>
-                  <p id="discount">₹0</p>
+                  <p id="discount">₹<%= cart.offerDiscount?? 0 %></p>
               </div>
               <hr>
               <div style="display: flex;justify-content: space-between;">
@@ -166,10 +162,25 @@
     </div>
   </footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
 
-    const goToCheckout=(cartId)=>{
-      window.location.href=`/user/checkout/${cartId}`
+    const goToCheckout=(cartId)=>{      
+      fetch(`/user/checkQuantity/${cartId}`, {
+        method:'GET'
+      })
+      .then(response=>response.json())
+      .then(data=>{
+        if(data.success){
+          window.location.href=`/user/loadCheckout/${cartId}`
+        }else{
+          Swal.fire({
+            icon:'error',
+            title:'No stock',
+            text:`Not enough stock is available for ${data.name}`
+          })
+        }
+      })
     }
 
     const changeQuantity = (cartId,cartProductId,action,productAmount,productId) =>{
@@ -183,7 +194,6 @@
       .then(response=>response.json())
       .then(data=>{
         const cart=data.updatedCart
-        console.log(cart);
 
         if(data.increase && action==='increase'){                    
           if(currentQuantity<5){
@@ -196,8 +206,17 @@
             quantityInput.value=currentQuantity 
           }
         }
-        document.getElementById(`amountData${productId}`).innerText=`₹${productAmount*currentQuantity}`
-        document.getElementById('subTotal').innerText=`₹${cart.totalAmount}`
+        let totalAmount=0
+        cart.products.forEach(product=>{
+          if(product.productId.regularPrice){
+            totalAmount+=(product.productId.regularPrice*product.quantity)
+          }else{
+            totalAmount+=(product.productId.amount*product.quantity)
+          }
+        })
+        
+        document.getElementById('subTotal').innerText=`₹${totalAmount}`
+        document.getElementById(`amountData${productId}`).innerText=`₹${(productAmount*currentQuantity).toFixed(2)}`
         document.getElementById('totalAmount').innerText=`₹${cart.totalAmount}`
       })
       }

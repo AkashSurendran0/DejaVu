@@ -201,6 +201,12 @@
           title:'Add to Cart',
           text:'Product already exists in your cart'
         })
+      }else if(data.noStock){
+        Swal.fire({
+          icon:'error',
+          title:'No stock',
+          text:'Not enough stock is available for this product'
+        })
       }else{
         Swal.fire({
           icon:'error',

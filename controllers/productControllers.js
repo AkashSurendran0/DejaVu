@@ -37,7 +37,7 @@ const showProducts = async (req,res)=>{
             limit: limit    
         })
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).render('404page')
+        res.status(STATUS_SERVER_ERROR).render('admin404')
         console.log(error.message);
     }
 }
@@ -49,7 +49,7 @@ const addProductForm = async (req,res)=>{
             messageInvalid: req.flash('authError')
         })
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).render('404page')
+        res.status(STATUS_SERVER_ERROR).render('admin404')
         console.log(error.message);
     }  
 }
@@ -88,7 +88,7 @@ const addProduct = async (req,res)=>{
         req.flash('addedSuccess', 'Product Added Successfully')
         res.redirect('/admin/products')
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).render('404page')
+        res.status(STATUS_SERVER_ERROR).render('admin404')
         console.log(error.message);
     }
 }
@@ -101,7 +101,7 @@ const editProductForm = async (req,res)=>{
         console.log(product);
         res.render('editProduct', {product: product, category: categoryList})
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).render('404page')
+        res.status(STATUS_SERVER_ERROR).render('admin404')
         console.log(error.message);
     }  
 }
@@ -145,7 +145,7 @@ const editProduct = async(req,res)=>{
         req.flash('editSuccess', 'Product Edited Successfully')
         res.redirect('/admin/products')
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).render('404page')
+        res.status(STATUS_SERVER_ERROR).render('admin404')
         console.log(error.message);
     }
 }
@@ -169,7 +169,7 @@ const deleteProduct = async (req,res)=>{
         }
         res.redirect('/admin/products')
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).render('404page')
+        res.status(STATUS_SERVER_ERROR).render('admin404')
         console.log(error.message);
     }
 }
@@ -446,6 +446,47 @@ const addProductReview = async (req,res)=>{
     }
 }
 
+const findProducts = async (req,res)=>{
+    try {
+        const name=req.query.name
+        const category=req.query.category?.trim()     
+
+        if(category && category !== "null" && category !== ""){
+            const foundCategory=await categories.findOne(
+                {
+                    name:{
+                        $regex: new RegExp(`^${category}`, 'i')
+                    }
+                }
+            )
+            
+            const foundProducts=await products.find(
+                {
+                    productName:{
+                        $regex: new RegExp(`^${name}`, 'i')
+                    },
+                    category:foundCategory._id
+                }
+            ).limit(9)
+            return res.json({products:foundProducts})
+        }
+        
+        const foundProducts=await products.find(
+            {
+                productName:{
+                    $regex: new RegExp(`^${name}`, 'i')
+                },
+            }
+        ).limit(9)
+        
+        res.json({products:foundProducts})
+
+    } catch (error) {
+        res.status(STATUS_SERVER_ERROR).render('404page')
+        console.log(error.message);
+    }
+}
+
 module.exports={
     showProducts,
     addProductForm,
@@ -455,5 +496,6 @@ module.exports={
     deleteProduct,
     loadProductDetailsPage,
     addProductReview,
-    loadShopPage
+    loadShopPage,
+    findProducts
 }

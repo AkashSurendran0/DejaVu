@@ -1,14 +1,6 @@
 const mongoose=require('mongoose')
 
 const offerSchema=new mongoose.Schema({
-    startDate:{
-        type:String,
-        required:true
-    },
-    endDate:{
-        type:String,
-        required:true
-    },
     minAmount:{
         type:Number,
         required:true
@@ -25,10 +17,6 @@ const offerSchema=new mongoose.Schema({
     offer:{
         type:Number,
         required:true
-    },
-    isActive:{
-        type:Boolean,
-        default:false
     }
 },{timestamps:true})
 

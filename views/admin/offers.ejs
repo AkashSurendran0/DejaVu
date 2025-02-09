@@ -33,10 +33,7 @@
                 <th class="px-4 py-3">Min Price</th>
                 <th class="px-4 py-3">Max Price</th>
                 <th class="px-4 py-3">Offer</th>
-                <th class="px-4 py-3">Start Date</th>
-                <th class="px-4 py-3">Expiry Date</th>
                 <th class="px-4 py-3">Created At</th>
-                <th class="px-4 py-3">Status</th>
                 <th class="px-4 py-3">Actions</th>
               </tr>
             </thead>
@@ -61,16 +58,7 @@
                     <%= offers[i].offer %> %
                 </td>
                 <td class="px-4 py-3 text-sm">
-                    <%= new Date(offers[i].startDate).toLocaleString() %>
-                </td>
-                <td class="px-4 py-3 text-sm">
-                    <%= new Date(offers[i].endDate).toLocaleString() %>
-                </td>
-                <td class="px-4 py-3 text-sm">
                     <%= offers[i].createdAt.toLocaleString() %>
-                </td>
-                <td class="px-4 py-3 text-sm">
-                    <%= offers[i].isActive? 'Active':'Not Active' %>
                 </td>
                 <td class="px-4 py-3">
                   <div style="display: flex;">
@@ -94,8 +82,8 @@
                       <button
                         class="flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-purple-600 rounded-lg dark:text-gray-400 focus:outline-none focus:shadow-outline-gray"
                         aria-label="Delete"
+                        onclick="deleteOffer('<%= offers[i]._id %>')"
                       >
-                      <a href="/admin/offers/deleteOffer/<%= offers[i]._id %>">
                       <svg
                         class="w-5 h-5"
                         aria-hidden="true"
@@ -108,7 +96,6 @@
                         clip-rule="evenodd"
                       ></path>
                       </svg>
-                      </a>
                     </button>
                   </div>
                 </td>
@@ -148,11 +135,37 @@
     </div>
   </main>
 
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
 
     setTimeout(()=>{
         document.getElementById('msg').innerHTML=''
     },2000)
+
+    const deleteOffer = (offerId) =>{
+      Swal.fire({
+        icon:'warning',
+        title:'Delete Offer',
+        text:'Do you want to delete this offer?',
+        showCancelButton:true,
+        cancelButtonText:'Cancel',
+        confirmButtonText:'Delete'
+      })
+      .then(result=>{
+        if(result.isConfirmed){
+          fetch(`/admin//offers/deleteOffer/${offerId}`, {
+            method:'GET'
+          })
+          .then(response=>response.json())
+          .then(data=>{
+            if(data.success){
+              window.location.href='/admin/offers'
+            }
+          })
+        }
+      })
+    }
 
   </script>
 

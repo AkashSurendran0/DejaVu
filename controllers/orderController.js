@@ -7,15 +7,53 @@ const products=require('../models/productSchema')
 const env=require('dotenv').config()
 const mongoose=require('mongoose')
 const { isErrored } = require('nodemailer/lib/xoauth2')
+const Razorpay=require('razorpay')
+const crypto=require('crypto')
+const PDFDocument=require('pdfkit')
+const fs=require('fs')
 
 const STATUS_SERVER_ERROR=parseInt(process.env.STATUS_SERVER_ERROR)
 const STATUS_NOT_FOUND=parseInt(process.env.STATUS_NOT_FOUND)
+
+const razorpayInstance=new Razorpay({
+    key_id:'rzp_test_8RKWZFiJMDAIeS',
+    key_secret:'ljyU5ZIohEiwxZvhtRqyGFy0'
+})
+
+const checkProductQuantity = async (req,res)=>{
+    try {        
+        const cart=req.params.cart
+        const products=await carts.findOne({_id:cart}).populate('products.productId')     
+
+        for (const product of products.products) {
+            let size = product.size;
+            if (product.productId.sizeAvailable[size] < 1) {
+                return res.json({ success: false, name: product.productId.productName });
+            }
+        }      
+        
+        res.json({success:true})
+
+    } catch (error) {
+        res.status(STATUS_SERVER_ERROR).render('404page')
+        console.log(error.message);
+    }
+}
 
 const loadCheckoutPage = async (req,res)=>{
     try {
         const cart=req.params.cart
         const products=await carts.findOne({_id:cart}).populate('products.productId')     
-        const user=await users.findOne({email:req.session.userEmail})
+        const user=await users.findOne({email:req.session.userEmail})       
+
+        let totalAmount=0
+        products.products.forEach(product=>{
+          if(product.productId.regularPrice){
+            totalAmount+=(product.productId.regularPrice*product.quantity)
+          }else{
+            totalAmount+=(product.productId.amount*product.quantity)
+          }
+        })
         const allCoupons=await coupons.find(
             {
                 redeemedBy:{
@@ -25,13 +63,14 @@ const loadCheckoutPage = async (req,res)=>{
                 minPrice:{$lte:products.totalAmount}
             }   
         )                   
-        const allAddress=await addresses.findOne({user:user._id})        
+        const allAddress=await addresses.findOne({user:user._id})                
         res.render('checkout',{
             allAddress: allAddress,
             msg:req.flash('msg'),
             cart: cart,
             products: products,
-            coupons:allCoupons
+            coupons:allCoupons,
+            totalAmount:totalAmount
         })
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
@@ -48,15 +87,19 @@ const placeOrder = async (req,res)=>{
         const method=req.query.method
         const cart=await carts.findOne({_id: product}).populate('products.productId')
 
+        let couponDiscount=0        
         let cartAmount
         if(code){
             const coupon=await coupons.findOne({code:code})
-            const reducedAmount=(cart.totalAmount*coupon.offer)/100
-            if(reducedAmount < coupon.maxPrice){
-                cartAmount=cart.totalAmount-reducedAmount
-            }else{
-                cartAmount=cart.totalAmount-coupon.maxPrice
+            const reducedAmount=((cart.totalAmount*coupon.offer)/100).toFixed(2)
+            if(reducedAmount < coupon.maxPrice){                
+                couponDiscount=reducedAmount
+                cartAmount=(cart.totalAmount-reducedAmount).toFixed(2)
+            }else{                
+                couponDiscount=coupon.maxPrice
+                cartAmount=(cart.totalAmount-coupon.maxPrice).toFixed(2)
             }
+            
             await coupons.updateOne(
                 {_id: coupon._id},
                 {
@@ -90,6 +133,8 @@ const placeOrder = async (req,res)=>{
             user: user._id,
             products: arrayProducts,
             quantity: cart.totalQuantity,
+            couponDiscount: couponDiscount,
+            offerDiscount: cart.offerDiscount?? 0,
             paymentmethod: method,
             totalAmount: cartAmount?? cart.totalAmount,
             address: address
@@ -273,7 +318,7 @@ const loadOrderManagement = async (req,res)=>{
             allOrders: allOrders
         })
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).render('404page')
+        res.status(STATUS_SERVER_ERROR).render('admin404')
         console.log(error.message);
     }
 }
@@ -333,7 +378,7 @@ const loadOrderDetails = async (req,res)=>{
             order:foundOrder
         })
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).render('404page')
+        res.status(STATUS_SERVER_ERROR).render('admin404')
         console.log(error.message);
     }
 }
@@ -342,6 +387,19 @@ const updateStatus = async (req,res)=>{
     try {
         const status=req.params.status
         const orderId=req.params.order
+        const foundOrder=await orders.findOne({_id: orderId})
+        if(foundOrder.status=='Payment Failed'){
+            await orders.updateOne(
+                {
+                    _id:orderId
+                },
+                {
+                    $set:{
+                        status:'Cash On Delivery'
+                    }
+                }
+            )
+        }
         await orders.updateOne(
             {_id: orderId},
             {$set:{status:status}}
@@ -367,13 +425,14 @@ const updateStatus = async (req,res)=>{
         }
         res.json({success:true})
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).render('404page')
+        res.status(STATUS_SERVER_ERROR).render('admin404')
         console.log(error.message);
     }
 }
 
 const cancelOrder = async (req,res)=>{
     try {
+        const userEmail=req.session.userEmail
         const orderId=req.query.order
         const orderProductId=req.query.orderProductId
         const reason=req.query.reason
@@ -389,6 +448,40 @@ const cancelOrder = async (req,res)=>{
                 }                
             }
         )
+        const productAmount=await orders.aggregate([
+            {
+                $match:{
+                    _id:new mongoose.Types.ObjectId(orderId),
+                    paymentmethod:'Online Payment'
+                }
+            },
+            {
+                $unwind:'$products'
+            },
+            {
+                $match:{
+                    'products._id':new mongoose.Types.ObjectId(orderProductId)
+                }
+            },
+            {
+                $project:{
+                    _id:0,
+                    'products.productAmount':1
+                }
+            }
+        ])
+        if(productAmount.length>0){
+            await users.updateOne(
+                {
+                    email:userEmail
+                },
+                {
+                    $inc:{
+                        walletBalance:productAmount[0].products.productAmount
+                    }
+                }
+            )
+        }
         const orderFound=await orders.findOne({_id: orderId})
         let allCancelled=true
         orderFound.products.forEach(products=>{
@@ -440,7 +533,7 @@ const requestReturn = async (req,res)=>{
                 {
                     $set:{
                         'products.$.status':'Return requested',
-                        cancelReason:reason
+                        'products.$.cancelReason':reason
                     }
                 }
             )
@@ -456,15 +549,10 @@ const requestReturn = async (req,res)=>{
 
 const confirmReturn = async (req,res)=>{
     try {
+        const userEmail=req.session.userEmail
         const order=req.query.order
-        console.log(order);
-        
-        const orderProductId=req.query.orderProductId
-        console.log(orderProductId);
-        
-        const confirm=parseInt(req.query.confirm)
-        console.log(confirm);
-        
+        const orderProductId=req.query.orderProductId        
+        const confirm=parseInt(req.query.confirm)        
 
         if(confirm){
             await orders.updateOne(
@@ -491,6 +579,40 @@ const confirmReturn = async (req,res)=>{
                     }
                 )
             })
+            const productAmount=await orders.aggregate([
+                {
+                    $match:{
+                        _id:new mongoose.Types.ObjectId(order),
+                        paymentmethod:'Online Payment'
+                    }
+                },
+                {
+                    $unwind:'$products'
+                },
+                {
+                    $match:{
+                        'products._id':new mongoose.Types.ObjectId(orderProductId)
+                    }
+                },
+                {
+                    $project:{
+                        _id:0,
+                        'products.productAmount':1
+                    }
+                }
+            ])
+            if(productAmount.length>0){
+                await users.updateOne(
+                    {
+                        email:userEmail
+                    },
+                    {
+                        $inc:{
+                            walletBalance:productAmount[0].products.productAmount
+                        }
+                    }
+                )
+            }
             res.json({confirm:true})
         }else{                        
             await orders.updateOne(
@@ -501,10 +623,204 @@ const confirmReturn = async (req,res)=>{
                 {
                     $set:{
                         'products.$.status':'Return Cancelled'
+                    },
+                    $unset:{
+                        'products.$.cancelReason':''
                     }
                 }
             )            
             res.json({decline:true})
+        }
+    } catch (error) {
+        res.status(STATUS_SERVER_ERROR).render('admin404')
+        console.log(error.message);
+    }
+}
+
+const loadRazorPayment = async (req,res)=>{
+    try {
+        console.log(req.query);
+        const id=req.query.cart?? req.query.order
+        const item=await carts.findOne({_id:id})?? await orders.findOne({_id:id})
+        
+        const amount=item.totalAmount
+
+        const order=await razorpayInstance.orders.create({
+            amount:amount*100,
+            currency:'INR',
+            receipt:`receipt_${Date.now()}`
+        })
+
+        res.json({success:true, orders:order})
+    } catch (error) {
+        res.status(STATUS_SERVER_ERROR).render('404page')
+        console.log(error.message);
+    }
+}   
+
+const verifyRazorPayment = async (req,res)=>{
+    try {        
+        const {payment_id,order_id,signature}=req.body
+        const secret='ljyU5ZIohEiwxZvhtRqyGFy0'        
+        const generated_signature=crypto
+            .createHmac('sha256', secret)
+            .update(order_id+'|'+payment_id)
+            .digest('hex')
+        if(generated_signature===signature){
+            res.json({success:true})
+        }else{
+            res.json({success:false})
+        }
+    } catch (error) {
+        res.status(STATUS_SERVER_ERROR).render('404page')
+        console.log(error.message);
+    }
+}
+
+const downloadInvoice = async (req,res) =>{
+    try {
+        const orderId=req.query.order
+        const order=await orders.aggregate([
+            {
+                $match:{
+                    _id:new mongoose.Types.ObjectId(orderId)
+                }
+            },
+            {
+                $lookup:{
+                    from:'users',
+                    localField:'user',
+                    foreignField:'_id',
+                    as:'resultUsers'
+                }
+            },
+            {
+                $unwind:'$resultUsers'
+            },
+            {
+                $lookup:{
+                    from:'addresses',
+                    localField:'address',
+                    foreignField:'address._id',
+                    as:'resultAddress'
+                }
+            },
+            {
+                $unwind:'$resultAddress'
+            }, 
+            {
+                $unwind:'$resultAddress.address'
+            },
+            {
+                $match:{
+                    $expr:{
+                        $eq:['$resultAddress.address._id', '$address']
+                    }
+                }
+            },
+            {
+                $unwind:'$products'
+            },
+            {
+                $lookup:{
+                    from:'products',
+                    localField:'products.productId',
+                    foreignField:'_id',
+                    as:'resultProducts'
+                }
+            },
+            {
+                $unwind:'$resultProducts'
+            }
+        ])     
+        console.log(order)
+
+        const doc=new PDFDocument()
+
+        res.setHeader("Content-Type", "application/pdf")
+        res.setHeader("Content-Disposition", 'attachment; filename="Product_Invoice_Report.pdf"')
+
+        doc.pipe(res)
+        doc.fontSize(22).fillColor('#333').text('Product Invoice-DejaVu Mens Store', {align:'center', underline:true})
+        doc.moveDown(1)
+
+        doc.fontSize(14).fillColor("#222")
+        doc.text(`Customer Name: ${order[0].resultUsers.name}`);
+        doc.text(`Email: ${order[0].resultUsers.email}`);
+        doc.moveDown(0.5);
+
+        doc.fontSize(14).fillColor("#222");
+        doc.text(`Date: ${new Date().toLocaleDateString()}`);
+        doc.moveDown(0.5);
+        doc.text(`Delivery Address:`);
+        doc.moveDown(0.2)
+        doc.fontSize(12).text(`${order[0].resultAddress.address.name}`);
+        doc.moveDown(0.2)
+        doc.fontSize(12).text(`${order[0].resultAddress.address.state}`);
+        doc.moveDown(0.2)
+        doc.fontSize(12).text(`${order[0].resultAddress.address.streetAddress},${order[0].resultAddress.address.city}`);
+        doc.moveDown(0.2)
+        doc.fontSize(12).text(`${order[0].resultAddress.address.postcode},${order[0].resultAddress.address.phone}`);
+        doc.moveDown(0.5)
+        doc.text(`Delivery Date: ${new Date(order[0].createdAt).toLocaleDateString()}`);
+        doc.moveDown(2);
+
+        const headerY = doc.y; 
+        doc.rect(50, headerY, 500, 25).fill('#5CBDFE'); 
+        doc.fillColor('#000').fontSize(12).text('Product', 55, headerY + 5, { width: 100, align: 'left' });
+        doc.text('Quantity', 260, headerY + 5, { width: 100, align: 'left' });
+        doc.text('Size', 320, headerY + 5, { width: 100, align: 'left' });
+        doc.text('Amount', 430, headerY + 5, { width: 100, align: 'left' });
+
+        doc.strokeColor('#0000FF').lineWidth(1).moveTo(50, headerY + 25).lineTo(550, headerY + 25).stroke();
+        doc.moveDown(1);
+
+        order.forEach((item) => {
+            const rowY = doc.y;
+            doc.fillColor('#000');
+            doc.text(`${item.resultProducts.productName}`, 55, rowY + 5, { width: 300, align: 'left' });
+            doc.text(`${item.products.size}`, 260, rowY + 5, { width: 50, align: 'left' });
+            doc.text(`${item.products.quantity}`, 320, rowY + 5, { width: 100, align: 'left' });
+            doc.text(`₹${item.products.productAmount}`, 430, rowY + 5, { width: 100, align: 'left' });
+            doc.moveDown(1);
+        });
+
+        doc.moveDown(1);
+        doc.text(`Offer Discount: ₹${order[0].offerDiscount?? 0}`, { align: 'right' });
+        doc.moveDown(0.5);
+        doc.text(`Coupon Discount: ₹${order[0].couponDiscount?? 0}`, { align: 'right' });
+        doc.moveDown(0.5);
+        doc.fontSize(12).text(`Total Payable: ₹${order[0].totalAmount}`, { align: 'right', underline: true });
+        doc.moveDown(2);
+
+        doc.text(`Payment Status: ${order[0].paymentmethod}`, { align: 'center' });
+        doc.moveDown(1);
+
+        doc.end()
+    } catch (error) {
+        res.status(STATUS_SERVER_ERROR).render('404page')
+        console.log(error.message);
+    }
+}
+
+const completePayment = async (req,res)=>{
+    try {
+        console.log('hi');
+        const order=req.query.order
+        try {
+            await orders.updateOne(
+                {
+                    _id:order
+                },
+                {
+                    $set:{
+                        paymentmethod:'Online Payment'
+                    }
+                }
+            )
+            res.json({success:true})
+        } catch (error) {
+            res.json({success:false})
         }
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
@@ -513,6 +829,7 @@ const confirmReturn = async (req,res)=>{
 }
 
 module.exports={
+    checkProductQuantity,
     loadCheckoutPage,
     placeOrder,
     loadMyOrderPage,
@@ -522,5 +839,9 @@ module.exports={
     updateStatus,
     cancelOrder,
     requestReturn,
-    confirmReturn
+    confirmReturn,
+    loadRazorPayment,
+    verifyRazorPayment,
+    downloadInvoice,
+    completePayment
 }

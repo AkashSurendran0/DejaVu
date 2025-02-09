@@ -1,8 +1,508 @@
 <%-include('partials/header')%>
 <%-include('partials/navbar')%>
 
-<body>
-    <h1>Logged</h1>
-</body>
+<style>
+
+    .dateFilter{
+        margin: 0 10px;
+        align-items: center;
+        margin-bottom: 15px;
+        display: flex;
+    }
+
+    .dateFilter input{
+        padding: 5px;
+        margin-left: 10px;
+        border-radius: 5px;
+        border: 1px solid blanchedalmond;
+    }
+
+    .dateFilter p{
+        margin-left: 10px;
+    }
+
+    #filterDate{
+        margin-left: 15px;
+        border-radius: 5px;
+        background-color: #ff5733;
+        color: white;
+        width: 70px;
+        padding: 5px;
+        transition: background-color 0.3s ease;
+    }
+
+    #filterDate:hover{
+        background-color: #ff7c5f;
+    }
+
+    .card{
+        width: 100%;
+        height: 90px;
+        background-color: #8b5cf6;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        color: white;
+        padding: 10px;
+        margin-bottom: 30px;
+    }
+
+    .text{
+        padding-left: 20px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .title{
+        font-weight: bolder;
+    }
+
+    .filterCard{
+        width: 100%;
+        height: 90px;
+        background-color: #ff5733;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        color: white;
+        padding: 10px;
+        margin-top: 20px;
+        border-radius: 5px;
+    }
+
+    .filterText{
+        padding-left: 20px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .filterTitle{
+        font-weight: bolder;
+    }
+
+    #downloadReport{
+        margin-left: 15px;
+        border-radius: 5px;
+        background-color: rgb(255, 9, 58);
+        color: white;
+        width: 180px;
+        padding: 5px;
+        transition: background-color 0.3s ease;
+    }
+
+    #downloadReport:hover{
+        background-color: rgb(213, 0, 43);
+    }
+
+    #downloadExcel{
+        margin-left: 15px;
+        border-radius: 5px;
+        background-color: rgb(0, 182, 0);
+        color: white;
+        width: 230px;
+        padding: 5px;
+        transition: background-color 0.3s ease;
+    }
+
+    #downloadExcel:hover{
+        background-color: rgb(0, 223, 0);
+    }
+
+</style>
+
+<main class="h-full pb-16 overflow-y-auto">
+    <div class="container grid px-6 mx-auto">
+        <div class="row">
+            <div style="display: flex;justify-content: space-between;padding-top: 20px;">
+                <div>
+                    <h2 class="my-6 text-2xl font-semibold text-gray-700 dark:text-gray-200">
+                        Admin Dashboard
+                    </h2>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
+                        <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
+                        <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>
+                    </svg>
+                    <div class="text">
+                        <p class="title">Total Users</p>
+                        <p class="count"><%= users.length %></p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" class="bi bi-box-fill" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M15.528 2.973a.75.75 0 0 1 .472.696v8.662a.75.75 0 0 1-.472.696l-7.25 2.9a.75.75 0 0 1-.557 0l-7.25-2.9A.75.75 0 0 1 0 12.331V3.669a.75.75 0 0 1 .471-.696L7.443.184l.004-.001.274-.11a.75.75 0 0 1 .558 0l.274.11.004.001zm-1.374.527L8 5.962 1.846 3.5 1 3.839v.4l6.5 2.6v7.922l.5.2.5-.2V6.84l6.5-2.6v-.4l-.846-.339Z"/>
+                      </svg>
+                    <div class="text">
+                        <p class="title">Total Orders</p>
+                        <p class="count"><%= totalSales[0].totalOrders %></p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" class="bi bi-graph-up-arrow" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M0 0h1v15h15v1H0zm10 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V4.9l-3.613 4.417a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61L13.445 4H10.5a.5.5 0 0 1-.5-.5"/>
+                      </svg>
+                    <div class="text">
+                        <p class="title">Total Sales</p>
+                        <p class="count">₹<%= totalSales[0].totalAmount %></p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                 <div class="card">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" class="bi bi-hourglass-split" viewBox="0 0 16 16">
+                        <path d="M2.5 15a.5.5 0 1 1 0-1h1v-1a4.5 4.5 0 0 1 2.557-4.06c.29-.139.443-.377.443-.59v-.7c0-.213-.154-.451-.443-.59A4.5 4.5 0 0 1 3.5 3V2h-1a.5.5 0 0 1 0-1h11a.5.5 0 0 1 0 1h-1v1a4.5 4.5 0 0 1-2.557 4.06c-.29.139-.443.377-.443.59v.7c0 .213.154.451.443.59A4.5 4.5 0 0 1 12.5 13v1h1a.5.5 0 0 1 0 1zm2-13v1c0 .537.12 1.045.337 1.5h6.326c.216-.455.337-.963.337-1.5V2zm3 6.35c0 .701-.478 1.236-1.011 1.492A3.5 3.5 0 0 0 4.5 13s.866-1.299 3-1.48zm1 0v3.17c2.134.181 3 1.48 3 1.48a3.5 3.5 0 0 0-1.989-3.158C8.978 9.586 8.5 9.052 8.5 8.351z"/>
+                      </svg>
+                    <div class="text">
+                        <p class="title">Pending Orders</p>
+                        <p class="count"><%= pendingOrders.length %></p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" class="bi bi-cash-coin" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M11 15a4 4 0 1 0 0-8 4 4 0 0 0 0 8m5-4a5 5 0 1 1-10 0 5 5 0 0 1 10 0"/>
+                        <path d="M9.438 11.944c.047.596.518 1.06 1.363 1.116v.44h.375v-.443c.875-.061 1.386-.529 1.386-1.207 0-.618-.39-.936-1.09-1.1l-.296-.07v-1.2c.376.043.614.248.671.532h.658c-.047-.575-.54-1.024-1.329-1.073V8.5h-.375v.45c-.747.073-1.255.522-1.255 1.158 0 .562.378.92 1.007 1.066l.248.061v1.272c-.384-.058-.639-.27-.696-.563h-.668zm1.36-1.354c-.369-.085-.569-.26-.569-.522 0-.294.216-.514.572-.578v1.1zm.432.746c.449.104.655.272.655.569 0 .339-.257.571-.709.614v-1.195z"/>
+                        <path d="M1 0a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h4.083q.088-.517.258-1H3a2 2 0 0 0-2-2V3a2 2 0 0 0 2-2h10a2 2 0 0 0 2 2v3.528c.38.34.717.728 1 1.154V1a1 1 0 0 0-1-1z"/>
+                        <path d="M9.998 5.083 10 5a2 2 0 1 0-3.132 1.65 6 6 0 0 1 3.13-1.567"/>
+                      </svg>
+                   <div class="text">
+                       <p class="title">Total Discount</p>
+                       <p class="count">₹<%= (totalSales[0].totalDiscount).toFixed(2) %></p>
+                   </div>
+               </div>
+           </div>
+           <div class="col-md-2">
+            <div class="card">
+                <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" class="bi bi-ticket-perforated-fill" viewBox="0 0 16 16">
+                    <path d="M0 4.5A1.5 1.5 0 0 1 1.5 3h13A1.5 1.5 0 0 1 16 4.5V6a.5.5 0 0 1-.5.5 1.5 1.5 0 0 0 0 3 .5.5 0 0 1 .5.5v1.5a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 11.5V10a.5.5 0 0 1 .5-.5 1.5 1.5 0 1 0 0-3A.5.5 0 0 1 0 6zm4-1v1h1v-1zm1 3v-1H4v1zm7 0v-1h-1v1zm-1-2h1v-1h-1zm-6 3H4v1h1zm7 1v-1h-1v1zm-7 1H4v1h1zm7 1v-1h-1v1zm-8 1v1h1v-1zm7 1h1v-1h-1z"/>
+                  </svg>
+               <div class="text">
+                   <p class="title">Coupon Discount</p>
+                   <p class="count">₹<%= totalSales[0].couponDiscount %></p>
+               </div>
+            </div>
+            </div>
+            <div class="dateFilter col-md-12">
+                <p><b>Filter by Date:</b></p>
+                <input type="date" id="startDate">
+                <p>To</p>
+                <input type="date" id="endDate">
+                <button id="filterDate">Filter</button>
+                <button id="downloadReport" onclick="downloadPDF()">Download Report (PDF)</button>
+                <button id="downloadExcel" onclick="downloadExcel()">Download Report (Excel)</button>
+            </div>
+            <div class="row">
+                <div class="col-md-10 mt-3">
+                    <canvas id="salesChart"></canvas>
+                </div>
+                <div class="col-md-2 mt-4">
+                    <div class="filterCard">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" class="bi bi-box-fill" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M15.528 2.973a.75.75 0 0 1 .472.696v8.662a.75.75 0 0 1-.472.696l-7.25 2.9a.75.75 0 0 1-.557 0l-7.25-2.9A.75.75 0 0 1 0 12.331V3.669a.75.75 0 0 1 .471-.696L7.443.184l.004-.001.274-.11a.75.75 0 0 1 .558 0l.274.11.004.001zm-1.374.527L8 5.962 1.846 3.5 1 3.839v.4l6.5 2.6v7.922l.5.2.5-.2V6.84l6.5-2.6v-.4l-.846-.339Z"/>
+                      </svg>
+                    <div class="filterText">
+                       <p class="filterTitle">Orders</p>
+                       <p class="count" id="orderCount"></p>
+                   </div>
+                </div>
+                <div class="filterCard">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" class="bi bi-graph-up-arrow" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M0 0h1v15h15v1H0zm10 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V4.9l-3.613 4.417a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61L13.445 4H10.5a.5.5 0 0 1-.5-.5"/>
+                      </svg>
+                    <div class="filterText">
+                       <p class="filterTitle">Profit</p>
+                       <p class="count" id="profit"></p>
+                    </div>
+                </div>
+                <div class="filterCard">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" class="bi bi-cash-coin" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M11 15a4 4 0 1 0 0-8 4 4 0 0 0 0 8m5-4a5 5 0 1 1-10 0 5 5 0 0 1 10 0"/>
+                        <path d="M9.438 11.944c.047.596.518 1.06 1.363 1.116v.44h.375v-.443c.875-.061 1.386-.529 1.386-1.207 0-.618-.39-.936-1.09-1.1l-.296-.07v-1.2c.376.043.614.248.671.532h.658c-.047-.575-.54-1.024-1.329-1.073V8.5h-.375v.45c-.747.073-1.255.522-1.255 1.158 0 .562.378.92 1.007 1.066l.248.061v1.272c-.384-.058-.639-.27-.696-.563h-.668zm1.36-1.354c-.369-.085-.569-.26-.569-.522 0-.294.216-.514.572-.578v1.1zm.432.746c.449.104.655.272.655.569 0 .339-.257.571-.709.614v-1.195z"/>
+                        <path d="M1 0a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h4.083q.088-.517.258-1H3a2 2 0 0 0-2-2V3a2 2 0 0 0 2-2h10a2 2 0 0 0 2 2v3.528c.38.34.717.728 1 1.154V1a1 1 0 0 0-1-1z"/>
+                        <path d="M9.998 5.083 10 5a2 2 0 1 0-3.132 1.65 6 6 0 0 1 3.13-1.567"/>
+                    </svg>
+                    <div class="filterText">
+                        <p class="filterTitle">Discount Applied</p>
+                        <p class="count" id="totalDiscount"></p>
+                    </div>
+                </div>
+                <div class="filterCard">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" class="bi bi-ticket-perforated-fill" viewBox="0 0 16 16">
+                        <path d="M0 4.5A1.5 1.5 0 0 1 1.5 3h13A1.5 1.5 0 0 1 16 4.5V6a.5.5 0 0 1-.5.5 1.5 1.5 0 0 0 0 3 .5.5 0 0 1 .5.5v1.5a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 11.5V10a.5.5 0 0 1 .5-.5 1.5 1.5 0 1 0 0-3A.5.5 0 0 1 0 6zm4-1v1h1v-1zm1 3v-1H4v1zm7 0v-1h-1v1zm-1-2h1v-1h-1zm-6 3H4v1h1zm7 1v-1h-1v1zm-7 1H4v1h1zm7 1v-1h-1v1zm-8 1v1h1v-1zm7 1h1v-1h-1z"/>
+                      </svg>
+                    <div class="filterText">
+                        <p class="filterTitle">Coupon Applied</p>
+                        <p class="count" id="totalCoupon"></p>
+                    </div>
+                </div>
+                </div>
+                <h4 class="my-6 mt-2 text-2xl font-semibold text-gray-700 dark:text-gray-200">
+                    Top orders
+                </h4>
+                <div class="w-full overflow-hidden rounded-lg shadow-xs">
+                    <div class="w-full overflow-x-auto">
+                      <table class="w-full whitespace-no-wrap">
+                        <thead>
+                          <tr
+                            class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800"
+                          >
+                            <th class="px-4 py-3">Id</th>
+                            <th class="px-4 py-3">Quantity</th>
+                            <th class="px-4 py-3">Date</th>
+                            <th class="px-4 py-3">Amount</th>
+                          </tr>
+                        </thead>
+                        <tbody id="topOrders" class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
+
+                        </tbody>
+                      </table>
+                    </div>
+                    <div
+                      class="grid px-4 py-3 text-xs font-semibold tracking-wide text-gray-500 uppercase border-t dark:border-gray-700 bg-gray-50 sm:grid-cols-9 dark:text-gray-400 dark:bg-gray-800"
+                    >
+                    
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <h4 class="my-6 mt-5 text-2xl font-semibold text-gray-700 dark:text-gray-200">
+                        Top Products
+                    </h4>
+                    <div class="w-full overflow-hidden rounded-lg shadow-xs">
+                        <div class="w-full overflow-x-auto">
+                          <table class="w-full whitespace-no-wrap">
+                            <thead>
+                              <tr
+                                class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800"
+                              >
+                                <th class="px-4 py-3">No.</th>
+                                <th class="px-4 py-3">Product</th>
+                                <th class="px-4 py-3">Sold Quantity</th>
+                                <th class="px-4 py-3">Sold Amount</th>
+                              </tr>
+                            </thead>
+                            <tbody id="topOrders" class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
+                                <% for(let i=0;i<topProducts.length;i++){ %>
+                                    <tr class="text-gray-700 dark:text-gray-400">
+                                        <td class="px-4 py-3 text-sm">
+                                            <%= i+1 %>
+                                        </td>
+                                        <td class="px-4 py-3 text-sm">
+                                            <%= topProducts[i]._id %>
+                                        </td>
+                                        <td class="px-4 py-3 text-sm">
+                                            <%= topProducts[i].soldQuantity %>
+                                        </td>
+                                        <td class="px-4 py-3 text-sm">
+                                            ₹<%= topProducts[i].soldAmount %>
+                                        </td>
+                                    </tr>
+                                <% } %>
+                            </tbody>
+                          </table>
+                        </div>
+                        <div
+                          class="grid px-4 py-3 text-xs font-semibold tracking-wide text-gray-500 uppercase border-t dark:border-gray-700 bg-gray-50 sm:grid-cols-9 dark:text-gray-400 dark:bg-gray-800"
+                        >
+                        </div>
+                      </div>
+                  </div>
+                  <div class="col-md-6">
+                    <h4 class="my-6 mt-5 text-2xl font-semibold text-gray-700 dark:text-gray-200">
+                        Top Categories
+                    </h4>
+                    <div class="w-full overflow-hidden rounded-lg shadow-xs">
+                        <div class="w-full overflow-x-auto">
+                          <table class="w-full whitespace-no-wrap">
+                            <thead>
+                              <tr
+                                class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800"
+                              >
+                                <th class="px-4 py-3">No.</th>
+                                <th class="px-4 py-3">Category</th>
+                                <th class="px-4 py-3">Sold Quantity</th>
+                                <th class="px-4 py-3">Sold Amount</th>
+                              </tr>
+                            </thead>
+                            <tbody id="topOrders" class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
+                                <% for(let i=0;i<topCategories.length;i++){ %>
+                                    <tr class="text-gray-700 dark:text-gray-400">
+                                        <td class="px-4 py-3 text-sm">
+                                            <%= i+1 %>
+                                        </td>
+                                        <td class="px-4 py-3 text-sm">
+                                            <%= topCategories[i]._id %>
+                                        </td>
+                                        <td class="px-4 py-3 text-sm">
+                                            <%= topCategories[i].soldQuantity %>
+                                        </td>
+                                        <td class="px-4 py-3 text-sm">
+                                            ₹<%= topCategories[i].soldAmount %>
+                                        </td>
+                                    </tr>
+                                <% } %>
+                            </tbody>
+                          </table>
+                        </div>
+                        <div
+                          class="grid px-4 py-3 text-xs font-semibold tracking-wide text-gray-500 uppercase border-t dark:border-gray-700 bg-gray-50 sm:grid-cols-9 dark:text-gray-400 dark:bg-gray-800"
+                        >
+                        </div>
+                      </div>
+                  </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+
+    let salesArray
+    let saleQuantity
+    let topOrders
+
+    document.getElementById('filterDate').addEventListener('click', ()=>{
+        const startDate=new Date(document.getElementById('startDate').value)
+        const endDate=new Date(document.getElementById('endDate').value)
+        if(startDate=='Invalid Date' || endDate=='Invalid Date'){
+            return Swal.fire({
+                icon:'error',
+                title:'Empty Fields',
+                text:'Start date and end date fields cannot be empty'
+            })
+        }else if(endDate>new Date()){
+            return Swal.fire({
+                icon:'error',
+                title:'Invalid End Date',
+                text:'End date cannot be greater than the current date'
+            })
+        }else if(endDate<startDate){
+            return Swal.fire({
+                icon:'error',
+                title:'Invalid end date',
+                text:'End date cannot be less then start date'
+            })
+        }
+        fetch(`/admin/getSalesReport?startDate=${startDate}&&endDate=${endDate}`, {
+            method:'GET'
+        })
+        .then(response=>response.json())
+        .then(data=>{
+            salesArray=data.salesData
+            saleQuantity=data.saleQuantity
+            topOrders=data.topOrders
+            
+            if (!Array.isArray(salesArray)) {
+                console.error("Error: salesData is not an array", salesArray);
+                return;
+            }
+            const labels=salesArray.map(entry=>entry._id)
+            const sales=salesArray.map(entry=>entry.totalSales)
+            updateChart(labels,sales,saleQuantity,topOrders)
+        })
+    })
+
+    const fetchSalesData = async () =>{ 
+        fetch('/admin/getSalesReport', {
+            method:'GET'
+        })
+        .then(response=>response.json())
+        .then(data=>{
+            salesArray=data.salesData
+            saleQuantity=data.saleQuantity
+            topOrders=data.topOrders
+            
+            if (!Array.isArray(salesArray)) {
+                console.error("Error: salesData is not an array", salesArray);
+                return;
+            }
+            const labels=salesArray.map(entry=>entry._id)
+            const sales=salesArray.map(entry=>entry.totalSales)
+            updateChart(labels,sales,saleQuantity,topOrders)
+        })       
+    }
+
+    let salesChart
+
+    const updateChart = (labels,sales,saleQuantity,topOrders) =>{        
+        document.getElementById('orderCount').innerText=saleQuantity[0].totalOrders        
+        document.getElementById('profit').innerText=`₹${saleQuantity[0].totalAmount}`
+        document.getElementById('totalDiscount').innerText=`₹${saleQuantity[0].totalDiscount}`
+        document.getElementById('totalCoupon').innerText=`₹${saleQuantity[0].couponDiscount}`        
+        const ctx=document.getElementById('salesChart').getContext('2d')
+
+        if(salesChart) salesChart.destroy()
+
+        salesChart=new Chart(ctx, {
+            type:'line',
+            data:{
+                labels:labels,
+                datasets:[{
+                    label:"Sales Amount",
+                    data:sales,
+                    borderColor:"#007bff",
+                    backgroundColor:"rgba(0, 123, 255, 0.2)",
+                    borderWidth:2,
+                    fill:true
+                }]
+            },
+            options:{
+                responsive:true,
+                scales:{
+                    x:{title:{display:true, text:"Date"}},
+                    y:{title:{display:true, text:"Sales (₹)"}, beginAtZero:true}
+                }
+            }
+        })
+
+        const allOrders=topOrders        
+        const tbody=document.getElementById('topOrders')
+        tbody.innerHTML=''
+        
+        let rows=''
+        for(let i=0;i<allOrders.length;i++){
+            rows+=`
+            <tr class="text-gray-700 dark:text-gray-400">
+                <td class="px-4 py-3 text-sm">
+                    #${allOrders[i]._id}
+                </td>
+                <td class="px-4 py-3 text-sm">
+                    ${allOrders[i].quantity}
+                </td>
+                <td class="px-4 py-3 text-sm">
+                    ${new Date(allOrders[i].createdAt).toLocaleDateString()}
+                </td>
+                <td class="px-4 py-3 text-sm">
+                    ₹${allOrders[i].totalAmount}
+                </td>
+            </tr>`
+        }
+        tbody.innerHTML=rows        
+    }
+
+    fetchSalesData()
+
+    const downloadPDF = () =>{
+        const saleCount=JSON.stringify(saleQuantity)
+        const orders=JSON.stringify(topOrders)
+        window.location.href=`/admin/downloadSalesReport?saleQuantity=${saleCount}&&topOrders=${orders}`
+    }
+
+    const downloadExcel = () =>{
+        const saleCount=JSON.stringify(saleQuantity)
+        const orders=JSON.stringify(topOrders)
+        window.location.href=`/admin/downloadSalesExcelReport?saleQuantity=${saleCount}&&topOrders=${orders}`
+    }
+
+</script>
 
 <%-include('partials/footer')%>

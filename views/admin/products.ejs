@@ -2,11 +2,73 @@
 <%-include('partials/navbar')%>
 
 <style>
+
 img {
     max-width: 100px;
     max-height: 50px;
     object-fit: contain;
 }
+
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Modal Content */
+.modal-content {
+  background: #fff;
+  padding: 20px;
+  width: 400px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.modal-content h2 {
+  margin-top: 0;
+  margin-bottom: 15px;
+}
+
+.modal-content textarea {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  resize: none;
+}
+
+.modal-actions {
+  margin-top: 20px;
+}
+
+.modal-actions .btn {
+  padding: 10px 15px;
+  margin: 0 5px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.modal-actions .btn {
+  background-color: #6a0dad; /* Purple color */
+  color: #fff;
+}
+
+.modal-actions .btn-secondary {
+  background-color: #ccc;
+  color: #000;
+}
+
+
 </style>
 
 <main class="h-full pb-16 overflow-y-auto">
@@ -138,6 +200,31 @@ img {
                       </svg>
                       </a>
                     </button>
+                    <% if(item.singleProductOffer){ %>
+                      <button
+                        id="removeOffer"
+                        class="flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-red-600 rounded-lg dark:text-gray-400 focus:outline-none focus:shadow-outline-gray"
+                        aria-label="Delete"
+                        onclick="deleteProductOffer('<%= item._id %>')"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-scissors" viewBox="0 0 16 16">
+                          <path d="M3.5 3.5c-.614-.884-.074-1.962.858-2.5L8 7.226 11.642 1c.932.538 1.472 1.616.858 2.5L8.81 8.61l1.556 2.661a2.5 2.5 0 1 1-.794.637L8 9.73l-1.572 2.177a2.5 2.5 0 1 1-.794-.637L7.19 8.61zm2.5 10a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0m7 0a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0"/>
+                        </svg>
+                      </svg>
+                    </button>
+                    <% }else{ %>
+                      <button
+                        id="addOffer"
+                        class="flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-purple-600 rounded-lg dark:text-gray-400 focus:outline-none focus:shadow-outline-gray"
+                        aria-label="Delete"
+                        onclick="addProductOffer('<%= item._id %>')"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-scissors" viewBox="0 0 16 16">
+                          <path d="M3.5 3.5c-.614-.884-.074-1.962.858-2.5L8 7.226 11.642 1c.932.538 1.472 1.616.858 2.5L8.81 8.61l1.556 2.661a2.5 2.5 0 1 1-.794.637L8 9.73l-1.572 2.177a2.5 2.5 0 1 1-.794-.637L7.19 8.61zm2.5 10a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0m7 0a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0"/>
+                        </svg>
+                      </svg>
+                    </button>
+                    <% } %>
                   </div>
                 </td>
               </tr>
@@ -180,6 +267,18 @@ img {
     </div>
   </main>
 
+
+  <div id="OfferModal" class="modal">
+    <div class="modal-content">
+      <p style="font-size: 20px;">Add Offer %</p>
+      <textarea id="offer" rows="1"></textarea>
+      <div class="modal-actions">
+        <button id="submitOffer" class="btn">Submit</button>
+        <button id="closeModal" class="btn btn-secondary">Close</button>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
 
@@ -216,6 +315,89 @@ img {
       if(msg3) msg3.innerText=''
       if(msg4) msg4.innerText=''
     }, 1500);
+
+    document.getElementById('closeModal').addEventListener('click', ()=>{
+      const OfferModal=document.getElementById('OfferModal')
+      OfferModal.style.display='none'
+    })
+
+    const addProductOffer = (productId) =>{
+      const OfferModal=document.getElementById('OfferModal')
+      OfferModal.style.display='flex'
+      document.getElementById('submitOffer').addEventListener('click', ()=>{
+        const offer=document.getElementById('offer').value.trim()
+        if(offer==''){
+          return alert('Please enter an offer')
+        }
+        fetch(`/admin/addProductOffer?product=${productId}&&offer=${offer}`, {
+          method:'GET'
+        })
+        .then(response=>response.json())
+        .then(data=>{
+          if(data.hasOffer){
+            return Swal.fire({
+              icon:'warning',
+              title:'Offer Exists',
+              text:'Offer already exists for this category'
+            })
+          }else if(data.success){
+            Swal.fire({
+              icon:'success',
+              title:'Offer added',
+              text:'Offer added for this product successfully'
+            })
+            .then(result=>{
+              if(result.isConfirmed){
+                window.location.href='/admin/products'
+              }
+            })
+          }else{
+            Swal.fire({
+                icon:'error',
+                title:'Error',
+                text:'Something unexpected happened. Please try again later'
+              })
+          }
+        })
+      })
+    }
+
+    const deleteProductOffer = (productId) =>{
+      Swal.fire({
+        icon:'warning',
+        title:'Remove Offer',
+        text:'Do you want to remove the offer of this product?',
+        showCancelButton:true
+      })
+      .then(result=>{
+        if(result.isConfirmed){
+          fetch(`/admin/removeProductoffer?product=${productId}`, {
+            method:'GET'
+          })
+          .then(response=>response.json())
+          .then(data=>{
+            if(data.success){
+              Swal.fire({
+                icon:'success',
+                title:'Offer removed',
+                text:'Offer for this product has been removed successfully'
+              })
+              .then(result=>{
+                if(result.isConfirmed){
+                  window.location.href='/admin/products'
+                }
+              })
+            }else{
+              Swal.fire({
+                icon:'error',
+                title:'Error',
+                text:'Something unexpected happened. Please try again later'
+              })
+            }
+          })
+        }
+      })
+    }
 
   </script>
 

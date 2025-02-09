@@ -39,22 +39,18 @@
                     <select name="offerCategory" id="" required>
                         <% for(let i=0;i<categories.length;i++){ %>
                             <option value="<%= categories[i].name %>"
-                                <%= categories[i].name===offer.category? 'selected':'' %>>
+                                <%= categories[i].name===offer.category.name? 'selected':'' %>>
                                 <%= categories[i].name %></option>
                         <% } %>
                     </select>
+                    <label for="">Offer:</label>
+                    <input type="number" name="offer" id="offer" value="<%= offer.offer %>" required>
+                </div>
+                <div class="col-md-6">
                     <label for="">Min Price:</label>
                     <input type="number" name="minPrice" id="minPrice" value="<%= offer.minAmount %>" required>
                     <label for="">Max Price</label>
                     <input type="number" name="maxPrice" id="maxPrice" value="<%= offer.maxAmount %>" required>
-                </div>
-                <div class="col-md-6">
-                    <label for="">Start Date:</label>
-                    <input type="datetime-local" name="startDate" id="startDate" value="<%= new Date(offer.startDate).toISOString().slice(0,16) %>" required>
-                    <label for="">End Date:</label>
-                    <input type="datetime-local" name="endDate" id="endDate" value="<%= new Date(offer.endDate).toISOString().slice(0,16) %>" required>
-                    <label for="">Offer:</label>
-                    <input type="number" name="offer" id="offer" value="<%= offer.offer %>" required>
                 </div>
                 <div class="d-flex justify-content-center mt-4">
                     <input style="width: 300px;" id="submitBtn" class="btn btn-success" type="submit" value="Edit offer">

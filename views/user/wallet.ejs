@@ -1,0 +1,102 @@
+<%- include('partials/userHeader') %>
+<%- include('partials/userNavbar') %>
+
+<style>
+
+    .walletBalance{
+        background-color: orange;
+        padding: 20px;
+        border-radius: 10px;
+        margin: 10px 20px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .balanceText{
+        color: white;
+        font-weight: bold;
+        font-size: medium;
+    }
+
+    .balanceAmount{
+        color: white;
+        font-weight: bolder;
+        font-size: 50px;
+    }
+
+    .productImage{
+        width: 80px;
+        height: 100px;
+    }
+
+</style>
+
+
+<div class="hero-wrap hero-bread" style="background-image: url('/uploads/settingsbanner.PNG');">
+    <div class="container">
+      <div class="row no-gutters slider-text align-items-center justify-content-center">
+        <div class="col-md-9 ftco-animate text-center">
+            <h1 class="mb-0 bread" style="background: white;">My Wallet</h1>
+        </div>
+      </div>
+    </div>
+</div>
+
+<section class="ftco-section bg-light">
+    <div class="container">
+        <div class="row">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                  <li><a href="/user" style="color: rgba(33, 37, 41, 0.75);">Home&nbsp;&nbsp;>&nbsp;&nbsp;</a></li>
+                  <li><a href="/user/shop" style="color: rgba(33, 37, 41, 0.75);">Shop&nbsp;&nbsp;>&nbsp;&nbsp;</a></li>
+                  <li>My Wallet</li>
+                </ol>
+              </nav>
+            <div class="col-md-10 order-md-last">
+                <h2 class="mb-4" style="font-weight: bold;">WALLET BALANCE</h2>
+                <div class="walletBalance">
+                    <div class="balanceText">
+                        <u>Wallet Balance:</u>
+                    </div>
+                    <div class="balanceAmount">
+                        ₹<%= user.walletBalance?? 0 %>
+                    </div>
+                </div>
+                <% if(refundOrders.length>0){ %>
+                    <table class="table orders mt-4 w-full whitespace-no-wrap">
+                        <thead>
+                            <tr class="text-center">
+                                <th class="image-prod">OrderId</th>
+                                <th class="product-name">Product</th>
+                                <th>Order Date</th>
+                                <th class="price">Quantity</th>
+                                <th class="quantity">Reason</th>
+                                <th class="total">Refund Amount</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% for(let i=0;i<refundOrders.length;i++){ %>
+                                <tr class="text-center">
+                                    <td>#<%= refundOrders[i]._id %></td>
+                                    <td><img class="productImage" src="<%= refundOrders[i].resultProducts.images[0] %>" alt=""></td>
+                                    <td><%= (refundOrders[i].createdAt).toLocaleDateString() %></td>
+                                    <td><%= refundOrders[i].products.quantity %></td>
+                                    <td><%= refundOrders[i].products.cancelReason %></td>
+                                    <td>₹<%= refundOrders[i].products.productAmount %></td>
+                                </tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                <% }else{ %>
+                    <p class="mt-4" style="font-size: 20px;">No refund made </p>
+                <% } %>
+            </div>
+            <%- include('partials/settingsNavbar') %>
+        </div>
+    </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<%- include('partials/userFooter') %>

@@ -12,7 +12,7 @@ const loadCoupons = async (req,res)=>{
             errMsg:req.flash('errMsg')
         })
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).render('404page')
+        res.status(STATUS_SERVER_ERROR).render('admin404')
         console.log(error.message);
     }
 }
@@ -21,7 +21,7 @@ const loadCouponAddPage = async (req,res)=>{
     try {
         res.render('addCoupon')
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).render('404page')
+        res.status(STATUS_SERVER_ERROR).render('admin404')
         console.log(error.message);
     }
 }
@@ -45,7 +45,7 @@ const addCoupon = async (req,res)=>{
         req.flash('msg', 'Coupon Added Successfully')
         res.redirect('/admin/coupons')
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).render('404page')
+        res.status(STATUS_SERVER_ERROR).render('admin404')
         console.log(error.message);
     }
 }
@@ -58,7 +58,7 @@ const loadEditCouponPage = async (req,res)=>{
             coupon:foundCoupon
         })
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).render('404page')
+        res.status(STATUS_SERVER_ERROR).render('admin404')
         console.log(error.message);
     }
 }
@@ -88,7 +88,7 @@ const editCoupon = async (req,res)=>{
         req.flash('msg', 'Coupon edited successfully')
         res.redirect('/admin/coupons')
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).render('404page')
+        res.status(STATUS_SERVER_ERROR).render('admin404')
         console.log(error.message);
     }
 }
@@ -119,7 +119,7 @@ const changeCouponStatus = async (req,res)=>{
         req.flash('msg', 'Coupon status changed successfully')
         res.redirect('/admin/coupons')
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).render('404page')
+        res.status(STATUS_SERVER_ERROR).render('admin404')
         console.log(error.message);
     }
 }
@@ -133,7 +133,7 @@ const deleteCoupon = async (req,res)=>{
         req.flash('msg', 'Coupon deleted successfully')
         res.redirect('/admin/coupons')
     } catch (error) {
-        res.status(STATUS_SERVER_ERROR).render('404page')
+        res.status(STATUS_SERVER_ERROR).render('admin404')
         console.log(error.message);
     }
 }
