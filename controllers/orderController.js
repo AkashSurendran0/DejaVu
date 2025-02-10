@@ -4,6 +4,7 @@ const users=require('../models/userSchema')
 const carts=require('../models/cartSchema')
 const coupons=require('../models/couponSchema')
 const products=require('../models/productSchema')
+const wallets=require('../models/walletSchema')
 const env=require('dotenv').config()
 const mongoose=require('mongoose')
 const { isErrored } = require('nodemailer/lib/xoauth2')
@@ -79,7 +80,9 @@ const loadCheckoutPage = async (req,res)=>{
 }
 
 const placeOrder = async (req,res)=>{
-    try {        
+    try {   
+        const userEmail=req.session.userEmail 
+        const loggedUser=await users.findOne({email:userEmail})    
         const code=req.query.coupon
         const user=await users.findOne({email: req.session.userEmail})
         const address=req.query.address        
@@ -108,6 +111,16 @@ const placeOrder = async (req,res)=>{
                     }
                 }
             )
+        }
+        if(method=='Wallet Payment'){
+            const userWallet=await wallets.findOne({user:loggedUser._id})
+            if(!userWallet){
+                return res.json({walletNotExists:true})
+            }
+            const amount=cartAmount?? cart.totalAmount
+            if(userWallet.walletAmount<amount){
+                return res.json({noAmount:true})
+            }
         }
 
         const arrayProducts=[]
@@ -142,7 +155,32 @@ const placeOrder = async (req,res)=>{
 
         await carts.deleteOne({_id: product})
 
-        await orders.insertMany(data)
+        const newOrder=await orders.insertMany(data)
+
+        if(method=='Wallet Payment'){
+            const amount=cartAmount?? cart.totalAmount
+            const data={
+                orderId:newOrder[0]._id,
+                debitDate:new Date().toLocaleDateString()
+            }
+            await wallets.updateOne(
+                {
+                    user:loggedUser._id
+                },
+                {
+                    $inc:{
+                        walletAmount:-amount
+                    },
+                    $push:{
+                        debitHistory:data
+                    }
+                },
+                {
+                    upsert:true
+                }
+            )
+        }
+
         return res.json({success:true})
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
@@ -388,18 +426,6 @@ const updateStatus = async (req,res)=>{
         const status=req.params.status
         const orderId=req.params.order
         const foundOrder=await orders.findOne({_id: orderId})
-        if(foundOrder.status=='Payment Failed'){
-            await orders.updateOne(
-                {
-                    _id:orderId
-                },
-                {
-                    $set:{
-                        status:'Cash On Delivery'
-                    }
-                }
-            )
-        }
         await orders.updateOne(
             {_id: orderId},
             {$set:{status:status}}
@@ -409,7 +435,7 @@ const updateStatus = async (req,res)=>{
                 {_id: orderId},
                 {
                     $set:{
-                        "products.$[element].status":'Delivered'
+                        "products.$[element].status":'Delivered',
                     }
                 },
                 {
@@ -422,6 +448,18 @@ const updateStatus = async (req,res)=>{
                     ]
                 }
             )
+            if(foundOrder.status=='Payment Failed'){
+                await orders.updateOne(
+                    {
+                        _id:orderId
+                    },
+                    {
+                        $set:{
+                            paymentmethod:'Cash On Delivery'
+                        }
+                    }
+                )
+            }
         }
         res.json({success:true})
     } catch (error) {
@@ -433,6 +471,7 @@ const updateStatus = async (req,res)=>{
 const cancelOrder = async (req,res)=>{
     try {
         const userEmail=req.session.userEmail
+        const loggedUser=await users.findOne({email:userEmail})
         const orderId=req.query.order
         const orderProductId=req.query.orderProductId
         const reason=req.query.reason
@@ -448,6 +487,15 @@ const cancelOrder = async (req,res)=>{
                 }                
             }
         )
+        const couponOrder=await orders.findOne(
+            {
+                _id:orderId,
+                couponDiscount:{
+                    $gt:0
+                }
+            }
+        )
+        
         const productAmount=await orders.aggregate([
             {
                 $match:{
@@ -462,27 +510,56 @@ const cancelOrder = async (req,res)=>{
                 $match:{
                     'products._id':new mongoose.Types.ObjectId(orderProductId)
                 }
-            },
-            {
-                $project:{
-                    _id:0,
-                    'products.productAmount':1
-                }
             }
         ])
+        let couponDiscount=0
+        let creditAmount=0
         if(productAmount.length>0){
-            await users.updateOne(
+            creditAmount=(productAmount[0].products.productAmount*productAmount[0].products.quantity).toFixed(2)
+        }
+        if(couponOrder){
+            couponDiscount=couponOrder.couponDiscount/couponOrder.products.length
+            creditAmount=((productAmount[0].products.productAmount-productAmount[0].couponDiscount)*productAmount[0].products.quantity).toFixed(2)
+        }
+        if(productAmount.length>0){
+            const data={
+                orderId:orderId,
+                productId:productAmount[0].products.productId,
+                quantity:productAmount[0].products.quantity,
+                creditAmount:creditAmount,
+                creditDate:new Date().toLocaleDateString()
+            }
+            await wallets.updateOne(
                 {
-                    email:userEmail
+                    user:loggedUser._id
                 },
                 {
                     $inc:{
-                        walletBalance:productAmount[0].products.productAmount
+                        walletAmount:creditAmount
+                    },
+                    $push:{
+                        creditHistory:data
                     }
+                },
+                {
+                    upsert:true
                 }
             )
         }
         const orderFound=await orders.findOne({_id: orderId})
+        const productFound = orderFound.products.find(p => p._id.toString() === orderProductId);
+        const amountToDeduct = creditAmount ?? productFound.productAmount;
+        await orders.updateOne(
+            {
+                _id:orderId,
+                'products._id':orderProductId
+            },
+            {
+                $inc:{
+                    totalAmount:-amountToDeduct
+                }
+            }
+        )
         let allCancelled=true
         orderFound.products.forEach(products=>{
             if(products.status != 'Cancelled'){
@@ -500,18 +577,33 @@ const cancelOrder = async (req,res)=>{
                 }
             )
         }
-        orderFound.products.forEach(async product=>{
-            const size=product.size
-            await products.updateOne(
-                {_id: product.productId},
-                {
-                    $inc:{
-                        [`sizeAvailable.${size}`]:product.quantity,
-                        stock:product.quantity
-                    }
+
+        const orderSize=await orders.aggregate([
+            {
+                $match:{
+                    _id:new mongoose.Types.ObjectId(orderId)
                 }
-            )
-        })
+            },
+            {
+                $unwind:'$products'
+            },
+            {
+                $match:{
+                    'products._id':new mongoose.Types.ObjectId(orderProductId)
+                }
+            }
+        ])
+        await products.updateOne(
+            {
+                _id:orderSize[0].products.productId
+            },
+            {
+                $inc:{
+                    [`sizeAvailable.${orderSize[0].products.size}`]:orderSize[0].products.quantity,
+                    stock:orderSize[0].products.quantity
+                }
+            }
+        )
         res.json({success:true})
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
@@ -566,24 +658,18 @@ const confirmReturn = async (req,res)=>{
                     }
                 }
             )
-            const orderFound=await orders.findOne({_id: order})
-            orderFound.products.forEach(async product=>{
-                const size=product.size
-                await products.updateOne(
-                    {_id: product.productId},
-                    {
-                        $inc:{
-                            [`sizeAvailable.${size}`]:product.quantity,
-                            stock:product.quantity
-                        }
+            const couponOrder=await orders.findOne(
+                {
+                    _id:order,
+                    couponDiscount:{
+                        $gt:0
                     }
-                )
-            })
+                }
+            )
             const productAmount=await orders.aggregate([
                 {
                     $match:{
                         _id:new mongoose.Types.ObjectId(order),
-                        paymentmethod:'Online Payment'
                     }
                 },
                 {
@@ -593,26 +679,63 @@ const confirmReturn = async (req,res)=>{
                     $match:{
                         'products._id':new mongoose.Types.ObjectId(orderProductId)
                     }
-                },
-                {
-                    $project:{
-                        _id:0,
-                        'products.productAmount':1
-                    }
                 }
             ])
+            let couponDiscount=0
+            let creditAmount
             if(productAmount.length>0){
-                await users.updateOne(
+                creditAmount=(productAmount[0].products.productAmount*productAmount[0].products.quantity).toFixed(2)
+            }
+            if(couponOrder){
+                couponDiscount=couponOrder.couponDiscount/couponOrder.products.length
+                creditAmount=((productAmount[0].products.productAmount-productAmount[0].couponDiscount)*productAmount[0].products.quantity).toFixed(2)
+            }
+            if(productAmount.length>0){
+                const data={
+                    orderId:order,
+                    productId:productAmount[0].products.productId,
+                    quantity:productAmount[0].products.quantity,
+                    creditAmount:creditAmount,
+                    creditDate:new Date().toLocaleDateString()
+                }
+                await wallets.updateOne(
                     {
-                        email:userEmail
+                        user:loggedUser._id
                     },
                     {
                         $inc:{
-                            walletBalance:productAmount[0].products.productAmount
+                            walletAmount:creditAmount
+                        },
+                        $push:{
+                            creditHistory:data
                         }
+                    },
+                    {
+                        upsert:true
                     }
                 )
             }
+            await orders.updateOne(
+                {
+                    _id:order
+                },
+                {
+                    $inc:{
+                        totalAmount:-creditAmount
+                    }
+                }
+            )
+            await products.updateOne(
+                {
+                    _id:productAmount[0].products.productId
+                },
+                {
+                    $inc:{
+                        [`sizeAvailable.${productAmount[0].products.size}`]:productAmount[0].products.quantity,
+                        stock:productAmount[0].products.quantity
+                    }
+                }
+            )
             res.json({confirm:true})
         }else{                        
             await orders.updateOne(

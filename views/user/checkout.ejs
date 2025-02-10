@@ -336,12 +336,21 @@
               </div>
             </div>
           <% } %>
-          <div class="card razorpayDiv" onclick="razorpayDiv()">
+          <div class="card mb-2 razorpayDiv" onclick="razorpayDiv()">
             <div class="card-body d-flex align-items-center">
               <input value="Online Payment" type="radio" class="mr-3 razorRadio" name="payment">
               <div>
                 <b>Online Payment</b>
                 <p>Get non contact delivery at your doorstep</p>
+              </div>
+            </div>
+          </div>
+          <div class="card walletPayment" onclick="payFromWallet()">
+            <div class="card-body d-flex align-items-center">
+              <input value="Wallet Payment" type="radio" class="mr-3 walletRadio" name="payment">
+              <div>
+                <b>Wallet Payment</b>
+                <p>Pay from your wallet with just one click</p>
               </div>
             </div>
           </div>
@@ -611,6 +620,13 @@ const razorpayDiv = () =>{
   razorpayDiv.style.borderColor = "gold";
 }
 
+const payFromWallet = () =>{
+  document.querySelector('.walletRadio').checked=true
+  const walletPayment = document.querySelector('.walletPayment');
+  walletPayment.style.transition = "border-color 0.5s ease";
+  walletPayment.style.borderColor = "gold";
+}
+
 const editAddress = (id,name,state,street,apartment,city,postcode,phone,altPhone,cartId) =>{
   modal.style.display = "block";
   if(name){
@@ -673,6 +689,7 @@ const orderBtn = async () =>{
           text:'Server is busy right now. Please try again later'
         })
       }else{
+        let isClicked=false
         const options={
           key:'rzp_test_8RKWZFiJMDAIeS',
           amount:data.orders.amount,
@@ -833,6 +850,18 @@ const orderBtn = async () =>{
             window.location.href=`/user/settings/orders`
           }
         })
+      }else if(data.walletNotExists){
+        Swal.fire({
+          icon:'error',
+          title:'No wallet found',
+          text:'You dont have an active wallet'
+        })
+      }else if(data.noAmount){
+        Swal.fire({
+          icon:'error',
+          title:'Insufficient Balance',
+          text:'You dont have enough balance in wallet for this transaction'
+        })
       }else{
         Swal.fire({
           title:'Order Error',
@@ -882,7 +911,7 @@ const applyCoupon = (couponId) =>{
       newElement.textContent="Remove"
       document.getElementById('addCoupon').appendChild(newElement)
       newElement.addEventListener('click', ()=>{
-        window.location.href=`/user/checkout/<%= products._id %>`
+        window.location.href=`/user/loadCheckout/<%= products._id %>`
       })
     }else{
       Swal.fire({

@@ -1,19 +1,65 @@
 <%- include('partials/userHeader') %>
 <%- include('partials/userNavbar') %>
 
+<style>
+
+	.review-stars input[type='radio']{
+      display: none;
+    }
+
+    .review-stars label{
+      font-size: 20px;
+    }
+
+    .review-stars{
+      display: flex;
+      flex-direction: row-reverse;
+      justify-content: flex-start;
+    }
+
+	.deals-container {
+		position: relative;
+		overflow: hidden;
+	}
+
+	.deals-container .row {
+		position: absolute;
+		width: 100%;
+		opacity: 0;
+		transition: opacity 1s ease-in-out;
+	}
+
+	.deals-container .row.active {
+		opacity: 1;
+		position: relative;
+	}
+
+	.deals-container img{
+		width: 35%;
+	}
+
+	.imgDiv{
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		/* padding-left: 500px; */
+	}
+
+</style>
+
     <section id="home-section" class="hero">
 		  <div class="home-slider owl-carousel">
-	      <div class="slider-item js-fullheight">
+	      <div class="slider-item " style="background-image: url(/uploads/shirtsbanner.webp);background-size: cover;background-position: center;">
 	      	<div class="overlay"></div>
 	        <div class="container-fluid p-0">
 	          <div class="row d-md-flex no-gutters slider-text align-items-center justify-content-end" data-scrollax-parent="true">
-	          	<img class="one-third order-md-last img-fluid" src="images/bg_1.png" alt="">
+	          	<img class="one-third order-md-last img-fluid" src="" alt="">
 		          <div class="one-forth d-flex align-items-center ftco-animate" data-scrollax=" properties: { translateY: '70%' }">
 		          	<div class="text">
 		          		<span class="subheading">#New Arrival</span>
 		          		<div class="horizontal">
-				            <h1 class="mb-4 mt-3">Shoes Collection 2019</h1>
-				            <p class="mb-4">A small river named Duden flows by their place and supplies it with the necessary regelialia. It is a paradisematic country.</p>
+				            <h1 class="mb-4 mt-3">Sharp & Sleek</h1>
+				            <p class="mb-4">Perfect fits for every occasion! Dress to impress.</p>
 				            
 				            <p><a href="#" class="btn-custom">Discover Now</a></p>
 				          </div>
@@ -23,17 +69,17 @@
 	        </div>
 	      </div>
 
-	      <div class="slider-item js-fullheight">
+	      <div class="slider-item " style="background-image: url(/uploads/pantsbanner.webp);background-size: cover;background-position: center;">
 	      	<div class="overlay"></div>
 	        <div class="container-fluid p-0">
 	          <div class="row d-flex no-gutters slider-text align-items-center justify-content-end" data-scrollax-parent="true">
-	          	<img class="one-third order-md-last img-fluid" src="images/bg_2.png" alt="">
+	          	<img class="one-third order-md-last img-fluid" src="" alt="">
 		          <div class="one-forth d-flex align-items-center ftco-animate" data-scrollax=" properties: { translateY: '70%' }">
 		          	<div class="text">
 		          		<span class="subheading">#New Arrival</span>
 		          		<div class="horizontal">
-				            <h1 class="mb-4 mt-3">New Shoes Winter Collection</h1>
-				            <p class="mb-4">A small river named Duden flows by their place and supplies it with the necessary regelialia. It is a paradisematic country.</p>
+				            <h1 class="mb-4 mt-3"> Stride in Style</h1>
+				            <p class="mb-4">From casual to classic, find your perfect pair.</p>
 				            
 				            <p><a href="#" class="btn-custom">Discover Now</a></p>
 				          </div>
@@ -42,6 +88,88 @@
 	        	</div>
 	        </div>
 	      </div>
+
+		  <div class="slider-item " style="background-image: url(/uploads/shoesbanner.webp);background-size: cover;background-position: center;">
+			<div class="overlay"></div>
+		  <div class="container-fluid p-0">
+			<div class="row d-flex no-gutters slider-text align-items-center justify-content-end" data-scrollax-parent="true">
+				<img class="one-third order-md-last img-fluid" src="" alt="">
+				<div class="one-forth d-flex align-items-center ftco-animate" data-scrollax=" properties: { translateY: '70%' }">
+					<div class="text">
+						<span class="subheading">#New Arrival</span>
+						<div class="horizontal">
+						  <h1 class="mb-4 mt-3"> Step Up Your Game</h1>
+						  <p class="mb-4">Elevate your outfit with the freshest kicks!</p>
+						  
+						  <p><a href="#" class="btn-custom">Discover Now</a></p>
+						</div>
+				  </div>
+				</div>
+			  </div>
+		  </div>
+		</div>
+
+		<div class="slider-item " style="background-image: url(/uploads/accessoriesbanner.webp);background-size: cover;background-position: center;">
+			<div class="overlay"></div>
+		  <div class="container-fluid p-0">
+			<div class="row d-flex no-gutters slider-text align-items-center justify-content-end" data-scrollax-parent="true">
+				<img class="one-third order-md-last img-fluid" src="" alt="">
+				<div class="one-forth d-flex align-items-center ftco-animate" data-scrollax=" properties: { translateY: '70%' }">
+					<div class="text">
+						<span class="subheading">#New Arrival</span>
+						<div class="horizontal">
+						  <h1 class="mb-4 mt-3">Finishing Touch</h1>
+						  <p class="mb-4">The right accessories make all the difference.</p>
+						  
+						  <p><a href="#" class="btn-custom">Discover Now</a></p>
+						</div>
+				  </div>
+				</div>
+			  </div>
+		  </div>
+		</div>
+
+		<div class="slider-item " style="background-image: url(/uploads/tshirtbanner.webp);background-size: cover;background-position: center;">
+			<div class="overlay"></div>
+		  <div class="container-fluid p-0">
+			<div class="row d-flex no-gutters slider-text align-items-center justify-content-end" data-scrollax-parent="true">
+				<img class="one-third order-md-last img-fluid" src="" alt="">
+				<div class="one-forth d-flex align-items-center ftco-animate" data-scrollax=" properties: { translateY: '70%' }">
+					<div class="text">
+						<span class="subheading">#New Arrival</span>
+						<div class="horizontal">
+						  <h1 class="mb-4 mt-3"> Casual Cool</h1>
+						  <p class="mb-4">Soft, stylish, and made for everyday vibes.</p>
+						  
+						  <p><a href="#" class="btn-custom">Discover Now</a></p>
+						</div>
+				  </div>
+				</div>
+			  </div>
+		  </div>
+		</div>
+
+		<div class="slider-item " style="background-image: url(/uploads/hoodiesbanner.webp);background-size: cover;background-position: center;">
+			<div class="overlay"></div>
+		  <div class="container-fluid p-0">
+			<div class="row d-flex no-gutters slider-text align-items-center justify-content-end" data-scrollax-parent="true">
+				<img class="one-third order-md-last img-fluid" src="" alt="">
+				<div class="one-forth d-flex align-items-center ftco-animate" data-scrollax=" properties: { translateY: '70%' }">
+					<div class="text">
+						<span class="subheading">#New Arrival</span>
+						<div class="horizontal">
+						  <h1 class="mb-4 mt-3">Stay Cozy, Stay Fresh</h1>
+						  <p class="mb-4">Ultimate comfort with unmatched style.</p>
+						  
+						  <p><a href="#" class="btn-custom">Discover Now</a></p>
+						</div>
+				  </div>
+				</div>
+			  </div>
+		  </div>
+		</div>
+
+
 	    </div>
     </section>
 
@@ -51,33 +179,39 @@
           <div class="col-lg-4 text-center d-flex align-self-stretch ftco-animate">
             <div class="media block-6 services p-4 py-md-5">
               <div class="icon d-flex justify-content-center align-items-center mb-4">
-            		<span class="flaticon-bag"></span>
+				<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="black" class="bi bi-truck mt-5" viewBox="0 0 16 16">
+					<path d="M0 3.5A1.5 1.5 0 0 1 1.5 2h9A1.5 1.5 0 0 1 12 3.5V5h1.02a1.5 1.5 0 0 1 1.17.563l1.481 1.85a1.5 1.5 0 0 1 .329.938V10.5a1.5 1.5 0 0 1-1.5 1.5H14a2 2 0 1 1-4 0H5a2 2 0 1 1-3.998-.085A1.5 1.5 0 0 1 0 10.5zm1.294 7.456A2 2 0 0 1 4.732 11h5.536a2 2 0 0 1 .732-.732V3.5a.5.5 0 0 0-.5-.5h-9a.5.5 0 0 0-.5.5v7a.5.5 0 0 0 .294.456M12 10a2 2 0 0 1 1.732 1h.768a.5.5 0 0 0 .5-.5V8.35a.5.5 0 0 0-.11-.312l-1.48-1.85A.5.5 0 0 0 13.02 6H12zm-9 1a1 1 0 1 0 0 2 1 1 0 0 0 0-2m9 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2"/>
+				  </svg>	
               </div>
               <div class="media-body">
                 <h3 class="heading">Free Shipping</h3>
-                <p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.</p>
+                <p>Enjoy hassle-free shopping with free shipping on all orders. No hidden fees, just seamless delivery straight to your doorstep!</p>
               </div>
             </div>      
           </div>
           <div class="col-lg-4 text-center d-flex align-self-stretch ftco-animate">
             <div class="media block-6 services p-4 py-md-5">
               <div class="icon d-flex justify-content-center align-items-center mb-4">
-            		<span class="flaticon-customer-service"></span>
+				<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="black" class="bi bi-telephone mt-5" viewBox="0 0 16 16">
+					<path d="M3.654 1.328a.678.678 0 0 0-1.015-.063L1.605 2.3c-.483.484-.661 1.169-.45 1.77a17.6 17.6 0 0 0 4.168 6.608 17.6 17.6 0 0 0 6.608 4.168c.601.211 1.286.033 1.77-.45l1.034-1.034a.678.678 0 0 0-.063-1.015l-2.307-1.794a.68.68 0 0 0-.58-.122l-2.19.547a1.75 1.75 0 0 1-1.657-.459L5.482 8.062a1.75 1.75 0 0 1-.46-1.657l.548-2.19a.68.68 0 0 0-.122-.58zM1.884.511a1.745 1.745 0 0 1 2.612.163L6.29 2.98c.329.423.445.974.315 1.494l-.547 2.19a.68.68 0 0 0 .178.643l2.457 2.457a.68.68 0 0 0 .644.178l2.189-.547a1.75 1.75 0 0 1 1.494.315l2.306 1.794c.829.645.905 1.87.163 2.611l-1.034 1.034c-.74.74-1.846 1.065-2.877.702a18.6 18.6 0 0 1-7.01-4.42 18.6 18.6 0 0 1-4.42-7.009c-.362-1.03-.037-2.137.703-2.877z"/>
+				  </svg>
               </div>
               <div class="media-body">
                 <h3 class="heading">Support Customer</h3>
-                <p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.</p>
+                <p>Got questions? Our 24/7 customer support is always ready to help. Fast, friendly, and dedicated to your satisfaction!</p>
               </div>
             </div>    
           </div>
           <div class="col-lg-4 text-center d-flex align-self-stretch ftco-animate">
             <div class="media block-6 services p-4 py-md-5">
               <div class="icon d-flex justify-content-center align-items-center mb-4">
-            		<span class="flaticon-payment-security"></span>
+				<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="black" class="bi bi-person-lock mt-5" viewBox="0 0 16 16">
+					<path d="M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0M8 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4m0 5.996V14H3s-1 0-1-1 1-4 6-4q.845.002 1.544.107a4.5 4.5 0 0 0-.803.918A11 11 0 0 0 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664zM9 13a1 1 0 0 1 1-1v-1a2 2 0 1 1 4 0v1a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1zm3-3a1 1 0 0 0-1 1v1h2v-1a1 1 0 0 0-1-1"/>
+				  </svg>
               </div>
               <div class="media-body">
                 <h3 class="heading">Secure Payments</h3>
-                <p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.</p>
+                <p>Shop with confidence! We offer 100% secure payments with trusted gateways, ensuring your transactions are safe and protected.</p>
               </div>
             </div>      
           </div>
@@ -89,549 +223,166 @@
     	<div class="container">
 				<div class="row justify-content-center mb-3 pb-3">
           <div class="col-md-12 heading-section text-center ftco-animate">
-            <h2 class="mb-4">New Shoes Arrival</h2>
-            <p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia</p>
+            <h2 class="mb-4">Top Rated Products</h2>
+            <p>Handpicked bestsellers, loved by customers for quality, style, and unbeatable value!</p>
           </div>
         </div>   		
     	</div>
     	<div class="container">
     		<div class="row">
-    			<div class="col-sm-12 col-md-6 col-lg-3 ftco-animate d-flex">
-    				<div class="product d-flex flex-column">
-    					<a href="#" class="img-prod"><img class="img-fluid" src="images/product-1.png" alt="Colorlib Template">
-    						<div class="overlay"></div>
-    					</a>
-    					<div class="text py-3 pb-4 px-3">
-    						<div class="d-flex">
-    							<div class="cat">
-		    						<span>Lifestyle</span>
-		    					</div>
-		    					<div class="rating">
-	    							<p class="text-right mb-0">
-	    								<a href="#"><span class="ion-ios-star-outline"></span></a>
-	    								<a href="#"><span class="ion-ios-star-outline"></span></a>
-	    								<a href="#"><span class="ion-ios-star-outline"></span></a>
-	    								<a href="#"><span class="ion-ios-star-outline"></span></a>
-	    								<a href="#"><span class="ion-ios-star-outline"></span></a>
-	    							</p>
-	    						</div>
-	    					</div>
-    						<h3><a href="#">Nike Free RN 2019 iD</a></h3>
-    						<div class="pricing">
-	    						<p class="price"><span>$120.00</span></p>
-	    					</div>
-	    					<p class="bottom-area d-flex px-3">
-    							<a href="#" class="add-to-cart text-center py-2 mr-1"><span>Add to cart <i class="ion-ios-add ml-1"></i></span></a>
-    							<a href="#" class="buy-now text-center py-2">Buy now<span><i class="ion-ios-cart ml-1"></i></span></a>
-    						</p>
-    					</div>
-    				</div>
-    			</div>
-    			<div class="col-sm-12 col-md-6 col-lg-3 ftco-animate d-flex">
-    				<div class="product d-flex flex-column">
-    					<a href="#" class="img-prod"><img class="img-fluid" src="images/product-2.png" alt="Colorlib Template">
-    						<span class="status">50% Off</span>
-    						<div class="overlay"></div>
-    					</a>
-    					<div class="text py-3 pb-4 px-3">
-    						<div class="d-flex">
-    							<div class="cat">
-		    						<span>Lifestyle</span>
-		    					</div>
-		    					<div class="rating">
-	    							<p class="text-right mb-0">
-	    								<a href="#"><span class="ion-ios-star-outline"></span></a>
-	    								<a href="#"><span class="ion-ios-star-outline"></span></a>
-	    								<a href="#"><span class="ion-ios-star-outline"></span></a>
-	    								<a href="#"><span class="ion-ios-star-outline"></span></a>
-	    								<a href="#"><span class="ion-ios-star-outline"></span></a>
-	    							</p>
-	    						</div>
-	    					</div>
-    						<h3><a href="#">Nike Free RN 2019 iD</a></h3>
-  							<div class="pricing">
-	    						<p class="price"><span class="mr-2 price-dc">$120.00</span><span class="price-sale">$80.00</span></p>
-	    					</div>
-	    					<p class="bottom-area d-flex px-3">
-    							<a href="#" class="add-to-cart text-center py-2 mr-1"><span>Add to cart <i class="ion-ios-add ml-1"></i></span></a>
-    							<a href="#" class="buy-now text-center py-2">Buy now<span><i class="ion-ios-cart ml-1"></i></span></a>
-    						</p>
-    					</div>
-    				</div>
-    			</div>
-    			<div class="col-sm-12 col-md-6 col-lg-3 ftco-animate d-flex">
-    				<div class="product">
-    					<a href="#" class="img-prod"><img class="img-fluid" src="images/product-3.png" alt="Colorlib Template">
-	    					<div class="overlay"></div>
-	    				</a>
-    					<div class="text py-3 pb-4 px-3">
-    						<div class="d-flex">
-    							<div class="cat">
-		    						<span>Lifestyle</span>
-		    					</div>
-		    					<div class="rating">
-	    							<p class="text-right mb-0">
-	    								<a href="#"><span class="ion-ios-star-outline"></span></a>
-	    								<a href="#"><span class="ion-ios-star-outline"></span></a>
-	    								<a href="#"><span class="ion-ios-star-outline"></span></a>
-	    								<a href="#"><span class="ion-ios-star-outline"></span></a>
-	    								<a href="#"><span class="ion-ios-star-outline"></span></a>
-	    							</p>
-	    						</div>
-	    					</div>
-    						<h3><a href="#">Nike Free RN 2019 iD</a></h3>
-  							<div class="pricing">
-	    						<p class="price"><span>$120.00</span></p>
-	    					</div>
-	    					<p class="bottom-area d-flex px-3">
-    							<a href="#" class="add-to-cart text-center py-2 mr-1"><span>Add to cart <i class="ion-ios-add ml-1"></i></span></a>
-    							<a href="#" class="buy-now text-center py-2">Buy now<span><i class="ion-ios-cart ml-1"></i></span></a>
-    						</p>
-    					</div>
-    				</div>
-    			</div>
-    			<div class="col-sm-12 col-md-6 col-lg-3 ftco-animate d-flex">
-    				<div class="product">
-    					<a href="#" class="img-prod"><img class="img-fluid" src="images/product-4.png" alt="Colorlib Template">
-    						<div class="overlay"></div>
-    					</a>
-    					<div class="text py-3 pb-4 px-3">
-    						<div class="d-flex">
-    							<div class="cat">
-		    						<span>Lifestyle</span>
-		    					</div>
-		    					<div class="rating">
-	    							<p class="text-right mb-0">
-	    								<a href="#"><span class="ion-ios-star-outline"></span></a>
-	    								<a href="#"><span class="ion-ios-star-outline"></span></a>
-	    								<a href="#"><span class="ion-ios-star-outline"></span></a>
-	    								<a href="#"><span class="ion-ios-star-outline"></span></a>
-	    								<a href="#"><span class="ion-ios-star-outline"></span></a>
-	    							</p>
-	    						</div>
-	    					</div>
-    						<h3><a href="#">Nike Free RN 2019 iD</a></h3>
-  							<div class="pricing">
-	    						<p class="price"><span>$120.00</span></p>
-	    					</div>
-	    					<p class="bottom-area d-flex px-3">
-    							<a href="#" class="add-to-cart text-center py-2 mr-1"><span>Add to cart <i class="ion-ios-add ml-1"></i></span></a>
-    							<a href="#" class="buy-now text-center py-2">Buy now<span><i class="ion-ios-cart ml-1"></i></span></a>
-    						</p>
-    					</div>
-    				</div>
-    			</div>
+				<% for(let i=0;i<topRatedProducts.length;i++){ %>
+					<div class="col-sm-12 col-md-6 col-lg-3 ftco-animate d-flex">
+						<div class="product d-flex flex-column">
+							<a href="/user/shop/product-details/<%= topRatedProducts[i]._id %>" class="img-prod"><img class="img-fluid" src="<%= topRatedProducts[i].images[0] %>" alt="Colorlib Template">
+								<div class="overlay"></div>
+							</a>
+							<div class="text py-3 pb-4 px-3">
+								<div class="d-flex">
+									<div class="cat">
+										<span><%= topRatedProducts[i].resultCategories.name %></span>
+									</div>
+									<div class="rating">
+										<div class="review-stars">
+										
+											<% if(!topRatedProducts[i].avgRating || topRatedProducts[i].avgRating==null){ %>
+												<% for(let j=5;j>=1;j-- ){ %>
+													<input type="radio" name="rating" id="review-star<%= j %>" value="<%= j %>" disabled>
+													<label for="review-star<%= j %>" style="color: #ddd;">★</i></label>
+												<% } %>
+											<% }else{ %>
+												<% for(let j=5;j>=1;j-- ){ %>
+													<% if(j<= Math.floor(topRatedProducts[i].avgRating)){ %>
+														<input type="radio" name="rating" id="review-star<%= j %>" value="<%= j %>" disabled>
+														<label for="review-star<%= j %>" style="color: #dbcc8f;">★</i></label>
+													<% }else{ %>
+														<input type="radio" name="rating" id="review-star<%= j %>" value="<%= j %>" disabled>
+														<label for="review-star<%= j %>" style="color: #ddd;">★</i></label>
+													<% } %>
+												<% } %>
+											<% } %>
 
-    			<div class="col-sm-12 col-md-6 col-lg-3 ftco-animate d-flex">
-    				<div class="product d-flex flex-column">
-    					<a href="#" class="img-prod"><img class="img-fluid" src="images/product-5.png" alt="Colorlib Template">
-    						<div class="overlay"></div>
-    					</a>
-    					<div class="text py-3 pb-4 px-3">
-    						<div class="d-flex">
-    							<div class="cat">
-		    						<span>Lifestyle</span>
-		    					</div>
-		    					<div class="rating">
-	    							<p class="text-right mb-0">
-	    								<a href="#"><span class="ion-ios-star-outline"></span></a>
-	    								<a href="#"><span class="ion-ios-star-outline"></span></a>
-	    								<a href="#"><span class="ion-ios-star-outline"></span></a>
-	    								<a href="#"><span class="ion-ios-star-outline"></span></a>
-	    								<a href="#"><span class="ion-ios-star-outline"></span></a>
-	    							</p>
-	    						</div>
-	    					</div>
-    						<h3><a href="#">Nike Free RN 2019 iD</a></h3>
-    						<div class="pricing">
-	    						<p class="price"><span>$120.00</span></p>
-	    					</div>
-	    					<p class="bottom-area d-flex px-3">
-    							<a href="#" class="add-to-cart text-center py-2 mr-1"><span>Add to cart <i class="ion-ios-add ml-1"></i></span></a>
-    							<a href="#" class="buy-now text-center py-2">Buy now<span><i class="ion-ios-cart ml-1"></i></span></a>
-    						</p>
-    					</div>
-    				</div>
-    			</div>
-    			<div class="col-sm-12 col-md-6 col-lg-3 ftco-animate d-flex">
-    				<div class="product d-flex flex-column">
-    					<a href="#" class="img-prod"><img class="img-fluid" src="images/product-6.png" alt="Colorlib Template">
-    						<span class="status">50% Off</span>
-    						<div class="overlay"></div>
-    					</a>
-    					<div class="text py-3 pb-4 px-3">
-    						<div class="d-flex">
-    							<div class="cat">
-		    						<span>Lifestyle</span>
-		    					</div>
-		    					<div class="rating">
-	    							<p class="text-right mb-0">
-	    								<a href="#"><span class="ion-ios-star-outline"></span></a>
-	    								<a href="#"><span class="ion-ios-star-outline"></span></a>
-	    								<a href="#"><span class="ion-ios-star-outline"></span></a>
-	    								<a href="#"><span class="ion-ios-star-outline"></span></a>
-	    								<a href="#"><span class="ion-ios-star-outline"></span></a>
-	    							</p>
-	    						</div>
-	    					</div>
-    						<h3><a href="#">Nike Free RN 2019 iD</a></h3>
-  							<div class="pricing">
-	    						<p class="price"><span class="mr-2 price-dc">$120.00</span><span class="price-sale">$80.00</span></p>
-	    					</div>
-	    					<p class="bottom-area d-flex px-3">
-    							<a href="#" class="add-to-cart text-center py-2 mr-1"><span>Add to cart <i class="ion-ios-add ml-1"></i></span></a>
-    							<a href="#" class="buy-now text-center py-2">Buy now<span><i class="ion-ios-cart ml-1"></i></span></a>
-    						</p>
-    					</div>
-    				</div>
-    			</div>
-    			<div class="col-sm-12 col-md-6 col-lg-3 ftco-animate d-flex">
-    				<div class="product">
-    					<a href="#" class="img-prod"><img class="img-fluid" src="images/product-7.png" alt="Colorlib Template">
-	    					<div class="overlay"></div>
-	    				</a>
-    					<div class="text py-3 pb-4 px-3">
-    						<div class="d-flex">
-    							<div class="cat">
-		    						<span>Lifestyle</span>
-		    					</div>
-		    					<div class="rating">
-	    							<p class="text-right mb-0">
-	    								<a href="#"><span class="ion-ios-star-outline"></span></a>
-	    								<a href="#"><span class="ion-ios-star-outline"></span></a>
-	    								<a href="#"><span class="ion-ios-star-outline"></span></a>
-	    								<a href="#"><span class="ion-ios-star-outline"></span></a>
-	    								<a href="#"><span class="ion-ios-star-outline"></span></a>
-	    							</p>
-	    						</div>
-	    					</div>
-    						<h3><a href="#">Nike Free RN 2019 iD</a></h3>
-  							<div class="pricing">
-	    						<p class="price"><span>$120.00</span></p>
-	    					</div>
-	    					<p class="bottom-area d-flex px-3">
-    							<a href="#" class="add-to-cart text-center py-2 mr-1"><span>Add to cart <i class="ion-ios-add ml-1"></i></span></a>
-    							<a href="#" class="buy-now text-center py-2">Buy now<span><i class="ion-ios-cart ml-1"></i></span></a>
-    						</p>
-    					</div>
-    				</div>
-    			</div>
-    			<div class="col-sm-12 col-md-6 col-lg-3 ftco-animate d-flex">
-    				<div class="product">
-    					<a href="#" class="img-prod"><img class="img-fluid" src="images/product-8.png" alt="Colorlib Template">
-    						<div class="overlay"></div>
-    					</a>
-    					<div class="text py-3 pb-4 px-3">
-    						<div class="d-flex">
-    							<div class="cat">
-		    						<span>Lifestyle</span>
-		    					</div>
-		    					<div class="rating">
-	    							<p class="text-right mb-0">
-	    								<a href="#"><span class="ion-ios-star-outline"></span></a>
-	    								<a href="#"><span class="ion-ios-star-outline"></span></a>
-	    								<a href="#"><span class="ion-ios-star-outline"></span></a>
-	    								<a href="#"><span class="ion-ios-star-outline"></span></a>
-	    								<a href="#"><span class="ion-ios-star-outline"></span></a>
-	    							</p>
-	    						</div>
-	    					</div>
-    						<h3><a href="#">Nike Free RN 2019 iD</a></h3>
-  							<div class="pricing">
-	    						<p class="price"><span>$120.00</span></p>
-	    					</div>
-	    					<p class="bottom-area d-flex px-3">
-    							<a href="#" class="add-to-cart text-center py-2 mr-1"><span>Add to cart <i class="ion-ios-add ml-1"></i></span></a>
-    							<a href="#" class="buy-now text-center py-2">Buy now<span><i class="ion-ios-cart ml-1"></i></span></a>
-    						</p>
-    					</div>
-    				</div>
-    			</div>
-    		</div>
-    	</div>
-    </section>
-
-
-
-    <section class="ftco-section ftco-choose ftco-no-pb ftco-no-pt">
-    	<div class="container">
-				<div class="row no-gutters">
-					<div class="col-lg-4">
-						<div class="choose-wrap divider-one img p-5 d-flex align-items-end" style="background-image: url(images/choose-1.jpg);">
-
-    					<div class="text text-center text-white px-2">
-								<span class="subheading">Men's Shoes</span>
-    						<h2>Men's Collection</h2>
-    						<p>Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean.</p>
-    						<p><a href="#" class="btn btn-black px-3 py-2">Shop now</a></p>
-    					</div>
-    				</div>
+									  </div>
+									</div>
+								</div>
+								<h3><a href="/user/shop/product-details/<%= topRatedProducts[i]._id %>"><%= topRatedProducts[i].productName	 %></a></h3>
+								<div class="pricing">
+									<% if(topRatedProducts[i].regularPrice){ %>
+										<p class="price" id="price"><span class="mr-2" style="color: red;"><del>₹<%= topRatedProducts[i].regularPrice %></del></span><span class="mr-2">₹<%= topRatedProducts[i].amount  %></span><span style="font-size: 12px;color: white;background-color: red; padding-left: 2px;padding-right: 2px;"><%= Math.floor(((topRatedProducts[i].regularPrice-topRatedProducts[i].amount)/topRatedProducts[i].regularPrice)*100) %>% off</span></p>
+									<% }else{ %>
+										<p class="price" id="price"><span>₹<%= topRatedProducts[i].amount %></span></p>
+									<% } %>
+								</div>
+								<p class="bottom-area d-flex px-3">
+									<a href="/user/shop/product-details/<%= topRatedProducts[i]._id %>" class="add-to-cart text-center py-2 mr-1"><span>Add to cart <i class="ion-ios-add ml-1"></i></span></a>
+									<a href="#" class="buy-now text-center py-2">Buy now<span><i class="ion-ios-cart ml-1"></i></span></a>
+								</p>
+							</div>
+						</div>
 					</div>
-					<div class="col-lg-8">
-    				<div class="row no-gutters choose-wrap divider-two align-items-stretch">
-    					<div class="col-md-12">
-	    					<div class="choose-wrap full-wrap img align-self-stretch d-flex align-item-center justify-content-end" style="background-image: url(images/choose-2.jpg);">
-	    						<div class="col-md-7 d-flex align-items-center">
-	    							<div class="text text-white px-5">
-	    								<span class="subheading">Women's Shoes</span>
-			    						<h2>Women's Collection</h2>
-			    						<p>Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean.</p>
-			    						<p><a href="#" class="btn btn-black px-3 py-2">Shop now</a></p>
-			    					</div>
-	    						</div>
-	    					</div>
-	    				</div>
-    					<div class="col-md-12">
-    						<div class="row no-gutters">
-    							<div class="col-md-6">
-		    						<div class="choose-wrap wrap img align-self-stretch bg-light d-flex align-items-center">
-		    							<div class="text text-center px-5">
-		    								<span class="subheading">Summer Sale</span>
-				    						<h2>Extra 50% Off</h2>
-				    						<p>Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean.</p>
-				    						<p><a href="#" class="btn btn-black px-3 py-2">Shop now</a></p>
-				    					</div>
-		    						</div>
-	    						</div>
-	    						<div class="col-md-6">
-		    						<div class="choose-wrap wrap img align-self-stretch d-flex align-items-center" style="background-image: url(images/choose-3.jpg);">
-		    							<div class="text text-center text-white px-5">
-		    								<span class="subheading">Shoes</span>
-				    						<h2>Best Sellers</h2>
-				    						<p>Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean.</p>
-				    						<p><a href="#" class="btn btn-black px-3 py-2">Shop now</a></p>
-				    					</div>
-		    						</div>
-	    						</div>
-	    					</div>
-    					</div>
-    				</div>
-    			</div>
-  			</div>
+				<% } %>
+    		</div>
     	</div>
     </section>
 
     <section class="ftco-section ftco-deal bg-primary">
-    	<div class="container">
-    		<div class="row">
-    			<div class="col-md-6">
-    				<img src="images/prod-1.png" class="img-fluid" alt="">
-    			</div>
-    			<div class="col-md-6">
-    				<div class="heading-section heading-section-white">
-    					<span class="subheading">Deal of the month</span>
-	            <h2 class="mb-3">Deal of the month</h2>
-	          </div>
-    				<div id="timer" class="d-flex mb-4">
-						  <div class="time" id="days"></div>
-						  <div class="time pl-4" id="hours"></div>
-						  <div class="time pl-4" id="minutes"></div>
-						  <div class="time pl-4" id="seconds"></div>
+    	<div class="deals-container">
+			
+			<% if(productsOnOffer.length>0){ %>
+				<% for(let i=0;i<productsOnOffer.length;i++){ %>
+					<div class="row">
+						<div class="col-md-6 imgDiv">
+							<a href="/user/shop/product-details/<%= productsOnOffer[i]._id %>"><img src="<%= productsOnOffer[i].images[0] %>" class="img-fluid" alt=""></a>
 						</div>
-						<div class="text-deal">
-							<h2><a href="#">Nike Free RN 2019 iD</a></h2>
-							<p class="price"><span class="mr-2 price-dc">$120.00</span><span class="price-sale">$80.00</span></p>
-							<ul class="thumb-deal d-flex mt-4">
-								<li class="img" style="background-image: url(images/product-6.png);"></li>
-								<li class="img" style="background-image: url(images/product-2.png);"></li>
-								<li class="img" style="background-image: url(images/product-4.png);"></li>
-							</ul>
+						<div class="col-md-6">
+							<div class="heading-section heading-section-white">
+								<span class="subheading">Deal of the month</span>
+								<h2 class="mb-3">Deal of the month</h2>
+							</div>
+							<div class="text-deal">
+								<h2><a href="#"><%= productsOnOffer[i].productName %></a></h2>
+								<p class="price"><span class="mr-2 price-dc">₹<%= productsOnOffer[i].regularPrice %></span><span class="price-sale">₹<%= productsOnOffer[i].amount %></span></p>
+								<ul class="thumb-deal d-flex mt-4">
+									<li class="img" style="background-image: url();"></li>
+									<li class="img" style="background-image: url(images/product-2.png);"></li>
+									<li class="img" style="background-image: url(images/product-4.png);"></li>
+								</ul>
+							</div>
 						</div>
-    			</div>
-    		</div>
+					</div>
+				<% } %>
+			<% } %>
+
     	</div>
+
     </section>
 
-    <section class="ftco-section testimony-section">
+    <section class="ftco-section bg-ligh">
+		<div class="container">
+			<div class="row justify-content-center mb-3 pb-3">
+	  			<div class="col-md-12 heading-section text-center ftco-animate">
+				<h2 class="mb-4">Shop for Kids</h2>
+				<p>Style Your Little Ones with the Cutest Trends!</p>
+	 	 	</div>
+		</div>   		
+	</div>
       <div class="container">
         <div class="row">
-        	<div class="col-lg-5">
-        		<div class="services-flow">
-        			<div class="services-2 p-4 d-flex ftco-animate">
-        				<div class="icon">
-        					<span class="flaticon-bag"></span>
-        				</div>
-        				<div class="text">
-	        				<h3>Free Shipping</h3>
-	        				<p class="mb-0">Separated they live in. A small river named Duden flows</p>
-        				</div>
-        			</div>
-        			<div class="services-2 p-4 d-flex ftco-animate">
-        				<div class="icon">
-        					<span class="flaticon-heart-box"></span>
-        				</div>
-        				<div class="text">
-	        				<h3>Valuable Gifts</h3>
-	        				<p class="mb-0">Separated they live in. A small river named Duden flows</p>
-	        			</div>
-        			</div>
-        			<div class="services-2 p-4 d-flex ftco-animate">
-        				<div class="icon">
-        					<span class="flaticon-payment-security"></span>
-        				</div>
-        				<div class="text">
-	        				<h3>All Day Support</h3>
-	        				<p class="mb-0">Separated they live in. A small river named Duden flows</p>
-	        			</div>
-        			</div>
-        			<div class="services-2 p-4 d-flex ftco-animate">
-        				<div class="icon">
-        					<span class="flaticon-customer-service"></span>
-        				</div>
-        				<div class="text">
-	        				<h3>All Day Support</h3>
-	        				<p class="mb-0">Separated they live in. A small river named Duden flows</p>
-	        			</div>
-        			</div>
-        		</div>
-        	</div>
-          <div class="col-lg-7">
-          	<div class="heading-section ftco-animate mb-5">
-	            <h2 class="mb-4">Our satisfied customer says</h2>
-	            <p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts. Separated they live in</p>
-	          </div>
-            <div class="carousel-testimony owl-carousel">
-              <div class="item">
-                <div class="testimony-wrap">
-                  <div class="user-img mb-4" style="background-image: url(images/person_1.jpg)">
-                    <span class="quote d-flex align-items-center justify-content-center">
-                      <i class="icon-quote-left"></i>
-                    </span>
-                  </div>
-                  <div class="text">
-                    <p class="mb-4 pl-4 line">Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.</p>
-                    <p class="name">Garreth Smith</p>
-                    <span class="position">Marketing Manager</span>
-                  </div>
-                </div>
-              </div>
-              <div class="item">
-                <div class="testimony-wrap">
-                  <div class="user-img mb-4" style="background-image: url(images/person_2.jpg)">
-                    <span class="quote d-flex align-items-center justify-content-center">
-                      <i class="icon-quote-left"></i>
-                    </span>
-                  </div>
-                  <div class="text">
-                    <p class="mb-4 pl-4 line">Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.</p>
-                    <p class="name">Garreth Smith</p>
-                    <span class="position">Interface Designer</span>
-                  </div>
-                </div>
-              </div>
-              <div class="item">
-                <div class="testimony-wrap">
-                  <div class="user-img mb-4" style="background-image: url(images/person_3.jpg)">
-                    <span class="quote d-flex align-items-center justify-content-center">
-                      <i class="icon-quote-left"></i>
-                    </span>
-                  </div>
-                  <div class="text">
-                    <p class="mb-4 pl-4 line">Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.</p>
-                    <p class="name">Garreth Smith</p>
-                    <span class="position">UI Designer</span>
-                  </div>
-                </div>
-              </div>
-              <div class="item">
-                <div class="testimony-wrap">
-                  <div class="user-img mb-4" style="background-image: url(images/person_1.jpg)">
-                    <span class="quote d-flex align-items-center justify-content-center">
-                      <i class="icon-quote-left"></i>
-                    </span>
-                  </div>
-                  <div class="text">
-                    <p class="mb-4 pl-4 line">Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.</p>
-                    <p class="name">Garreth Smith</p>
-                    <span class="position">Web Developer</span>
-                  </div>
-                </div>
-              </div>
-              <div class="item">
-                <div class="testimony-wrap">
-                  <div class="user-img mb-4" style="background-image: url(images/person_1.jpg)">
-                    <span class="quote d-flex align-items-center justify-content-center">
-                      <i class="icon-quote-left"></i>
-                    </span>
-                  </div>
-                  <div class="text">
-                    <p class="mb-4 pl-4 line">Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.</p>
-                    <p class="name">Garreth Smith</p>
-                    <span class="position">System Analyst</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+			<% for(let i=0;i<kidsDress.length;i++){ %>
+				<div class="col-sm-12 col-md-6 col-lg-3 ftco-animate d-flex">
+					<div class="product d-flex flex-column">
+						<a href="/user/shop/product-details/<%= kidsDress[i]._id %>" class="img-prod"><img class="img-fluid" src="<%= kidsDress[i].images[0] %>" alt="Colorlib Template">
+							<div class="overlay"></div>
+						</a>
+						<div class="text py-3 pb-4 px-3">
+							<div class="d-flex">
+
+								<div class="rating">
+									<div class="review-stars">
+									
+										<% if(!kidsDress[i].avgRating || kidsDress[i].avgRating==null){ %>
+											<% for(let j=5;j>=1;j-- ){ %>
+												<input type="radio" name="rating" id="review-star<%= j %>" value="<%= j %>" disabled>
+												<label for="review-star<%= j %>" style="color: #ddd;">★</i></label>
+											<% } %>
+										<% }else{ %>
+											<% for(let j=5;j>=1;j-- ){ %>
+												<% if(j<= Math.floor(kidsDress[i].avgRating)){ %>
+													<input type="radio" name="rating" id="review-star<%= j %>" value="<%= j %>" disabled>
+													<label for="review-star<%= j %>" style="color: #dbcc8f;">★</i></label>
+												<% }else{ %>
+													<input type="radio" name="rating" id="review-star<%= j %>" value="<%= j %>" disabled>
+													<label for="review-star<%= j %>" style="color: #ddd;">★</i></label>
+												<% } %>
+											<% } %>
+										<% } %>
+
+								  </div>
+								</div>
+							</div>
+							<h3><a href="/user/shop/product-details/<%= kidsDress[i]._id %>"><%= kidsDress[i].productName %></a></h3>
+							<div class="pricing">
+								<% if(kidsDress[i].regularPrice){ %>
+									<p class="price" id="price"><span class="mr-2" style="color: red;"><del>₹<%= kidsDress[i].regularPrice %></del></span><span class="mr-2">₹<%= kidsDress[i].amount  %></span><span style="font-size: 12px;color: white;background-color: red; padding-left: 2px;padding-right: 2px;"><%= Math.floor(((kidsDress[i].regularPrice-kidsDress[i].amount)/kidsDress[i].regularPrice)*100) %>% off</span></p>
+								<% }else{ %>
+									<p class="price" id="price"><span>₹<%= kidsDress[i].amount %></span></p>
+								<% } %>
+							</div>
+							<p class="bottom-area d-flex px-3">
+								<a href="/user/shop/product-details/<%= kidsDress[i]._id %>" class="add-to-cart text-center py-2 mr-1"><span>Add to cart <i class="ion-ios-add ml-1"></i></span></a>
+								<a href="#" class="buy-now text-center py-2">Buy now<span><i class="ion-ios-cart ml-1"></i></span></a>
+							</p>
+						</div>
+					</div>
+				</div>
+			<% } %>	
         </div>
       </div>
-    </section>
-
-    <section class="ftco-gallery">
-    	<div class="container">
-    		<div class="row justify-content-center">
-    			<div class="col-md-8 heading-section text-center mb-4 ftco-animate">
-            <h2 class="mb-4">Follow Us On Instagram</h2>
-            <p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts. Separated they live in</p>
-          </div>
-    		</div>
-    	</div>
-    	<div class="container-fluid px-0">
-    		<div class="row no-gutters">
-					<div class="col-md-4 col-lg-2 ftco-animate">
-						<a href="images/gallery-1.jpg" class="gallery image-popup img d-flex align-items-center" style="background-image: url(images/gallery-1.jpg);">
-							<div class="icon mb-4 d-flex align-items-center justify-content-center">
-    						<span class="icon-instagram"></span>
-    					</div>
-						</a>
-					</div>
-					<div class="col-md-4 col-lg-2 ftco-animate">
-						<a href="images/gallery-2.jpg" class="gallery image-popup img d-flex align-items-center" style="background-image: url(images/gallery-2.jpg);">
-							<div class="icon mb-4 d-flex align-items-center justify-content-center">
-    						<span class="icon-instagram"></span>
-    					</div>
-						</a>
-					</div>
-					<div class="col-md-4 col-lg-2 ftco-animate">
-						<a href="images/gallery-3.jpg" class="gallery image-popup img d-flex align-items-center" style="background-image: url(images/gallery-3.jpg);">
-							<div class="icon mb-4 d-flex align-items-center justify-content-center">
-    						<span class="icon-instagram"></span>
-    					</div>
-						</a>
-					</div>
-					<div class="col-md-4 col-lg-2 ftco-animate">
-						<a href="images/gallery-4.jpg" class="gallery image-popup img d-flex align-items-center" style="background-image: url(images/gallery-4.jpg);">
-							<div class="icon mb-4 d-flex align-items-center justify-content-center">
-    						<span class="icon-instagram"></span>
-    					</div>
-						</a>
-					</div>
-					<div class="col-md-4 col-lg-2 ftco-animate">
-						<a href="images/gallery-5.jpg" class="gallery image-popup img d-flex align-items-center" style="background-image: url(images/gallery-5.jpg);">
-							<div class="icon mb-4 d-flex align-items-center justify-content-center">
-    						<span class="icon-instagram"></span>
-    					</div>
-						</a>
-					</div>
-					<div class="col-md-4 col-lg-2 ftco-animate">
-						<a href="images/gallery-6.jpg" class="gallery image-popup img d-flex align-items-center" style="background-image: url(images/gallery-6.jpg);">
-							<div class="icon mb-4 d-flex align-items-center justify-content-center">
-    						<span class="icon-instagram"></span>
-    					</div>
-						</a>
-					</div>
-        </div>
-    	</div>
     </section>
 
     <footer class="ftco-footer ftco-section">
 		<div class="container">
 			<div class="row">
-				<div class="mouse">
-						  <a href="#" class="mouse-icon">
-							  <div class="mouse-wheel"><span class="ion-ios-arrow-up"></span></div>
-						  </a>
-					  </div>
+
 			</div>
 		  <div class="row mb-5">
 			<div class="col-md">
@@ -697,5 +448,34 @@
 		  </div>
 		</div>
 	  </footer>
+
+	  <script>
+
+	document.addEventListener("DOMContentLoaded", function () {
+		const slides = document.querySelectorAll(".deals-container .row");
+		let currentSlide = 0;
+
+		function showSlide(index) {
+			slides.forEach((slide, i) => {
+				slide.classList.remove("active");
+				slide.style.opacity = "0";
+			});
+
+			slides[index].classList.add("active");
+			slides[index].style.opacity = "1";
+		}
+
+		function nextSlide() {
+			currentSlide = (currentSlide + 1) % slides.length;
+			showSlide(currentSlide);
+		}
+
+		showSlide(currentSlide);
+
+		setInterval(nextSlide, 3000);
+	});
+
+
+	  </script>
 
 <%- include('partials/userFooter') %>

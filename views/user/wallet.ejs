@@ -59,10 +59,11 @@
                         <u>Wallet Balance:</u>
                     </div>
                     <div class="balanceAmount">
-                        ₹<%= user.walletBalance?? 0 %>
+                        ₹<%= refundOrders? refundOrders.walletAmount:0 %>
                     </div>
                 </div>
-                <% if(refundOrders.length>0){ %>
+                <% if(refundOrders){ %>
+                    <p class="mt-4" style="font-size: 18px;">Credit History </p>
                     <table class="table orders mt-4 w-full whitespace-no-wrap">
                         <thead>
                             <tr class="text-center">
@@ -70,22 +71,44 @@
                                 <th class="product-name">Product</th>
                                 <th>Order Date</th>
                                 <th class="price">Quantity</th>
-                                <th class="quantity">Reason</th>
                                 <th class="total">Refund Amount</th>
                                 <th></th>
                             </tr>
                         </thead>
                         <tbody>
-                            <% for(let i=0;i<refundOrders.length;i++){ %>
+                            <% refundOrders.creditHistory.forEach(credit=>{ %>
                                 <tr class="text-center">
-                                    <td>#<%= refundOrders[i]._id %></td>
-                                    <td><img class="productImage" src="<%= refundOrders[i].resultProducts.images[0] %>" alt=""></td>
-                                    <td><%= (refundOrders[i].createdAt).toLocaleDateString() %></td>
-                                    <td><%= refundOrders[i].products.quantity %></td>
-                                    <td><%= refundOrders[i].products.cancelReason %></td>
-                                    <td>₹<%= refundOrders[i].products.productAmount %></td>
+                                    <td>#<%= credit.orderId %></td>
+                                    <td><img class="productImage" src="<%= credit.productId.images[0] %>" alt=""></td>
+                                    <td><%= (credit.creditDate).toLocaleDateString() %></td>
+                                    <td><%= credit.quantity %></td>
+                                    <td>₹<%= credit.creditAmount %></td>
                                 </tr>
-                            <% } %>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                    <p class="mt-4" style="font-size: 18px;">Debit History </p>
+                    <table class="table orders mt-4 w-full whitespace-no-wrap">
+                        <thead>
+                            <tr class="text-center">
+                                <th class="image-prod">OrderId</th>
+                                <th class="product-name">Product</th>
+                                <th>Order Date</th>
+                                <th class="price">Quantity</th>
+                                <th class="total">Refund Amount</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% refundOrders.debitHistory.forEach(debit=>{ %>
+                                <tr class="text-center">
+                                    <td>#<%= debit.orderId._id %></td>
+                                    <td><img class="productImage" src="<%= credit.productId.images[0] %>" alt=""></td>
+                                    <td><%= (credit.creditDate).toLocaleDateString() %></td>
+                                    <td><%= credit.quantity %></td>
+                                    <td>₹<%= credit.creditAmount %></td>
+                                </tr>
+                            <% }) %>
                         </tbody>
                     </table>
                 <% }else{ %>

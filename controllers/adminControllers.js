@@ -246,7 +246,8 @@ const getSalesReport = async (req,res)=>{
                         createdAt:{
                             $gte:startDate,
                             $lte:endDate
-                        }
+                        },
+                        status:'Delivered'
                     }
                 },
                 {
@@ -265,7 +266,8 @@ const getSalesReport = async (req,res)=>{
                         createdAt:{
                             $gte:startDate,
                             $lte:endDate
-                        }
+                        },
+                        status:'Delivered'
                     }
                 },
                 {
@@ -302,7 +304,8 @@ const getSalesReport = async (req,res)=>{
                         createdAt:{
                             $gte:startDate,
                             $lte:endDate
-                        }
+                        },
+                        status:'Delivered'
                     }
                 },
                 {
@@ -332,7 +335,8 @@ const getSalesReport = async (req,res)=>{
                 $match:{
                     createdAt:{
                         $gte:last7Days
-                    }
+                    },
+                    status:'Delivered'
                 }
             },
             {
@@ -368,7 +372,8 @@ const getSalesReport = async (req,res)=>{
                 $match:{
                     createdAt:{
                         $gte:last7Days
-                    }
+                    },
+                    status:'Delivered'
                 }
             },
             {
@@ -386,7 +391,8 @@ const getSalesReport = async (req,res)=>{
                 $match:{
                     createdAt:{
                         $gte:last7Days
-                    }
+                    },
+                    status:'Delivered'
                 }
             },
             {

@@ -6,13 +6,64 @@ const sendMail=require('../helpers/mailHelper')
 const bcrypt=require('../helpers/bcrypt')
 const address = require('../models/addressSchema')
 const orders = require('../models/orderSchema')
+const products=require('../models/productSchema')
+const categories = require('../models/categorySchema')
+const wallets = require('../models/walletSchema')
 
 const STATUS_SERVER_ERROR=parseInt(process.env.STATUS_SERVER_ERROR)
 const STATUS_NOT_FOUND=parseInt(process.env.STATUS_NOT_FOUND)
 
 const loadHomePage = async (req,res)=>{
     try {
-       res.render('home') 
+        const topRatedProducts=await products.aggregate([
+            {
+                $lookup:{
+                    from:'categories',
+                    localField:'category',
+                    foreignField:'_id',
+                    as:'resultCategories'
+                }
+            },
+            {
+                $unwind:'$resultCategories'
+            },
+            {
+                $match:{
+                    isDeleted:false
+                }
+            },
+            {
+                $addFields:{
+                    avgRating:{
+                        $avg:'$review.rating'
+                    }
+                }
+            },
+            {
+                $sort:{
+                    avgRating:-1
+                }
+            },
+            {
+                $limit:8
+            }
+        ])
+        const productsOnOffer=await products.find(
+            {
+                regularPrice:{
+                    $gt:0
+                }
+            }
+        )
+        const kidsCategory=await categories.findOne({name:{$regex:'^kid', $options:'i'}})
+        const kidsDress = await products.find({
+            category: kidsCategory._id 
+        }).limit(4);
+        res.render('home', {
+            topRatedProducts:topRatedProducts,
+            productsOnOffer:productsOnOffer,
+            kidsDress:kidsDress
+        }) 
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
         console.log(error.message);
@@ -403,41 +454,37 @@ const loadWalletPage = async (req,res)=>{
     try {
         const userEmail=req.session.userEmail
         const user=await users.findOne({email:userEmail})
-        const refundOrders=await orders.aggregate([
+        const refundOrders=await wallets.findOne({user:user._id}).populate('creditHistory.productId')
+        const debitOrders=await orders.aggregate([
             {
                 $match:{
                     user:new mongoose.Types.ObjectId(user._id)
                 }
             },
             {
-                $unwind:'$products'
+                $unwind:'$debitHistory'
             },
             {
-                $match:{
-                    'products.status':{
-                        $in:['Cancelled','Returned']
-                    },
-                    paymentmethod:'Online Payment'
+                $lookup:{
+                    from:'orders',
+                    localField:'debitHistory.orderId',
+                    foreignField:'_id',
+                    as:'resultOrders'
                 }
             },
             {
-                $lookup: {
-                  from: "products",
-                  localField: "products.productId", 
-                  foreignField: "_id",
-                  as: "resultProducts"
-                }
+                $unwind:'$resultOrders'
             },
             {
-                $unwind:'$resultProducts'
+                $lookup:{
+                    from:'products',
+                    localField:'resultOrders.product'
+                }
             }
-              
         ])
-        console.log(refundOrders);
         
         res.render('wallet', {
             refundOrders:refundOrders,
-            user:user
         })
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')

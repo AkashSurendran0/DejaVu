@@ -135,7 +135,7 @@ const addAddressFromCheckout = async (req,res)=>{
                 {$set:{"address.$":data}}
             )
             req.flash('msg', 'Address edited successfully')
-            return res.redirect(`/user/checkout/${cart}`)
+            return res.redirect(`/user/loadCheckout/${cart}`)
         }
 
         await address.updateOne(
@@ -145,7 +145,7 @@ const addAddressFromCheckout = async (req,res)=>{
         )
 
         req.flash('msg', 'Address added successfully')
-        res.redirect(`/user/checkout/${cart}`)
+        res.redirect(`/user/loadCheckout/${cart}`)
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
         console.log(error.message);
