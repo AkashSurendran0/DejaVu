@@ -28,7 +28,7 @@ const loadCartPage = async (req,res)=>{
         })
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
-        console.log(error.message);
+        
     }
 }
 
@@ -87,6 +87,7 @@ const addToCart = async (req,res)=>{
             }else if((itemAlreadyExist[0].quantity)+quantity > 5 ){
                 return res.json({quantityFive:true})
             }else{
+                const gstAmount=((foundProduct.amount*quantity)/100)*5
                 await carts.updateOne(
                     {
                         user: user._id,
@@ -96,11 +97,12 @@ const addToCart = async (req,res)=>{
                         $inc:{
                             'products.$.quantity':quantity,
                             totalQuantity:quantity,
-                            totalAmount:foundProduct.amount*quantity
+                            totalAmount:(foundProduct.amount*quantity)+gstAmount,
+                            GST:gstAmount
                         }
                     }
                 )
-                const offerAmount=foundProduct.regularPrice-foundProduct.amount
+                const offerAmount=((foundProduct.regularPrice-foundProduct.amount)*quantity).toFixed(2)
                 if(foundProduct.hasOffer){
                     await carts.updateOne(
                         {
@@ -122,6 +124,9 @@ const addToCart = async (req,res)=>{
                             $set:{
                                 totalAmount:{
                                     $round:['$totalAmount',2]
+                                },
+                                GST:{
+                                    $round:['$GST', 2]
                                 }
                             }
                         }
@@ -131,6 +136,7 @@ const addToCart = async (req,res)=>{
             return res.json({success:true})
         }  
         
+        const gstAmount=((foundProduct.amount*quantity)/100)*5
         await carts.updateOne(
             {user: user._id},   
             {
@@ -143,14 +149,14 @@ const addToCart = async (req,res)=>{
                 },
                 $inc:{
                     totalQuantity:quantity,
-                    totalAmount:(foundProduct.amount)*quantity
+                    totalAmount:((foundProduct.amount)*quantity)+gstAmount,
+                    GST:gstAmount
                 }
             },
             {upsert:true}
         )
         if(foundProduct.regularPrice){
-            const offerAmount=(foundProduct.regularPrice-foundProduct.amount).toFixed(2)
-            console.log(offerAmount);
+            const offerAmount=((foundProduct.regularPrice-foundProduct.amount)*quantity).toFixed(2)
             
             if(foundProduct.hasOffer){
                 await carts.updateOne(
@@ -182,7 +188,7 @@ const addToCart = async (req,res)=>{
         res.json({success:true})
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).json({success:false})
-        console.log(error.message);
+        
     }
 }
 
@@ -207,7 +213,7 @@ const removeProduct = async (req,res)=>{
         ])
         const foundProduct=await products.findOne({_id: productInCart[0].products.productId})
         if(foundProduct.hasOffer){
-            const offerAmount=foundProduct.regularPrice-foundProduct.amount
+            const offerAmount=((foundProduct.regularPrice-foundProduct.amount)*productInCart[0].products.quantity).toFixed(2)
             await carts.updateOne(
                 {
                     _id: cartId
@@ -219,13 +225,14 @@ const removeProduct = async (req,res)=>{
                 }
             )
         }
-        
+        const gstAmount=((foundProduct.amount*productInCart[0].products.quantity)/100)*5
         await carts.updateOne(
             {_id: cartId},
             {
                 $inc:{
                     totalQuantity: -productInCart[0].products.quantity,
-                    totalAmount: -((foundProduct.amount)*(productInCart[0].products.quantity))
+                    totalAmount: -((foundProduct.amount)*(productInCart[0].products.quantity))-gstAmount,
+                    GST:-gstAmount
                 },
                 $pull:{
                     products:{
@@ -234,10 +241,25 @@ const removeProduct = async (req,res)=>{
                 }
             }
         )
+        await carts.updateOne(
+            {_id:cartId},
+            [
+                {
+                    $set:{
+                        totalAmount:{
+                            $round:['$totalAmount', 2]
+                        },
+                        GST:{
+                            $round:['$GST', 2]
+                        }
+                    }
+                }
+            ]
+        )
         res.redirect('/user/cart')
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
-        console.log(error.message);
+        
     }
 }
 
@@ -249,6 +271,10 @@ const changeQuantity = async (req,res)=>{
         const cartProduct=req.query.cartProduct 
         const action=req.query.action
         const product=await products.findOne({_id: cartProduct})
+        let discountPrice=0
+        if(product.regularPrice){
+            discountPrice=product.regularPrice-product.amount
+        }
         const size=await carts.aggregate([
             {
                 $match:{
@@ -285,8 +311,8 @@ const changeQuantity = async (req,res)=>{
         
         if(action==='increase'){
             if(currentQuantity < stockAvailable[0].sizeAvailable[size[0].products.size] && currentQuantity<5){
-                console.log('increased');
-                
+                const gstAmount=(product.amount/100)*5
+                const productAmount=product.amount+gstAmount
                 await carts.updateOne(
                     {
                         _id: cart, 'products._id':cartProductId
@@ -295,7 +321,9 @@ const changeQuantity = async (req,res)=>{
                         $inc:{
                             'products.$.quantity':1,
                             totalQuantity:1,
-                            totalAmount:product.amount
+                            totalAmount:productAmount,
+                            GST:gstAmount,
+                            offerDiscount:discountPrice
                         }
                     }
                 )
@@ -308,6 +336,12 @@ const changeQuantity = async (req,res)=>{
                             $set:{
                                 totalAmount:{
                                     $round:['$totalAmount', 2]
+                                },
+                                offerDiscount:{
+                                    $round:['$offerDiscount', 2]
+                                },
+                                GST:{
+                                    $round:['$GST', 2]
                                 }
                             }
                         }
@@ -322,8 +356,8 @@ const changeQuantity = async (req,res)=>{
             }
         }else if(action==='decrease'){
             if(currentQuantity > 1){
-                console.log('decreased');
-                
+                const gstAmount=(product.amount/100)*5
+                const productAmount=product.amount+gstAmount
                 await carts.updateOne(
                     {
                         _id: cart, 'products._id':cartProductId
@@ -332,7 +366,9 @@ const changeQuantity = async (req,res)=>{
                         $inc:{
                             'products.$.quantity':-1,
                             totalQuantity:-1,
-                            totalAmount:-product.amount
+                            totalAmount:-productAmount,
+                            GST:-gstAmount,
+                            offerDiscount:-discountPrice
                         }
                     }
                 )
@@ -345,6 +381,12 @@ const changeQuantity = async (req,res)=>{
                             $set:{
                                 totalAmount:{
                                     $round:['$totalAmount', 2]
+                                },
+                                offerDiscount:{
+                                    $round:['$offerDiscount', 2]
+                                },
+                                GST:{
+                                    $round:['$GST', 2]
                                 }
                             }
                         }
@@ -360,7 +402,7 @@ const changeQuantity = async (req,res)=>{
         }
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
-        console.log(error.message);
+        
     }
 }
 

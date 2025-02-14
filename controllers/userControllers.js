@@ -66,7 +66,7 @@ const loadHomePage = async (req,res)=>{
         }) 
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
-        console.log(error.message);
+        
     }
 }
 
@@ -75,7 +75,7 @@ const loadLoginPage = async (req,res)=>{
         res.render('userlogin', {loginErr: req.flash('invalidUser'), userLogin: req.flash('userLogin')})
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
-        console.log(error.message);
+        
     }
 }
 
@@ -84,7 +84,7 @@ const loadEmailSignupPage = async (req,res)=>{
         res.render('userEmailLogin', {emailReq:req.flash('emailReq'), otpExp: req.flash('otpExpired')})
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
-        console.log(error.message);
+        
     }
 }
 
@@ -120,14 +120,13 @@ const sendOTP = async (req,res)=>{
 
         setTimeout(()=>{
             delete storeOTP[email]
-            console.log('Otp deleted');
         },60000)
         req.session.userEmail = email
-        console.log(storeOTP[email]);
+        (storeOTP[email]);
         res.render('verify-otp', {OTPerr: req.flash('OTPerr'), storedOTP: storeOTP[email]})
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
-        console.log(error.message);
+        
     }
 }
 
@@ -146,7 +145,7 @@ const verifyOTP = async (req,res)=>{
         }
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
-        console.log(error.message);
+        
     }
 }
 
@@ -155,7 +154,7 @@ const loadSignupPage = async (req,res)=>{
         res.render('userSignup', {err:false})
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
-        console.log(error.message);
+        
     }
 }
 
@@ -178,7 +177,7 @@ const resendOTP = async (req,res)=>{
         res.render('verify-otp', {OTPerr: req.flash('OTPerr')})
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
-        console.log(error.message);
+        
     }
 }
 
@@ -206,7 +205,7 @@ const userSignup = async (req,res)=>{
         res.redirect('/user')
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
-        console.log(error.message);
+        
     }
 }
 
@@ -217,7 +216,7 @@ const userLogout = async (req,res)=>{
         })
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
-        console.log(error.message);
+        
     }
 }
 
@@ -244,7 +243,7 @@ const userLogin = async (req,res)=>{
         res.redirect('/user')
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
-        console.log(error.message);
+        
     }
 }
 
@@ -253,7 +252,7 @@ const loadEmailVerificationPage = async (req,res)=>{
         res.render('verifyEmail', {emailErr: req.flash('noUser')})
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
-        console.log(error.message);
+        
     }
 }
 
@@ -285,13 +284,13 @@ const sendVerifyOTP = async (req,res)=>{
         res.render('recoverPasswordOTP', {OTPerr: req.flash('OTPerr')})
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
-        console.log(error.message);
+        
     }
 }
 
 const verifyRecoverOTP = async (req,res)=>{
     try {
-        console.log(req.body);
+        (req.body);
         const {otp} = req.body
         const email = req.session.userEmail
         const storedOTP=storeOTP[email]
@@ -305,7 +304,7 @@ const verifyRecoverOTP = async (req,res)=>{
         }
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
-        console.log(error.message);
+        
     }
 }
 
@@ -314,7 +313,7 @@ const loadChangePassword = async (req,res)=>{
         res.render('recoverPassword', {err:false})
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
-        console.log(error.message);
+        
     }
 }
 
@@ -339,7 +338,7 @@ const changePassword = async (req,res)=>{
         res.redirect('/user/login')
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
-        console.log(error.message);
+        
     }
 }
 
@@ -354,7 +353,7 @@ const loadBasicInfoPage = async (req,res)=>{
         })
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
-        console.log(error.message);
+        
     }
 }
 
@@ -379,7 +378,7 @@ const updateUser = async (req,res)=>{
         res.redirect('/user/settings/basicInfo')
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
-        console.log(error.message);
+        
     }
 }
 
@@ -411,7 +410,7 @@ const changePasswordFromSettings = async (req,res)=>{
         res.redirect('/user/settings/basicInfo')
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
-        console.log(error.message);
+        
     }
 }
 
@@ -429,14 +428,14 @@ const deleteAccount = async (req,res)=>{
         })
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
-        console.log(error.message);
+        
     }
 }
 
 const validatePassword = async (req,res)=>{
     try {
         const {userId,password}=req.body
-        console.log(req.body);
+        (req.body);
         
         const user=await users.findById(userId)
         const isMatch=await bcrypt.check(password,user.password)
@@ -446,7 +445,7 @@ const validatePassword = async (req,res)=>{
         res.json({success:true})
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
-        console.log(error.message);
+        
     }
 }
 
@@ -455,7 +454,7 @@ const loadWalletPage = async (req,res)=>{
         const userEmail=req.session.userEmail
         const user=await users.findOne({email:userEmail})
         const refundOrders=await wallets.findOne({user:user._id}).populate('creditHistory.productId')
-        const debitOrders=await orders.aggregate([
+        const debitOrders=await wallets.aggregate([
             {
                 $match:{
                     user:new mongoose.Types.ObjectId(user._id)
@@ -478,17 +477,72 @@ const loadWalletPage = async (req,res)=>{
             {
                 $lookup:{
                     from:'products',
-                    localField:'resultOrders.product'
+                    localField:'resultOrders.products.productId',
+                    foreignField:'_id',
+                    as:'resultProducts'
                 }
+            },
+            {
+                $project: {
+                    _id: 1,
+                    user: 1,
+                    "debitHistory.orderId": 1,
+                    "debitHistory.debitDate": 1,
+                    "resultOrders._id": 1,
+                    "resultOrders.status": 1,
+                    "resultOrders.paymentmethod": 1,
+                    "resultOrders.quantity":1,
+                    "resultOrders.totalAmount": 1,
+                    "resultOrders.createdAt": 1,
+                    "resultProducts": 1
+                  }
             }
-        ])
-        
+        ])        
         res.render('wallet', {
             refundOrders:refundOrders,
+            debitOrders:debitOrders
         })
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
-        console.log(error.message);
+        
+    }
+}
+
+const loadAboutUsPage = async (req,res)=>{
+    try {
+        res.render('aboutUs')
+    } catch (error) {
+        res.status(STATUS_SERVER_ERROR).render('404page')
+        
+    }
+}
+
+const loadContactUsPage = async (req,res)=>{
+    try {
+        res.render('contactUs')
+    } catch (error) {
+        res.status(STATUS_SERVER_ERROR).render('404page')
+        
+    }
+}
+
+const sendContactMail = async (req,res)=>{
+    try {
+        const {name,email,subject,message}=req.body
+        try {
+            await sendMail({
+                from: email,
+                to: 'akashsurendran1001@gmail.com',
+                subject: subject,
+                text: `This message is from ${name}. Message: ${message}`
+            })
+            res.json({success:true})
+        } catch (error) {
+            res.json({success:false})
+        }
+    } catch (error) {
+        res.status(STATUS_SERVER_ERROR).render('404page')
+        
     }
 }
 
@@ -513,5 +567,8 @@ module.exports={
     changePasswordFromSettings,
     deleteAccount,
     validatePassword,
-    loadWalletPage
+    loadWalletPage,
+    loadAboutUsPage,
+    loadContactUsPage,
+    sendContactMail
 }

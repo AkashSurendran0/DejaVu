@@ -1,0 +1,118 @@
+<%-include('partials/userHeader')%>
+<%-include('partials/userNavbar')%>
+
+<div class="hero-wrap hero-bread" style="background-image: url('/uploads/contactUsbanner.png');">
+    <div class="container">
+      <div class="row no-gutters slider-text align-items-center justify-content-center">
+        <div class="col-md-9 ftco-animate text-center">
+          <h1 class="mb-0 bread" style="background: white;">Contact Us</h1>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="ftco-section contact-section bg-light">
+    <div class="container">
+        <div class="row d-flex mb-5 contact-info">
+        <div class="w-100"></div>
+        <div class="col-md-3 d-flex">
+            <div class="info bg-white p-4">
+              <p><span>Address:</span>  1527 Fashion Ave, Los Angeles, CA 90015, USA</p>
+            </div>
+        </div>
+        <div class="col-md-3 d-flex">
+            <div class="info bg-white p-4">
+              <p><span>Phone:</span> <a href="tel://1234567920"> +1 (213) 555-7890</a></p>
+            </div>
+        </div>
+        <div class="col-md-3 d-flex">
+            <div class="info bg-white p-4">
+              <p><span>Email:</span> <a href="mailto:info@yoursite.com"> dejavubusiness@gmail.com</a></p>
+            </div>
+        </div>
+        <div class="col-md-3 d-flex">
+            <div class="info bg-white p-4">
+              <p><span>Website:</span> <a href="#">dejavuMensStore.ddns</a></p>
+            </div>
+        </div>
+      </div>
+      <div class="row block-9">
+        <div class="col-md-6 order-md-last d-flex">
+          <form action="#" class="bg-white p-5 contact-form">
+            <div class="form-group">
+              <input type="text" class="form-control" id="name" placeholder="Your Name" required>
+            </div>
+            <div class="form-group">
+              <input type="text" class="form-control" id="email" placeholder="Your Email" required>
+            </div>
+            <div class="form-group">
+              <input type="text" class="form-control" id="subject" placeholder="Subject" required>
+            </div>
+            <div class="form-group">
+              <textarea name="" cols="30" rows="7" id="message" class="form-control" placeholder="Message" required></textarea>
+            </div>
+            <div class="form-group">
+              <input type="submit" id="sentMail" value="Send Message" class="btn btn-primary py-3 px-5">
+            </div>
+          </form>
+        
+        </div>
+
+        <div class="col-md-6 d-flex">
+            <div id="map" class="bg-white">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d7564.98851708083!2d-118.24947310436565!3d34.05522127326802!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80c2c75ddc27da13%3A0xe22fdf6f254608f4!2sLos%20Angeles%2C%20CA%2C%20USA!5e0!3m2!1sen!2sin!4v1739370166890!5m2!1sen!2sin" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+        </div>
+      </div>
+    </div>
+  </section> 
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+
+    document.getElementById('sentMail').addEventListener('click', (event)=>{
+        event.preventDefault()
+        const name=document.getElementById('name').value
+        const email=document.getElementById('email').value
+        const subject=document.getElementById('subject').value
+        const message=document.getElementById('message').value
+        const data={
+            name:name,
+            email:email,
+            subject:subject,
+            message:message
+        }
+        
+        fetch('/user/sendMail', {
+            method:'POST',
+            headers:{
+                'Content-Type':'application/json'
+            },
+            body:JSON.stringify(data)
+        })
+        .then(response=>response.json())
+        .then(data=>{
+            if(data.success){
+                Swal.fire({
+                    icon:'success',
+                    title:'Mail Sent',
+                    text:'Thank you for your concern. We will get in touch with you immediately.'
+                })
+                .then(result=>{
+                    if(result.isConfirmed){
+                        window.location.href='/user/contactUs'
+                    }
+                })
+            }else{
+                Swal.fire({
+                    icon:'error',
+                    title:'Error sending mail',
+                    text:'Looks like the server is busy. Please try again later.'
+                })
+            }
+        })
+    })
+
+</script>
+
+<%- include('partials/userFooter') %>

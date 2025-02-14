@@ -31,7 +31,7 @@ img {
             <h3>No Orders Currently</h3>
         <% }else{ %>
             <div class="w-full overflow-hidden rounded-lg shadow-xs">
-                <div class="w-full overflow-x-auto">
+                <div class="w-full overflow-x-auto table-repsonsive">
                     <table class="w-full whitespace-no-wrap">
                         <thead>
                           <tr
@@ -51,37 +51,37 @@ img {
                         <tbody
                           class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800"
                         >
-                        <% for(let i=0;i<allOrders.length;i++){ %>
+                        <% allOrders.forEach(order=>{ %>
                           <tr class="text-gray-700 dark:text-gray-400">
-                            <td class="px-4 py-3 text-sm">#<%= allOrders[i]._id %></td>
+                            <td class="px-4 py-3 text-sm">#<%= order._id %></td>
                             <td class="px-4 py-3 text-sm d-flex">
-                                    <% allOrders[i].resultProducts.forEach(image=>{ %>
-                                        <img class="ml-2" src="<%= image.images[0] %>" alt="Product Image">
+                                    <% order.products.forEach(product=>{ %>
+                                        <img class="ml-2" src="<%= product.productId.images[0] %>" alt="Product Image">
                                     <% }) %>
                             </td>
-                            <td class="px-4 py-3 text-sm"><%= allOrders[i].createdAt.toLocaleDateString() %></td>
+                            <td class="px-4 py-3 text-sm"><%= order.createdAt.toLocaleDateString() %></td>
                             <td class="px-4 py-3 text-sm">
                                 <div>
-                                    <p class="mb-1"><b><%= allOrders[i].resultAddress.address.name %></b></p>
-                                    <p class="mb-0"><%= allOrders[i].resultAddress.address.state %>, <%= allOrders[i].resultAddress.address.streetAddress %>, <%= allOrders[i].resultAddress.address.city %>, <%= allOrders[i].resultAddress.address.postcode %>, <%= allOrders[i].resultAddress.address.phone %></p>
+                                    <p class="mb-1"><b><%= order.address.name %></b></p>
+                                    <p class="mb-0"><%= order.address.state %>, <%= order.address.streetAddress %>, <%= order.address.city %>, <%= order.address.postcode %>, <%= order.address.phone %></p>
                                 </div>
                             </td>
-                            <td class="px-4 py-3 text-sm"><%= allOrders[i].quantity %></td>
-                            <td class="px-4 py-3 text-sm">₹&nbsp;&nbsp;<%= allOrders[i].totalAmount %></td>
-                            <td class="px-4 py-3 text-sm"><%= allOrders[i].paymentmethod %></td>
+                            <td class="px-4 py-3 text-sm"><%= order.quantity %></td>
+                            <td class="px-4 py-3 text-sm">₹&nbsp;&nbsp;<%= order.totalAmount %></td>
+                            <td class="px-4 py-3 text-sm"><%= order.paymentmethod %></td>
                             <td class="px-4 py-3 text-sm"><span class="btn btn-<%= 
-                                allOrders[i].status === 'Pending' ? 'warning' :
-                                allOrders[i].status === 'Shipped' ? 'primary' :
-                                allOrders[i].status === 'Out for Delivery' ? 'info' :
-                                allOrders[i].status === 'Delivered' ? 'success' :
-                                allOrders[i].status === 'Cancelled' ? 'danger' : 
+                                order.status === 'Pending' ? 'warning' :
+                                order.status === 'Shipped' ? 'primary' :
+                                order.status === 'Out for Delivery' ? 'info' :
+                                order.status === 'Delivered' ? 'success' :
+                                order.status === 'Cancelled' ? 'danger' : 
                                 'dark' 
                               %>">
-                                <%= allOrders[i].status %>
+                                <%= order.status %>
                               </span></td>
-                            <td class="px-4 py-3 text-sm"><button class="btn editOrder"><a href="/admin/orderManagement/order-details/<%= allOrders[i]._id %>">View Order</a></button></td>
+                            <td class="px-4 py-3 text-sm"><button class="btn editOrder"><a href="/admin/orderManagement/order-details/<%= order._id %>">View Order</a></button></td>
                           </tr>
-                        <% } %>
+                        <% }) %>
                         </tbody>
                       </table>
                     

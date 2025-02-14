@@ -135,6 +135,17 @@ input[type="checkbox"]{
 #logoImg{
     cursor: pointer;
 }
+@media screen and (max-width: 768px) {
+    .register {
+        display: none;
+    }
+    .login{
+        width:100%
+    }
+    .container{
+        width: 100%;
+    }
+}
 </style>
 
 <div class="container">
@@ -172,4 +183,3 @@ input[type="checkbox"]{
     })
 </script>
 
-<%-include('partials/userFooter')%>

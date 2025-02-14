@@ -200,26 +200,30 @@
                 <h2 class="mb-4" style="font-weight: bold;">ORDER SUMMARY</h2>
                 <div class="row">
                     <div class="col-md-6">
-                        <h4><b>Order Id: # <%= order[0]._id %></b></h4>
-                        <p>Ordered by : <%= order[0].userFound[0].name %></p>
+                        <h4><b>Order Id: # <%= order._id %></b></h4>
+                        <p>Ordered by : <%= order.user.name %></p>
                         <h5><b>Delivery Address:</b></h5>
-                        <p><b><%= order[0].resultAddress.address.name %></b></p>
-                        <p><%= order[0].resultAddress.address.state %></p>
-                        <p><%= order[0].resultAddress.address.streetAddress %>, <%= order[0].resultAddress.address.city %>, <% if(order[0].resultAddress.address.apartment){ %> <%= order[0].resultAddress.address.apartment %> <% } %></p>
-                        <p><%= order[0].resultAddress.address.postcode %>, <%= order[0].resultAddress.address.phone %></p>
+                        <p><b><%= order.address.name %></b></p>
+                        <p><%= order.address.state %></p>
+                        <p><%= order.address.streetAddress %>, <%= order.address.city %>, <% if(order.address.apartment){ %> <%= order.address.apartment %> <% } %></p>
+                        <p><%= order.address.postcode %>, <%= order.address.phone %></p>
                         <h5><b>Delivery Details:</b></h5>
-                        <p><b>Total Amount:</b>&nbsp;&nbsp;&nbsp;₹<%= order[0].totalAmount %></p>
-                        <p><b>Total Quantity:</b>&nbsp;&nbsp;&nbsp;<%= order[0].quantity %></p>
-                        <p><b>Payment:</b>&nbsp;&nbsp;&nbsp;<%= order[0].paymentmethod %></p>
-                        <% if(order[0].status=='Delivered'){ %>
-                          <p><button class="mt-2 invoiceBtn" onclick="downloadInvoice('<%= order[0]._id %>')">Get Invoice</button></p>
+                        <p><b>Total Amount:</b>&nbsp;&nbsp;&nbsp;₹<%= Math.floor(order.totalAmount-order.GST+order.couponDiscount+order.offerDiscount) %></p>
+                        <p><b>Coupon Discount Applied:</b>&nbsp;&nbsp;&nbsp;₹<%= order.couponDiscount?? 0 %></p>
+                        <p><b>Offer Discount Applied:</b>&nbsp;&nbsp;&nbsp;₹<%= order.offerDiscount?? 0 %></p>
+                        <p><b>GST Applied @ 5%:</b>&nbsp;&nbsp;&nbsp;₹<%= order.GST?? 0 %></p>
+                        <p><b>Total Quantity:</b>&nbsp;&nbsp;&nbsp;<%= order.quantity %></p>
+                        <p><b>Payable Amount:</b>&nbsp;&nbsp;&nbsp;₹<%= order.totalAmount %></p>
+                        <p><b>Payment:</b>&nbsp;&nbsp;&nbsp;<%= order.paymentmethod %></p>
+                        <% if(order.status=='Delivered' || order.paymentmethod=='Online Payment' || order.paymentmethod=='Wallet Payment'){ %>
+                          <p><button class="mt-2 invoiceBtn" onclick="downloadInvoice('<%= order._id %>')">Get Invoice</button></p>
                         <% } %>
-                        <% if(order[0].paymentmethod=='Payment Failed'){ %>
-                          <p><button class="mt-2 paymentBtn" onclick="retryPayment('<%= order[0]._id %>')">Retry Payment</button></p>
+                        <% if(order.paymentmethod=='Payment Failed'){ %>
+                          <p><button class="mt-2 paymentBtn" onclick="retryPayment('<%= order._id %>')">Retry Payment</button></p>
                         <% } %>
                     </div>
                     <div class="col-md-6 d-flex">
-                      <% if(order[0].status=='Cancelled'){ %>
+                      <% if(order.status=='Cancelled'){ %>
                         <div class="col-md-3">
                           <div class="tracking">
                             <div class="step completed">
@@ -282,7 +286,8 @@
                     </div>
                     <div class="col-md-12">
                         <h2 class="mb-4 mt-3" style="font-weight: bold;">PRODUCT DETAILS</h2>
-                        <table class="table orderProducts" style="overflow-y: scroll;overflow: hidden;">
+                        <div class="table-responsive">
+                          <table class="table orderProducts">
                             <thead>
                               <tr class="text-center">
                                 <th class="image-prod">Products</th>
@@ -294,42 +299,43 @@
                               </tr>
                             </thead>
                             <tbody>
-                              <% for(let i=0;i<order.length;i++){ %>
+                              <% order.products.forEach(product=>{ %>
                                 <tr class="text-center">
                                   <td>
-                                    <img src="<%= order[i].resultProducts[0].images[0] %>" alt="">
+                                    <img src="<%= product.productId.images[0] %>" alt="">
                                   </td>
                                   <td class="image-prod">
-                                    <p><%= order[i].resultProducts[0].productName %></p>
+                                    <p><%= product.productId.productName %></p>
                                   </td>
                                   <td class="product-name">
-                                    <p><%= order[i].products.size %></p>
+                                    <p><%= product.size %></p>
                                   </td>
                                   <td class="price">
-                                    <p><%= order[i].products.quantity %></p>
+                                    <p><%= product.quantity %></p>
                                   </td>
                                   <td class="size">
-                                    <p><%= order[i].products.productAmount %></p>
+                                    <p><%= product.productAmount %></p>
                                   </td>
                                   <td>
-                                    <% if(order[i].products.status == 'Return Cancelled'){ %>
+                                    <% if(product.status == 'Return Cancelled'){ %>
                                       <span class="btn btn-info">Return Cancelled</span>
-                                    <% }else if(order[i].products.status == 'Returned'){ %>
+                                    <% }else if(product.status == 'Returned'){ %>
                                       <span class="btn btn-danger">Returned</span>
-                                    <% }else if(order[i].products.status == 'Return requested'){ %>
+                                    <% }else if(product.status == 'Return requested'){ %>
                                       <span class="btn btn-warning">Return requested</span>
-                                    <% }else if(order[i].products.status == 'Delivered'){ %>
-                                      <button class="cancelBtn btn-info" onclick="requestReturn('<%= order[i].products._id %>')">Return</button>
-                                    <% }else if(order[i].products.status == 'Cancelled'){ %>
+                                    <% }else if(product.status == 'Delivered'){ %>
+                                      <button class="cancelBtn btn-info" onclick="requestReturn('<%= product._id %>')">Return</button>
+                                    <% }else if(product.status == 'Cancelled'){ %>
                                       <span class="btn btn-danger">Cancelled</span>
                                     <% }else{ %>
-                                      <button class="cancelBtn" onclick="openReasonInput('<%= order[i].products._id %>')">Cancel</button>
+                                      <button class="cancelBtn" onclick="openReasonInput('<%= product._id %>')">Cancel</button>
                                     <% } %>
                                   </td>
                                 </tr>
-                              <% } %>
+                              <% }) %>
                             </tbody>
                           </table>
+                        </div>
                     </div>
                 </div>
                 
@@ -359,7 +365,7 @@
       window.location.href=`/user/order/downloadInvoice?order=${orderId}`
     }
 
-    const deliveryStatus='<%= order[0].status %>'
+    const deliveryStatus='<%= order.status %>'
     if(deliveryStatus=='Pending'){
         const targetDiv=document.querySelectorAll('.step')[0]
         const targetCircle=document.querySelectorAll('.circle')[0]
@@ -425,13 +431,14 @@
     });
 
     const openReasonInput = (orderProductId) =>{
+      console.log(orderProductId);
       modal.style.display = "flex";
       document.getElementById('submitReason').addEventListener('click', ()=>{
         const reason = document.getElementById("cancelReason").value;        
         if (reason.trim() === "") {
             alert("Please enter a reason for cancellation.");
         } else {
-            fetch(`/user/order/cancel-order?order=<%= order[0]._id %>&&reason=${reason}&&orderProductId=${orderProductId}`,{
+            fetch(`/user/order/cancel-order?order=<%= order._id %>&&reason=${reason}&&orderProductId=${orderProductId}`,{
               method:'GET'
             })
             .then(response=>response.json())
@@ -460,13 +467,14 @@
     }
 
     const requestReturn = (orderProductId) =>{
+      console.log(orderProductId);
       modal.style.display='flex'
       document.getElementById('submitReason').addEventListener('click', ()=>{
         const reason=document.getElementById('cancelReason').value
         if(reason.trim()===""){
           alert('Please enter a reason for return')
         }else{
-          fetch(`/user/order/returnOrder?order=<%= order[0]._id %>&&reason=${reason}&&orderProductId=${orderProductId}`, {
+          fetch(`/user/order/returnOrder?order=<%= order._id %>&&reason=${reason}&&orderProductId=${orderProductId}`, {
             method:'GET'
           })
           .then(response=>response.json())
@@ -478,7 +486,7 @@
                 text:'The return request has been send.'
               }).then(result=>{
                 if(result.isConfirmed){
-                  window.location.href=`/user/order/order-summary/<%= order[0]._id %>`
+                  window.location.href=`/user/order/order-summary/<%= order._id %>`
                 }
               })
             }else{

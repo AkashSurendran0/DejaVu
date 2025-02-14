@@ -72,5 +72,8 @@ routes.get('/findProducts', productRoutes.findProducts)
 routes.post('/razorpay/verify-payment', blockCheck, orderRoutes.verifyRazorPayment)
 routes.get('/order/downloadInvoice', blockCheck, orderRoutes.downloadInvoice)
 routes.get('/completePayment', userContinue, blockCheck, orderRoutes.completePayment)
+routes.get('/aboutUs', blockCheck, userRoutes.loadAboutUsPage)
+routes.get('/contactUs', userRoutes.loadContactUsPage)
+routes.post('/sendMail', userRoutes.sendContactMail)
 
 module.exports=routes

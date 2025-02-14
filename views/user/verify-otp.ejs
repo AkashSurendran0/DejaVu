@@ -153,6 +153,17 @@ input[type="submit"]:hover{
 #logoImg{
     cursor: pointer;
 }
+@media screen and (max-width: 768px) {
+    .register {
+        display: none;
+    }
+    .login{
+        width:100%
+    }
+    .container{
+        width: 100%;
+    }
+}
 </style>
 
 <div class="container">
@@ -231,4 +242,3 @@ input[type="submit"]:hover{
     })
 </script>
 
-<%-include('partials/userFooter')%>

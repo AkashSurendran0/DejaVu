@@ -9,7 +9,6 @@ const hashPassword=async(password)=>{
         return hashedPass
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).send('Server not responding')
-        console.log(error.message);
     }
 }
 
@@ -18,7 +17,6 @@ const check=async(password,dbPassword)=>{
         return await bcrypt.compare(password,dbPassword)
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).send('Server not responding')
-        console.log(error.message);
     }
 }
 

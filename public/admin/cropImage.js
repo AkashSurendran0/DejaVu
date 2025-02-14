@@ -77,7 +77,6 @@ uploadButton.addEventListener('click', ()=>{
     })
     .then((response)=>response.json())
     .then((data)=>{
-        console.log('Upload Successfull:', data);
         alert('All images uploaded successfully')
     })
     .catch((error)=>{

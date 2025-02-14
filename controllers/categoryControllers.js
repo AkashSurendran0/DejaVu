@@ -29,7 +29,7 @@ const showCategories = async (req,res)=>{
         })
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('admin404')
-        console.log(error.message);
+        
     }
 }
 
@@ -38,7 +38,7 @@ const addCategoriesForm = async (req,res)=>{
         res.render('addCategories', {message: req.flash('categoryExistsMessage')})
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('admin404')
-        console.log(error.message);
+        
     }
 }
 
@@ -59,7 +59,7 @@ const addCategory = async (req,res)=>{
         res.redirect('/admin/categories')
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('admin404')
-        console.log(error.message);
+        
     }
 }
 
@@ -70,7 +70,7 @@ const editCategoryForm = async(req,res)=>{
         res.render('editCategory', {category: category})
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('admin404')
-        console.log(error.message);
+        
     }
 }
 
@@ -94,7 +94,7 @@ const editCategory = async(req,res)=>{
         res.redirect('/admin/categories')
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('admin404')
-        console.log(error.message);
+        
     }  
 }
 
@@ -115,7 +115,7 @@ const deleteCategory = async(req,res)=>{
         res.redirect('/admin/categories')
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('admin404')
-        console.log(error.message);
+        
     }
     
 }

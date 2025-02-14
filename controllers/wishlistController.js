@@ -17,7 +17,7 @@ const loadWishlistPage = async (req,res)=>{
         })
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
-        console.log(error.message);
+        
     }
 }
 
@@ -69,7 +69,7 @@ const addToWishlist = async (req,res)=>{
         
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
-        console.log(error.message);
+        
     }
 }
 
@@ -94,7 +94,7 @@ const removeProduct = async (req,res)=>{
         }
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
-        console.log(error.message);
+        
     }
 }
 

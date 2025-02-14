@@ -13,10 +13,8 @@ const STATUS_SERVER_ERROR=parseInt(process.env.STATUS_SERVER_ERROR)
 const loadAdminPage = async (req,res)=>{
     try {
         res.render('login', ({messageInvalid:req.flash('invalidAdmin'), messageWrong:req.flash('invalidPassword')}))
-        console.log('At admin login page');
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('admin404')
-        console.log(error.message);
     }
 }
 
@@ -37,7 +35,6 @@ const adminAuthenticate = async (req,res)=>{
         res.redirect('/admin/dashboard')
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('admin404')
-        console.log(error.message);
     }
 }
 
@@ -45,6 +42,11 @@ const showDashboard = async (req,res)=>{
     try {
         const allUsers=await users.find()
         const totalSales=await orders.aggregate([
+            {
+                $match:{
+                    status:'Delivered'
+                }
+            },
             {
                 $group:{
                     _id:null,
@@ -73,6 +75,11 @@ const showDashboard = async (req,res)=>{
             }
         ])
         const topProducts=await orders.aggregate([
+            {
+                $match:{
+                    status:'Delivered'
+                }
+            },
             {
                 $unwind:'$products'
             },
@@ -110,6 +117,11 @@ const showDashboard = async (req,res)=>{
             }
         ])
         const topCategories=await orders.aggregate([
+            {
+                $match:{
+                    status:'Delivered'
+                }
+            },
             {
                 $unwind:'$products'
             },
@@ -157,7 +169,6 @@ const showDashboard = async (req,res)=>{
                 $limit:10
             }
         ])
-        console.log(topCategories)
         res.render('dashboard', {
             users:allUsers,
             totalSales:totalSales,
@@ -167,7 +178,6 @@ const showDashboard = async (req,res)=>{
         })
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('admin404')
-        console.log(error.message);
     }
     
 }
@@ -193,7 +203,6 @@ const showUserManagement = async (req,res)=>{
         }) 
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('admin404')
-        console.log(error.message);
     }
 } 
 
@@ -215,7 +224,6 @@ const manageUser = async (req,res)=>{
         res.redirect('/admin/usersManagement')
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('admin404')
-        console.log(error.message);
     }
 }
 
@@ -226,7 +234,6 @@ const adminLogout = async (req,res)=>{
         })
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('admin404')
-        console.log(error.message);
     }
 }
 
@@ -417,7 +424,7 @@ const getSalesReport = async (req,res)=>{
         res.json({salesData:salesData, saleQuantity:saleQuantity, topOrders:topOrders})
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('admin404')
-        console.log(error.message);
+        consle.log(error.message);
     }
 }
 
@@ -488,7 +495,6 @@ const downloadSalesReport = async (req,res)=>{
         doc.end();
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('admin404')
-        console.log(error.message);
     }
 }
 
@@ -551,7 +557,6 @@ const downloadSalesExcelReport = async (req,res)=>{
         res.end();
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('admin404')
-        console.log(error.message);
     }
 }
 

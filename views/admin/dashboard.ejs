@@ -108,6 +108,24 @@
         background-color: rgb(0, 223, 0);
     }
 
+    #altFilter{
+        display: flex;
+        align-items: center;
+        margin: 0 10px;
+    }
+
+    #altFilter p{
+        margin-left: 10px;
+    }
+
+    #altFilter select{
+        border-radius: 5px;
+        width: 150px;
+        margin-left: 12px;
+        height: 40px;
+        border: 1px solid blanchedalmond;
+    }
+
 </style>
 
 <main class="h-full pb-16 overflow-y-auto">
@@ -128,7 +146,7 @@
                     </svg>
                     <div class="text">
                         <p class="title">Total Users</p>
-                        <p class="count"><%= users.length %></p>
+                        <p class="count"><%= users.length>0? users.length:0 %></p>
                     </div>
                 </div>
             </div>
@@ -139,7 +157,7 @@
                       </svg>
                     <div class="text">
                         <p class="title">Total Orders</p>
-                        <p class="count"><%= totalSales[0].totalOrders %></p>
+                        <p class="count"><%= totalSales.length>0? totalSales[0].totalOrders:0 %></p>
                     </div>
                 </div>
             </div>
@@ -150,7 +168,7 @@
                       </svg>
                     <div class="text">
                         <p class="title">Total Sales</p>
-                        <p class="count">₹<%= totalSales[0].totalAmount %></p>
+                        <p class="count">₹<%=  totalSales.length>0? totalSales[0].totalAmount:0 %></p>
                     </div>
                 </div>
             </div>
@@ -161,7 +179,7 @@
                       </svg>
                     <div class="text">
                         <p class="title">Pending Orders</p>
-                        <p class="count"><%= pendingOrders.length %></p>
+                        <p class="count"><%= pendingOrders.length>0? pendingOrders.length:0 %></p>
                     </div>
                 </div>
             </div>
@@ -175,7 +193,7 @@
                       </svg>
                    <div class="text">
                        <p class="title">Total Discount</p>
-                       <p class="count">₹<%= (totalSales[0].totalDiscount).toFixed(2) %></p>
+                       <p class="count">₹<%=  totalSales.length>0? (totalSales[0].totalDiscount).toFixed(2):0 %></p>
                    </div>
                </div>
            </div>
@@ -186,7 +204,7 @@
                   </svg>
                <div class="text">
                    <p class="title">Coupon Discount</p>
-                   <p class="count">₹<%= totalSales[0].couponDiscount %></p>
+                   <p class="count">₹<%=  totalSales.length>0? totalSales[0].couponDiscount:0 %></p>
                </div>
             </div>
             </div>
@@ -198,6 +216,14 @@
                 <button id="filterDate">Filter</button>
                 <button id="downloadReport" onclick="downloadPDF()">Download Report (PDF)</button>
                 <button id="downloadExcel" onclick="downloadExcel()">Download Report (Excel)</button>
+            </div>
+            <div id="altFilter">
+                <p><b>Custom Filter:</b></p>
+                <select name="altFilter" id="customFilter" onchange="getCustomReport(this.value)">
+                    <option value="lastWeek">Last week</option>
+                    <option value="lastMonth">Last Month</option>
+                    <option value="lastYear">Last Year</option>
+                </select>
             </div>
             <div class="row">
                 <div class="col-md-10 mt-3">
@@ -248,16 +274,18 @@
                     Top orders
                 </h4>
                 <div class="w-full overflow-hidden rounded-lg shadow-xs">
-                    <div class="w-full overflow-x-auto">
+                    <div class="w-full overflow-x-auto table-responsive">
                       <table class="w-full whitespace-no-wrap">
                         <thead>
                           <tr
                             class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800"
                           >
                             <th class="px-4 py-3">Id</th>
-                            <th class="px-4 py-3">Quantity</th>
                             <th class="px-4 py-3">Date</th>
                             <th class="px-4 py-3">Amount</th>
+                            <th class="px-4 py-3">Quantity</th>
+                            <th class="px-4 py-3">Offer Discount</th>
+                            <th class="px-4 py-3">Coupon Discount</th>
                           </tr>
                         </thead>
                         <tbody id="topOrders" class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
@@ -276,7 +304,7 @@
                         Top Products
                     </h4>
                     <div class="w-full overflow-hidden rounded-lg shadow-xs">
-                        <div class="w-full overflow-x-auto">
+                        <div class="w-full overflow-x-auto table-responsive">
                           <table class="w-full whitespace-no-wrap">
                             <thead>
                               <tr
@@ -319,7 +347,7 @@
                         Top Categories
                     </h4>
                     <div class="w-full overflow-hidden rounded-lg shadow-xs">
-                        <div class="w-full overflow-x-auto">
+                        <div class="w-full overflow-x-auto table-responsive">
                           <table class="w-full whitespace-no-wrap">
                             <thead>
                               <tr
@@ -369,6 +397,73 @@
     let salesArray
     let saleQuantity
     let topOrders
+
+    const getCustomReport = (value) =>{
+        if(value=='lastWeek'){
+            const startDate=new Date()
+            startDate.setDate(startDate.getDate()-6)
+            const endDate=new Date()
+            fetch(`/admin/getSalesReport?startDate=${startDate}&&endDate=${endDate}`, {
+                method:'GET'
+            })
+            .then(response=>response.json())
+            .then(data=>{
+                salesArray=data.salesData
+                saleQuantity=data.saleQuantity
+                topOrders=data.topOrders
+                
+                if (!Array.isArray(salesArray)) {
+                    console.error("Error: salesData is not an array", salesArray);
+                    return;
+                }
+                const labels=salesArray.map(entry=>entry._id)
+                const sales=salesArray.map(entry=>entry.totalSales)
+                updateChart(labels,sales,saleQuantity,topOrders)
+            })
+        }else if(value=='lastMonth'){
+            const startDate=new Date()
+            startDate.setDate(startDate.getDate()-29)
+            const endDate=new Date()
+            fetch(`/admin/getSalesReport?startDate=${startDate}&&endDate=${endDate}`, {
+                method:'GET'
+            })
+            .then(response=>response.json())
+            .then(data=>{
+                salesArray=data.salesData
+                saleQuantity=data.saleQuantity
+                topOrders=data.topOrders
+                
+                if (!Array.isArray(salesArray)) {
+                    console.error("Error: salesData is not an array", salesArray);
+                    return;
+                }
+                const labels=salesArray.map(entry=>entry._id)
+                const sales=salesArray.map(entry=>entry.totalSales)
+                updateChart(labels,sales,saleQuantity,topOrders)
+            })
+        }else if(value=='lastYear'){
+            const startDate=new Date()
+            startDate.setDate(startDate.getDate()-364)
+            const endDate=new Date()
+            fetch(`/admin/getSalesReport?startDate=${startDate}&&endDate=${endDate}`, {
+                method:'GET'
+            })
+            .then(response=>response.json())
+            .then(data=>{
+                salesArray=data.salesData
+                saleQuantity=data.saleQuantity
+                topOrders=data.topOrders
+                
+                if (!Array.isArray(salesArray)) {
+                    console.error("Error: salesData is not an array", salesArray);
+                    return;
+                }
+                const labels=salesArray.map(entry=>entry._id)
+                const sales=salesArray.map(entry=>entry.totalSales)
+                updateChart(labels,sales,saleQuantity,topOrders)
+            })
+        }
+    }
 
     document.getElementById('filterDate').addEventListener('click', ()=>{
         const startDate=new Date(document.getElementById('startDate').value)
@@ -433,7 +528,7 @@
 
     let salesChart
 
-    const updateChart = (labels,sales,saleQuantity,topOrders) =>{        
+    const updateChart = (labels,sales,saleQuantity,topOrders) =>{   
         document.getElementById('orderCount').innerText=saleQuantity[0].totalOrders        
         document.getElementById('profit').innerText=`₹${saleQuantity[0].totalAmount}`
         document.getElementById('totalDiscount').innerText=`₹${saleQuantity[0].totalDiscount}`
@@ -472,17 +567,23 @@
         for(let i=0;i<allOrders.length;i++){
             rows+=`
             <tr class="text-gray-700 dark:text-gray-400">
-                <td class="px-4 py-3 text-sm">
+                <td class="px-1 py-3 text-sm">
                     #${allOrders[i]._id}
-                </td>
-                <td class="px-4 py-3 text-sm">
-                    ${allOrders[i].quantity}
                 </td>
                 <td class="px-4 py-3 text-sm">
                     ${new Date(allOrders[i].createdAt).toLocaleDateString()}
                 </td>
                 <td class="px-4 py-3 text-sm">
                     ₹${allOrders[i].totalAmount}
+                </td>
+                <td class="px-4 py-3 text-sm">
+                    ${allOrders[i].quantity}
+                </td>
+                <td class="px-4 py-3 text-sm">
+                    ${allOrders[i].offerDiscount?? 0}
+                </td>
+                <td class="px-4 py-3 text-sm">
+                    ${allOrders[i].couponDiscount?? 0}
                 </td>
             </tr>`
         }

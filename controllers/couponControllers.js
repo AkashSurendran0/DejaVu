@@ -13,7 +13,7 @@ const loadCoupons = async (req,res)=>{
         })
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('admin404')
-        console.log(error.message);
+        
     }
 }
 
@@ -22,7 +22,7 @@ const loadCouponAddPage = async (req,res)=>{
         res.render('addCoupon')
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('admin404')
-        console.log(error.message);
+        
     }
 }
 
@@ -46,7 +46,7 @@ const addCoupon = async (req,res)=>{
         res.redirect('/admin/coupons')
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('admin404')
-        console.log(error.message);
+        
     }
 }
 
@@ -59,7 +59,7 @@ const loadEditCouponPage = async (req,res)=>{
         })
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('admin404')
-        console.log(error.message);
+        
     }
 }
 
@@ -89,7 +89,7 @@ const editCoupon = async (req,res)=>{
         res.redirect('/admin/coupons')
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('admin404')
-        console.log(error.message);
+        
     }
 }
 
@@ -120,7 +120,7 @@ const changeCouponStatus = async (req,res)=>{
         res.redirect('/admin/coupons')
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('admin404')
-        console.log(error.message);
+        
     }
 }
 
@@ -134,7 +134,7 @@ const deleteCoupon = async (req,res)=>{
         res.redirect('/admin/coupons')
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('admin404')
-        console.log(error.message);
+        
     }
 }
 
@@ -153,7 +153,7 @@ const getCouponDetails = async (req,res)=>{
         res.json({success:false})
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
-        console.log(error.message);
+        
     }
 }
 

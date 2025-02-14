@@ -9,169 +9,6 @@ const cron = require("node-cron");
 
 const STATUS_SERVER_ERROR = parseInt(process.env.STATUS_SERVER_ERROR);
 
-// cron.schedule('*/1 * * * *',async (req,res)=>{
-//     const allOffers=await offers.find()
-
-//     if(allOffers.length>0){
-//         for(let i=0;i<allOffers.length;i++){
-//             const currentDate=new Date()
-//             const startDate=new Date(allOffers[i].startDate)
-//             const endDate=new Date(allOffers[i].endDate)
-
-//             const normalizeDate = (date) =>{
-//                 return new Date(
-//                     date.getFullYear(),
-//                     date.getMonth(),
-//                     date.getDate(),
-//                     date.getHours(),
-//                     date.getMinutes()
-//                 )
-//             }
-
-//             const normalizeCurrentDate=normalizeDate(currentDate).getTime()
-//             const normalizeStartDate=normalizeDate(startDate).getTime()
-//             const normalizeEndDate=normalizeDate(endDate).getTime()
-
-//             const allCarts=await carts.find().populate('products.productId')
-
-//             if(normalizeCurrentDate >= normalizeEndDate){
-//                 if(allCarts.length>0){
-//                     allCarts.forEach(userCart=>{
-//                         if(userCart.products.length>0){
-//                             userCart.products.forEach(async product=>{
-//                                 if(product.productId.regularPrice){
-//                                     await carts.updateOne(
-//                                         {
-//                                             _id: userCart._id
-//                                         },
-//                                         [
-//                                             {
-//                                                 $set: {
-//                                                     totalAmount: {
-//                                                         $add: [
-//                                                             { $subtract: ["$totalAmount", {
-//                                                                 $multiply:[product.productId.amount,product.quantity]
-//                                                             }] },
-//                                                             {
-//                                                                 $multiply:[product.productId.regularPrice,product.quantity]
-//                                                             }
-//                                                         ]
-//                                                     },
-//                                                 }
-//                                             }
-//                                         ]
-//                                     )
-//                                 }
-//                             })
-//                         }
-//                     })
-//                 }
-//                 await carts.updateMany(
-//                     {
-//                         offerDiscount:{$exists:true}
-//                     },
-//                     {
-//                         $set:{
-//                             offerDiscount:0
-//                         }
-//                     }
-//                 )
-//                 if(allOffers[i].isActive){
-//                     try {
-//                         await products.updateMany(
-//                             {
-//                                 regularPrice: {$exists:true},
-//                                 $or:[
-//                                     {singleProductOffer:false},
-//                                     {singleProductOffer:{$exists:false}}
-//                                 ]
-//                             },
-//                             [
-//                                 {
-//                                     $set:{
-//                                         amount: "$regularPrice",
-//                                         hasOffer:false
-//                                     },
-//                                 }
-//                             ]
-//                         )
-//                         await products.updateMany(
-//                             {
-//                                 regularPrice:{$exists:true},
-//                                 $or:[
-//                                     {singleProductOffer:false},
-//                                     {singleProductOffer:{$exists:false}}
-//                                 ]
-//                             },
-//                             {
-//                                 $unset:{
-//                                     regularPrice:'',
-//                                     offerDiscount:''
-//                                 }
-//                             }
-//                         )
-//                         await offers.deleteOne(
-//                             {endDate: allOffers[i].endDate}
-//                         )
-
-//                     } catch (error) {
-//                         console.log('Error during updation', error)
-//                     }
-
-//                 }
-//             }else if(normalizeCurrentDate >= normalizeStartDate){
-//                 if(!allOffers[i].isActive){
-//                     try {
-
-//                         await products.updateMany(
-//                             {
-//                                 regularPrice:{$exists:false},
-//                                 category: allOffers[i].category,
-//                                 amount:{
-//                                         $gte: allOffers[i].minAmount,
-//                                         $lte: allOffers[i].maxAmount
-//                                 },
-//                                 $or:[
-//                                     {hasOffer:false},
-//                                     {hasOffer:{$exists:false}}
-//                                 ]
-//                             },
-//                             [
-//                                 {
-//                                     $set:{
-//                                         regularPrice:"$amount",
-//                                         amount:{
-//                                             $round:[
-//                                                 {
-//                                                     $subtract:[
-//                                                         "$amount",
-//                                                         {
-//                                                             $multiply:["$amount", {$divide:[allOffers[i].offer, 100]}]
-//                                                         }
-//                                                     ]
-//                                                 },
-//                                                 2
-//                                             ]
-//                                         },
-//                                         hasOffer:true
-//                                     }
-//                                 }
-//                             ]
-//                         )
-
-//                         await offers.updateOne(
-//                             {_id: allOffers[i]._id},
-//                             {$set: {isActive:true}}
-//                         )
-//                     } catch (error) {
-//                         console.log('Error during updation', error)
-//                     }
-//                 }
-//             }
-//         }
-//     }
-// })
-
 const loadOfferPage = async (req, res) => {
   try {
     const category = await categories.find();
@@ -184,7 +21,7 @@ const loadOfferPage = async (req, res) => {
     });
   } catch (error) {
     res.status(STATUS_SERVER_ERROR).render("admin404");
-    console.log(error.message);
+    
   }
 };
 
@@ -194,7 +31,7 @@ const loadAddOfferPage = async (req, res) => {
     res.render("addOffers", { categories: category });
   } catch (error) {
     res.status(STATUS_SERVER_ERROR).render("admin404");
-    console.log(error.message);
+    
   }
 };
 
@@ -265,7 +102,7 @@ const addOffer = async (req, res) => {
     res.redirect("/admin/offers");
   } catch (error) {
     res.status(STATUS_SERVER_ERROR).render("admin404");
-    console.log(error.message);
+    
   }
 };
 
@@ -277,7 +114,7 @@ const loadOfferEditPage = async (req, res) => {
     res.render("editOffers", { offer: offer, categories: allCategory });
   } catch (error) {
     res.status(STATUS_SERVER_ERROR).render("admin404");
-    console.log(error.message);
+    
   }
 };
 
@@ -336,7 +173,7 @@ const editOffer = async (req, res) => {
     res.redirect("/admin/offers");
   } catch (error) {
     res.status(STATUS_SERVER_ERROR).render("admin404");
-    console.log(error.message);
+    
   }
 };
 
@@ -443,7 +280,7 @@ const deleteOffer = async (req, res) => {
     }
   } catch (error) {
     res.status(STATUS_SERVER_ERROR).render("admin404");
-    console.log(error.message);
+    
   }
 };
 
@@ -485,7 +322,7 @@ const addSingleProductOffer = async (req, res) => {
     res.json({ success: true });
   } catch (error) {
     res.status(STATUS_SERVER_ERROR).render("admin404");
-    console.log(error.message);
+    
   }
 };
 
@@ -519,7 +356,7 @@ const removeSingleProductOffer = async (req, res) => {
     res.json({ success: true });
   } catch (error) {
     res.status(STATUS_SERVER_ERROR).render("admin404");
-    console.log(error.message);
+    
   }
 };
 

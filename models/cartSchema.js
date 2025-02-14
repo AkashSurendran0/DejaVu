@@ -29,6 +29,10 @@ const cartSchema=new mongoose.Schema({
         type:Number,
         default:0,
     },
+    GST:{
+        type:Number,
+        default:0
+    },
     offerDiscount:{
         type:Number,
         required:false,

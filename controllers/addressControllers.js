@@ -13,7 +13,6 @@ const manageAddress = async (req,res)=>{
         res.render('manageAddress', {msg:req.flash('msg'), foundAddress: foundAddress})
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
-        console.log(error.message);
     }
 }
 
@@ -22,7 +21,6 @@ const getAddAddressForm = async (req,res)=>{
         res.render('addAddress')
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
-        console.log(error.message);
     }
 }
 
@@ -48,7 +46,6 @@ const addAddress = async (req,res)=>{
         res.redirect('/user/settings/manageAddress')
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
-        console.log(error.message);
     }
 }
 
@@ -63,7 +60,6 @@ const deleteAddress = async (req,res)=>{
         res.redirect('/user/settings/manageAddress')
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
-        console.log(error.message);
     }
 }
 
@@ -84,7 +80,6 @@ const getEditAddressForm = async (req,res)=>{
         res.render('editAddress', {address:foundAddress})
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
-        console.log(error.message); 
     }
 }
 
@@ -109,7 +104,6 @@ const editAddress = async (req,res)=>{
         res.redirect('/user/settings/manageAddress')
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
-        console.log(error.message);
     }
 }
 
@@ -148,7 +142,6 @@ const addAddressFromCheckout = async (req,res)=>{
         res.redirect(`/user/loadCheckout/${cart}`)
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
-        console.log(error.message);
     }
 }
 

@@ -13,7 +13,15 @@
     opacity: 1;
     color: red;
   }
+  .navbar-collapse {
+    display: none;
+  }
+
+  .navbar-collapse.show {
+      display: block;
+  }
 </style>
+
 
 <body class="goto-here">
     <div class="py-1 bg-black">
@@ -40,7 +48,7 @@
 <nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
     <div class="container">
       <a class="navbar-brand" href="/user">DejaVu Mens Store</a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav" aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
+      <button onclick="toggleNavbar()" class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav" aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="oi oi-menu"></span> Menu
       </button>
 
@@ -48,8 +56,8 @@
         <ul class="navbar-nav ml-auto">
           <li class="nav-item active"><a href="/user" class="nav-link">Home</a></li>
           <li class="nav-item active"><a href="/user/shop" class="nav-link">Shop</a></li>
-          <li class="nav-item"><a href="about.html" class="nav-link">About</a></li>
-          <li class="nav-item"><a href="blog.html" class="nav-link">Contact Us</a></li>
+          <li class="nav-item"><a href="/user/aboutUs" class="nav-link">About</a></li>
+          <li class="nav-item"><a href="/user/contactUs" class="nav-link">Contact Us</a></li>
           <li class="nav-item"><a href="/user/cart" class="nav-link">Cart<i class="bi bi-cart-fill"></i></a></li>
           <li class="nav-item"><a href="/user/wishlist" class="nav-link">Wishlist</a></li>
           <li class="nav-item"><a href="/user/settings/basicInfo" class="nav-link">Settings</a></li>
@@ -62,3 +70,13 @@
       </div>
     </div>
   </nav>
+
+  <script>
+
+function toggleNavbar() {
+    var navbarCollapse = document.getElementById("ftco-nav");
+    navbarCollapse.classList.toggle("show");
+}
+
+  </script>
+

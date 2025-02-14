@@ -38,7 +38,7 @@ const showProducts = async (req,res)=>{
         })
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('admin404')
-        console.log(error.message);
+        
     }
 }
 
@@ -50,7 +50,7 @@ const addProductForm = async (req,res)=>{
         })
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('admin404')
-        console.log(error.message);
+        
     }  
 }
 
@@ -89,7 +89,7 @@ const addProduct = async (req,res)=>{
         res.redirect('/admin/products')
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('admin404')
-        console.log(error.message);
+        
     }
 }
 
@@ -102,7 +102,7 @@ const editProductForm = async (req,res)=>{
         res.render('editProduct', {product: product, category: categoryList})
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('admin404')
-        console.log(error.message);
+        
     }  
 }
 
@@ -146,7 +146,7 @@ const editProduct = async(req,res)=>{
         res.redirect('/admin/products')
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('admin404')
-        console.log(error.message);
+        
     }
 }
 
@@ -170,7 +170,7 @@ const deleteProduct = async (req,res)=>{
         res.redirect('/admin/products')
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('admin404')
-        console.log(error.message);
+        
     }
 }
 
@@ -360,7 +360,7 @@ const loadShopPage = async (req,res)=>{
         })
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
-        console.log(error.message);
+        
     }
 }
 
@@ -421,7 +421,7 @@ const loadProductDetailsPage = async (req,res)=>{
         })
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
-        console.log(error.message);
+        
     }
 }
 
@@ -442,7 +442,7 @@ const addProductReview = async (req,res)=>{
         res.redirect(`/user/shop/product-details/${id}`)
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
-        console.log(error.message);
+        
     }
 }
 
@@ -483,7 +483,7 @@ const findProducts = async (req,res)=>{
 
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
-        console.log(error.message);
+        
     }
 }
 

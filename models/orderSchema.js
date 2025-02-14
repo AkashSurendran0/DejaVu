@@ -62,10 +62,44 @@ const orderSchema=new mongoose.Schema({
         type:Number,
         required:true
     },
-    address:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'addresses',
+    GST:{
+        type:Number,
         required:true
+    },
+    address:{
+        name:{
+            type: String,
+            required:true
+        },
+        state:{
+            type:String,
+            required: true
+        },
+        streetAddress:{
+            type:String,
+            required:true
+        },
+        apartment:{
+            type:String,
+            required:false,
+            default:'none'
+        },
+        city:{
+            type:String,
+            required:true
+        },
+        postcode:{
+            type:Number,
+            required:true
+        },
+        phone:{
+            type:Number,
+            required:true
+        },
+        altPhone:{
+            type:Number,
+            required:false
+        }
     }
 },{timestamps:true})
 
