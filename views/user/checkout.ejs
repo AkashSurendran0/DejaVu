@@ -517,6 +517,45 @@ const openModal = (cartId)=>{
   if(document.querySelector('[name="altphone"]').value){
     document.querySelector('[name="altphone"]').value=''
   }
+  const name1 = document.getElementById("name").value.trim();
+        if (name1.length < 3) {
+        event.preventDefault();
+        return Swal.fire({
+            icon:'error',
+            title:'Input Error',
+            text:'Name must be at least 3 characters long'
+        })
+        }
+
+        const postcode1 = document.getElementById("postcode").value.trim();
+        if (!/^\d{5,6}$/.test(postcode1)) {
+        event.preventDefault();
+        return Swal.fire({
+            icon:'error',
+            title:'Input Error',
+            text:'Postcode must be 5-6 digits long'
+        })
+        }
+
+        const phone1 = document.getElementById("phone").value.trim();
+        if (!/^\d{10}$/.test(phone1)) {
+        event.preventDefault();
+        return Swal.fire({
+            icon:'error',
+            title:'Input Error',
+            text:'Phone number must be 10 digits'
+        })
+        }
+
+        const altphone1 = document.getElementById("altphone").value.trim();
+        if (altphone && !/^\d{10}$/.test(altphone1)) {
+        event.preventDefault();
+        return Swal.fire({
+            icon:'error',
+            title:'Input Error',
+            text:'Alternative phone number must be 10 digits if provided'
+        })
+        }
   document.querySelector('.addressForm').action=`/user/settings/addAddressFromCheckout/${cartId}`
 }
 
@@ -595,6 +634,41 @@ const editAddress = (id,name,state,street,apartment,city,postcode,phone,altPhone
   if(altPhone){
     document.querySelector('[name="altphone"]').value=altPhone
   }
+        if (name.length < 3) {
+        event.preventDefault();
+        return Swal.fire({
+            icon:'error',
+            title:'Input Error',
+            text:'Name must be at least 3 characters long'
+        })
+        }
+
+        if (!/^\d{5,6}$/.test(postcode)) {
+        event.preventDefault();
+        return Swal.fire({
+            icon:'error',
+            title:'Input Error',
+            text:'Postcode must be 5-6 digits long'
+        })
+        }
+
+        if (!/^\d{10}$/.test(phone)) {
+        event.preventDefault();
+        return Swal.fire({
+            icon:'error',
+            title:'Input Error',
+            text:'Phone number must be 10 digits'
+        })
+        }
+
+        if (altPhone && !/^\d{10}$/.test(altPhone)) {
+        event.preventDefault();
+        return Swal.fire({
+            icon:'error',
+            title:'Input Error',
+            text:'Alternative phone number must be 10 digits if provided'
+        })
+        }
   document.querySelector('.addressForm').action=`/user/settings/addAddressFromCheckout/${cartId}?address=${id}`
 }
 
@@ -822,6 +896,7 @@ const orderBtn = async () =>{
 const couponModal=document.getElementById('couponModal')
 const closeCouponModal=document.getElementById('closeCoupon')
 document.getElementById('viewCoupons').addEventListener('click', ()=>{
+  
   couponModal.style.display='block'
 })
 closeCouponModal.addEventListener('click', ()=>{
@@ -838,6 +913,7 @@ const applyCoupon = (couponId) =>{
     if(data.success){      
       document.getElementById('coupon').value=data.coupon.code
       document.getElementById('coupon').style.backgroundColor='#dadada'
+      document.getElementById('coupon').disabled=true
       const totalAmount=parseInt(document.getElementById('totalAmount').innerText.split('').filter(item=>item!='₹').join(''))      
       const reducedAmount=(totalAmount*data.coupon.offer)/100    
       
