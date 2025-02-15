@@ -217,7 +217,6 @@
             return res.json({success:true})
         } catch (error) {
             res.status(STATUS_SERVER_ERROR).render('404page')
-            console.log(error)
         }
     }
 
@@ -360,8 +359,6 @@
             let offerDeduct=0
             const refundProducts = orderFound.products.filter(p => p.status !== 'Cancelled');
 
-            console.log(refundProducts);
-            console.log(refundProducts.length);
             if(orderFound.couponDiscount){
                 couponDeduct=(orderFound.couponDiscount/refundProducts.length).toFixed(2)
             }
@@ -371,17 +368,13 @@
             if(orderFound.offerDiscount){
                 offerDeduct=(orderFound.offerDiscount/refundProducts.length).toFixed(2)
             }
-            console.log(offerDeduct);
-            console.log(couponDeduct);
-            console.log(gstDeduct)
-            console.log(orderFound.quantity)
+
             const productFound = orderFound.products.find(p => p._id.toString() === orderProductId);
             let couponDiscount=0
             let creditAmount=parseInt(productFound.productAmount*productFound.quantity)+parseInt(gstDeduct)
             if(couponOrder){
                 creditAmount=(creditAmount-couponDeduct).toFixed(2)
             }
-            console.log(creditAmount);
             await orders.updateOne(
                 {
                     _id: orderId,
@@ -495,7 +488,6 @@
             )
             res.json({success:true})
         } catch (error) {
-            console.log(error.message);
             res.status(STATUS_SERVER_ERROR).render('404page')
             
         }
@@ -567,8 +559,6 @@
                 let offerDeduct=0
                 const refundProducts = orderFound.products.filter(p => p.status !== 'Cancelled' && p.status !== 'Returned');
     
-                console.log(refundProducts);
-                console.log(refundProducts.length);
                 if(orderFound.couponDiscount){
                     couponDeduct=(orderFound.couponDiscount/refundProducts.length).toFixed(2)
                 }
@@ -578,17 +568,12 @@
                 if(orderFound.offerDiscount){
                     offerDeduct=(orderFound.offerDiscount/refundProducts.length).toFixed(2)
                 }
-                console.log(offerDeduct);
-                console.log(couponDeduct);
-                console.log(gstDeduct)
-                console.log(orderFound.quantity)
                 const productFound = orderFound.products.find(p => p._id.toString() === orderProductId);
                 let couponDiscount=0
                 let creditAmount=parseInt(productFound.productAmount*productFound.quantity)+parseInt(gstDeduct)
                 if(couponOrder){
                     creditAmount=(creditAmount-couponDeduct).toFixed(2)
                 }
-                console.log(creditAmount);
                 await orders.updateOne(
                     {
                         _id:order,
@@ -685,7 +670,6 @@
                 res.json({decline:true})
             }
         } catch (error) {
-            console.log(error);
             res.status(STATUS_SERVER_ERROR).render('admin404')
             
         }
@@ -714,7 +698,6 @@
             })
             res.json({success:true, orders:order})
         } catch (error) {
-            console.log(error);
             res.status(STATUS_SERVER_ERROR).render('404page')
             
         }

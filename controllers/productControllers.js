@@ -98,7 +98,6 @@ const editProductForm = async (req,res)=>{
         const id=req.params.id
         const categoryList=await categories.find()
         const product= await products.findById(id).populate('category')
-        console.log(product);
         res.render('editProduct', {product: product, category: categoryList})
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('admin404')

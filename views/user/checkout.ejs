@@ -619,7 +619,6 @@ const orderBtn = async () =>{
   }
   let paymentMethod=payment.value
   if(paymentMethod=='Online Payment'){
-    console.log('hiii');
     let couponApplied
     if(document.getElementById('couponApply').style.display=='none'){
       couponApplied=document.getElementById('coupon').value
@@ -629,7 +628,6 @@ const orderBtn = async () =>{
     })
     .then(response=>response.json())
     .then(data=>{
-      console.log('reached');
       if(!data.success){
         Swal.fire({
           icon:'error',

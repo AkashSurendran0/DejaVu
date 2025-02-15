@@ -37,8 +37,6 @@ const loadAddOfferPage = async (req, res) => {
 
 const addOffer = async (req, res) => {
   try {
-    console.log(req.body);
-
     const { offerCategory, minPrice, maxPrice, offer } = req.body;
     const allOffers = await offers.find();
     let offerExists = false;

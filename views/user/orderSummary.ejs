@@ -431,7 +431,6 @@
     });
 
     const openReasonInput = (orderProductId) =>{
-      console.log(orderProductId);
       modal.style.display = "flex";
       document.getElementById('submitReason').addEventListener('click', ()=>{
         const reason = document.getElementById("cancelReason").value;        
@@ -467,7 +466,6 @@
     }
 
     const requestReturn = (orderProductId) =>{
-      console.log(orderProductId);
       modal.style.display='flex'
       document.getElementById('submitReason').addEventListener('click', ()=>{
         const reason=document.getElementById('cancelReason').value
