@@ -122,9 +122,10 @@ const sendOTP = async (req,res)=>{
             delete storeOTP[email]
         },60000)
         req.session.userEmail = email
-        (storeOTP[email]);
         res.render('verify-otp', {OTPerr: req.flash('OTPerr'), storedOTP: storeOTP[email]})
     } catch (error) {
+        console.log(error);
+        
         res.status(STATUS_SERVER_ERROR).render('404page')
         
     }
@@ -132,14 +133,14 @@ const sendOTP = async (req,res)=>{
 
 const verifyOTP = async (req,res)=>{
     try {
-        const {otp} = req.body
+        const otp = req.query.otp
         const email = req.session.userEmail
         const storedOTP=storeOTP[email]
         
         if(parseInt(otp)==storedOTP.otp){
             delete storeOTP[email]
             req.session.authenticate=true
-            res.json({success:true, redirectURL:'/user/signup-details'})
+            res.json({success:true})
         }else{
             res.status(STATUS_NOT_FOUND).json({success:false})
         }
@@ -435,7 +436,6 @@ const deleteAccount = async (req,res)=>{
 const validatePassword = async (req,res)=>{
     try {
         const {userId,password}=req.body
-        (req.body);
         
         const user=await users.findById(userId)
         const isMatch=await bcrypt.check(password,user.password)

@@ -22,7 +22,7 @@ routes.post('/shop/product-details/add-review/:id', userContinue, productRoutes.
 routes.get('/login', allowAuth, blockCheck, userRoutes.loadLoginPage)
 routes.get('/signup-Email', allowAuth, blockCheck, userRoutes.loadEmailSignupPage)
 routes.post('/signup-SendOTP', userRoutes.sendOTP)
-routes.post('/signup-VerifyOTP', userRoutes.verifyOTP)
+routes.get('/signup-VerifyOTP', userRoutes.verifyOTP)
 routes.get('/changePassword', allowAuth, blockCheck, userAuth, userRoutes.loadChangePassword)
 routes.post('/changePassword', userRoutes.changePassword)
 routes.post('/resendOTP', userRoutes.resendOTP)

@@ -174,7 +174,7 @@ input[type="submit"]:hover{
                 <br>
                 <p class="text-danger"><%= OTPerr %></p>
             <% } %>
-            <form action="/user/signup-VerifyOTP" method="post" onsubmit="return validateOTP()">
+            <form action="/user/signup-VerifyOTP" method="post" onsubmit="validateOTP(event)">
                 <input type="text" placeholder="Enter OTP" name="otp" id="otp" required><br>
                 <input id="submitBtn" type="submit" value="Verify OTP"/>
             </form>
@@ -215,18 +215,17 @@ input[type="submit"]:hover{
         disableResendOtpBtn()
     })
 
-    function validateOTP(){
+    function validateOTP(event){
+        event.preventDefault()
         const otpInput=document.getElementById('otp').value
-        $.ajax({
-            type:'post',
-            url:'/user/signup-VerifyOTP',
-            data:{otp:otpInput},
-            success:function(response){
-                if(response.success){
-                    window.location.href = response.redirectURL
-                }
-            },
-            error:function(){
+        fetch(`/user/signup-VerifyOTP?otp=${otpInput}`, {
+            method:'GET'
+        })
+        .then(response=>response.json())
+        .then(data=>{
+            if(data.success){
+                window.location.href='/user/signup-details'
+            }else{
                 Swal.fire({
                     icon:'error',
                     title:'Invalid OTP',
@@ -234,7 +233,6 @@ input[type="submit"]:hover{
                 })
             }
         })
-        return false
     }
 
     document.getElementById('logoImg').addEventListener('click', ()=>{
