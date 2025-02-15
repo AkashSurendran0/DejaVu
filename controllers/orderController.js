@@ -443,7 +443,8 @@
                 ]
             )
             let allCancelled=true
-            orderFound.products.forEach(products=>{
+            const updatedOrder=await orders.findOne({_id: orderId})
+            updatedOrder.products.forEach(products=>{
                 if(products.status != 'Cancelled'){
                     allCancelled=false
                     return

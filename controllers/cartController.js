@@ -87,7 +87,7 @@ const addToCart = async (req,res)=>{
             }else if((itemAlreadyExist[0].quantity)+quantity > 5 ){
                 return res.json({quantityFive:true})
             }else{
-                const gstAmount=((foundProduct.amount*quantity)/100)*5
+                const gstAmount=Math.floor(((foundProduct.amount*quantity)/100)*5)
                 await carts.updateOne(
                     {
                         user: user._id,
@@ -136,7 +136,7 @@ const addToCart = async (req,res)=>{
             return res.json({success:true})
         }  
         
-        const gstAmount=((foundProduct.amount*quantity)/100)*5
+        const gstAmount=Math.floor(((foundProduct.amount*quantity)/100)*5)
         await carts.updateOne(
             {user: user._id},   
             {
