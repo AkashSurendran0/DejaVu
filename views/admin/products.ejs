@@ -2,13 +2,11 @@
 <%-include('partials/navbar')%>
 
 <style>
-
 img {
     max-width: 100px;
     max-height: 50px;
     object-fit: contain;
 }
-
 .modal {
   display: none; /* Hidden by default */
   position: fixed;
@@ -21,7 +19,6 @@ img {
   justify-content: center;
   align-items: center;
 }
-
 /* Modal Content */
 .modal-content {
   background: #fff;
@@ -31,12 +28,10 @@ img {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   text-align: center;
 }
-
 .modal-content h2 {
   margin-top: 0;
   margin-bottom: 15px;
 }
-
 .modal-content textarea {
   width: 100%;
   padding: 10px;
@@ -45,11 +40,9 @@ img {
   border-radius: 4px;
   resize: none;
 }
-
 .modal-actions {
   margin-top: 20px;
 }
-
 .modal-actions .btn {
   padding: 10px 15px;
   margin: 0 5px;
@@ -57,18 +50,14 @@ img {
   border-radius: 4px;
   cursor: pointer;
 }
-
 .modal-actions .btn {
   background-color: #6a0dad; /* Purple color */
   color: #fff;
 }
-
 .modal-actions .btn-secondary {
   background-color: #ccc;
   color: #000;
 }
-
-
 </style>
 
 <main class="h-full pb-16 overflow-y-auto">
@@ -97,6 +86,7 @@ img {
     <button style="background: rgb(138, 255, 130);color: black;width: 200px;height: 50px;border-radius: 15px;font-size: 13px;"><a href="/admin/products/addProductForm">ADD PRODUCTS +</a></button>
     </div>
       <div class="w-full overflow-hidden rounded-lg shadow-xs">
+        <div class="w-full overflow-x-auto">
         <div class="w-full overflow-x-auto table-repsonsive">
           <table class="w-full whitespace-no-wrap">
             <thead>
@@ -281,7 +271,6 @@ img {
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
-
     const manageUser = (itemId,event) =>{
       event.preventDefault()
       Swal.fire({
@@ -303,24 +292,20 @@ img {
         }
       })
     }
-
     setTimeout(() => {
       const msg1=document.getElementById('msg1')
       const msg2=document.getElementById('msg2')
       const msg3=document.getElementById('msg3')
       const msg4=document.getElementById('msg4')
-
       if(msg1) msg1.innerText=''
       if(msg2) msg2.innerText=''
       if(msg3) msg3.innerText=''
       if(msg4) msg4.innerText=''
     }, 1500);
-
     document.getElementById('closeModal').addEventListener('click', ()=>{
       const OfferModal=document.getElementById('OfferModal')
       OfferModal.style.display='none'
     })
-
     const addProductOffer = (productId) =>{
       const OfferModal=document.getElementById('OfferModal')
       OfferModal.style.display='flex'
@@ -361,7 +346,6 @@ img {
         })
       })
     }
-
     const deleteProductOffer = (productId) =>{
       Swal.fire({
         icon:'warning',
@@ -398,7 +382,6 @@ img {
         }
       })
     }
-
   </script>
 
 <%-include('partials/footer')%>
