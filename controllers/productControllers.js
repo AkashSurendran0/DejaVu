@@ -438,7 +438,7 @@ const addProductReview = async (req,res)=>{
             {_id: product.id},
             {$push:{review:data}}
         )
-        res.redirect(`/user/shop/product-details/${id}`)
+        res.redirect(`/shop/product-details/${id}`)
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
         

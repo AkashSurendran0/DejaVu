@@ -242,7 +242,7 @@
 				<% for(let i=0;i<topRatedProducts.length;i++){ %>
 					<div class="col-sm-12 col-md-6 col-lg-3 ftco-animate d-flex">
 						<div class="product d-flex flex-column">
-							<a href="/user/shop/product-details/<%= topRatedProducts[i]._id %>" class="img-prod"><img class="img-fluid" src="<%= topRatedProducts[i].images[0] %>" alt="Colorlib Template">
+							<a href="/shop/product-details/<%= topRatedProducts[i]._id %>" class="img-prod"><img class="img-fluid" src="<%= topRatedProducts[i].images[0] %>" alt="Colorlib Template">
 								<div class="overlay"></div>
 							</a>
 							<div class="text py-3 pb-4 px-3">
@@ -273,7 +273,7 @@
 									  </div>
 									</div>
 								</div>
-								<h3><a href="/user/shop/product-details/<%= topRatedProducts[i]._id %>"><%= topRatedProducts[i].productName	 %></a></h3>
+								<h3><a href="/shop/product-details/<%= topRatedProducts[i]._id %>"><%= topRatedProducts[i].productName	 %></a></h3>
 								<div class="pricing">
 									<% if(topRatedProducts[i].regularPrice){ %>
 										<p class="price" id="price"><span class="mr-2" style="color: red;"><del>₹<%= topRatedProducts[i].regularPrice %></del></span><span class="mr-2">₹<%= topRatedProducts[i].amount  %></span><span style="font-size: 12px;color: white;background-color: red; padding-left: 2px;padding-right: 2px;"><%= Math.floor(((topRatedProducts[i].regularPrice-topRatedProducts[i].amount)/topRatedProducts[i].regularPrice)*100) %>% off</span></p>
@@ -282,10 +282,10 @@
 									<% } %>
 								</div>
 								<p class="bottom-area d-flex px-3">
-									<a href="/user/shop/product-details/<%= topRatedProducts[i]._id %>" class="add-to-cart text-center py-2 mr-1"><span>Add to cart <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-cart-fill" viewBox="0 0 16 16">
+									<a href="/shop/product-details/<%= topRatedProducts[i]._id %>" class="add-to-cart text-center py-2 mr-1"><span>Add to cart <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-cart-fill" viewBox="0 0 16 16">
 										<path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5M5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4m7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4m-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2m7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
 									  </svg></span></a>
-									<a href="/user/shop/product-details/<%= topRatedProducts[i]._id %>" class="buy-now text-center py-2">Add to Wishlist<span><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-heart-fill" viewBox="0 0 16 16">
+									<a href="/shop/product-details/<%= topRatedProducts[i]._id %>" class="buy-now text-center py-2">Add to Wishlist<span><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-heart-fill" viewBox="0 0 16 16">
 										<path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314"/>
 									  </svg></span></a>
 								</p>
@@ -304,7 +304,7 @@
 				<% for(let i=0;i<productsOnOffer.length;i++){ %>
 					<div class="row">
 						<div class="col-md-6 imgDiv">
-							<a href="/user/shop/product-details/<%= productsOnOffer[i]._id %>"><img src="<%= productsOnOffer[i].images[0] %>" class="img-fluid" alt=""></a>
+							<a href="/shop/product-details/<%= productsOnOffer[i]._id %>"><img src="<%= productsOnOffer[i].images[0] %>" class="img-fluid" alt=""></a>
 						</div>
 						<div class="col-md-6">
 							<div class="heading-section heading-section-white">
@@ -343,7 +343,7 @@
 			<% for(let i=0;i<kidsDress.length;i++){ %>
 				<div class="col-sm-12 col-md-6 col-lg-3 ftco-animate d-flex">
 					<div class="product d-flex flex-column">
-						<a href="/user/shop/product-details/<%= kidsDress[i]._id %>" class="img-prod"><img class="img-fluid" src="<%= kidsDress[i].images[0] %>" alt="Colorlib Template">
+						<a href="/shop/product-details/<%= kidsDress[i]._id %>" class="img-prod"><img class="img-fluid" src="<%= kidsDress[i].images[0] %>" alt="Colorlib Template">
 							<div class="overlay"></div>
 						</a>
 						<div class="text py-3 pb-4 px-3">
@@ -372,7 +372,7 @@
 								  </div>
 								</div>
 							</div>
-							<h3><a href="/user/shop/product-details/<%= kidsDress[i]._id %>"><%= kidsDress[i].productName %></a></h3>
+							<h3><a href="/shop/product-details/<%= kidsDress[i]._id %>"><%= kidsDress[i].productName %></a></h3>
 							<div class="pricing">
 								<% if(kidsDress[i].regularPrice){ %>
 									<p class="price" id="price"><span class="mr-2" style="color: red;"><del>₹<%= kidsDress[i].regularPrice %></del></span><span class="mr-2">₹<%= kidsDress[i].amount  %></span><span style="font-size: 12px;color: white;background-color: red; padding-left: 2px;padding-right: 2px;"><%= Math.floor(((kidsDress[i].regularPrice-kidsDress[i].amount)/kidsDress[i].regularPrice)*100) %>% off</span></p>
@@ -381,10 +381,10 @@
 								<% } %>
 							</div>
 							<p class="bottom-area d-flex px-3">
-								<a href="/user/shop/product-details/<%= kidsDress[i]._id %>" class="add-to-cart text-center py-2 mr-1"><span>Add to cart <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-cart-fill" viewBox="0 0 16 16">
+								<a href="/shop/product-details/<%= kidsDress[i]._id %>" class="add-to-cart text-center py-2 mr-1"><span>Add to cart <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-cart-fill" viewBox="0 0 16 16">
 									<path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5M5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4m7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4m-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2m7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
 								  </svg></span></a>
-								<a href="/user/shop/product-details/<%= kidsDress[i]._id %>" class="buy-now text-center py-2">Add to Wishlist<span><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-heart-fill" viewBox="0 0 16 16">
+								<a href="/shop/product-details/<%= kidsDress[i]._id %>" class="buy-now text-center py-2">Add to Wishlist<span><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-heart-fill" viewBox="0 0 16 16">
 									<path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314"/>
 								  </svg></span></a>
 							</p>

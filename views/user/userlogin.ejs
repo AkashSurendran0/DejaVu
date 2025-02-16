@@ -162,19 +162,19 @@ input[type="checkbox"]{
             <% if(userLogin.length>0) { %>
                 <p class="text-success"><%= loginErr %></p>
             <% } %>
-            <form action="/user/login" method="post">
+            <form action="/login" method="post">
                 <input type="email" placeholder="Email" name="email" required>
                 <input type="password" placeholder="Password" name="password" required><br>
                 <div style="display: flex;justify-content: space-between;">
-                    <a href="/user/signup-Email">Create New Account?</a>
-                    <a href="/user/forgot-password/emailverification">Forgot password?</a>
+                    <a href="/signup-Email">Create New Account?</a>
+                    <a href="/forgot-password/emailverification">Forgot password?</a>
                 </div>
                 <button>Log In</button>
             </form>
             <hr><p>Or Login With</p><hr>
             <br>
             <div style="display: flex;justify-content: center;">
-            <a href="/user/auth/google"><i class="bi bi-google" style="color: white;font-size: 30px;padding: 7px 50px;border-radius: 5px;background-color: skyblue;"></i></a>
+            <a href="/auth/google"><i class="bi bi-google" style="color: white;font-size: 30px;padding: 7px 50px;border-radius: 5px;background-color: skyblue;"></i></a>
             </div>
        </div>
     </div>
@@ -185,6 +185,6 @@ input[type="checkbox"]{
 
   <script>
     document.getElementById('logoImg').addEventListener('click', ()=>{
-        window.location.href='/user'
+        window.location.href='/'
     })
   </script>

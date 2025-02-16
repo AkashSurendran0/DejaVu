@@ -43,7 +43,7 @@ const addAddress = async (req,res)=>{
             {upsert:true}
         )
         req.flash('msg', 'Address added Successfully')
-        res.redirect('/user/settings/manageAddress')
+        res.redirect('/settings/manageAddress')
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
     }
@@ -57,7 +57,7 @@ const deleteAddress = async (req,res)=>{
             {$pull:{address:{_id: id}}}
         )
         req.flash('msg', 'Address deleted successfully')
-        res.redirect('/user/settings/manageAddress')
+        res.redirect('/settings/manageAddress')
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
     }
@@ -101,14 +101,14 @@ const editAddress = async (req,res)=>{
             {$set:{"address.$":data}},
         )
         req.flash('msg', 'Address Updated Succesfully')
-        res.redirect('/user/settings/manageAddress')
+        res.redirect('/settings/manageAddress')
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
     }
 }
 
 const addAddressFromCheckout = async (req,res)=>{
-    try {
+    try {                
         const addressId=req.query.address
         const cart=req.params.cart
         const user=await users.findOne({email: req.session.userEmail})
@@ -123,13 +123,13 @@ const addAddressFromCheckout = async (req,res)=>{
             altPhone:req.body.altPhone
         }
 
-        if(addressId){
+        if(addressId){            
             await address.updateOne(
                 {'address._id':addressId},
                 {$set:{"address.$":data}}
             )
             req.flash('msg', 'Address edited successfully')
-            return res.redirect(`/user/loadCheckout/${cart}`)
+            return res.redirect(`/loadCheckout/${cart}`)
         }
 
         await address.updateOne(
@@ -139,7 +139,7 @@ const addAddressFromCheckout = async (req,res)=>{
         )
 
         req.flash('msg', 'Address added successfully')
-        res.redirect(`/user/loadCheckout/${cart}`)
+        res.redirect(`/loadCheckout/${cart}`)
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
     }

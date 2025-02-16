@@ -160,10 +160,10 @@ input[type="checkbox"]{
                 <br>
                 <p class="text-danger"><%= emailErr %></p>
             <% } %>
-            <form action="/user/signup-SendVerifyOTP" method="post">
+            <form action="/signup-SendVerifyOTP" method="post">
                 <input type="email" name="email" placeholder="Enter your email"><br>
                 <div style="display: flex;justify-content: space-between;">
-                    <a href="/user/login">Already a User?</a>
+                    <a href="/login">Already a User?</a>
                 </div>
                 <button>Send OTP</button>
             </form>  
@@ -176,7 +176,7 @@ input[type="checkbox"]{
 
 <script>
     document.getElementById('logoImg').addEventListener('click', ()=>{
-        window.location.href='/user'
+        window.location.href='/'
     })
 </script>
 

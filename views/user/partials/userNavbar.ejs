@@ -47,24 +47,24 @@
 </div>
 <nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
     <div class="container">
-      <a class="navbar-brand" href="/user">DejaVu Mens Store</a>
+      <a class="navbar-brand" href="/">DejaVu Mens Store</a>
       <button onclick="toggleNavbar()" class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav" aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="oi oi-menu"></span> Menu
       </button>
 
       <div class="collapse navbar-collapse" id="ftco-nav">
         <ul class="navbar-nav ml-auto">
-          <li class="nav-item active"><a href="/user" class="nav-link">Home</a></li>
-          <li class="nav-item active"><a href="/user/shop" class="nav-link">Shop</a></li>
-          <li class="nav-item"><a href="/user/aboutUs" class="nav-link">About</a></li>
-          <li class="nav-item"><a href="/user/contactUs" class="nav-link">Contact Us</a></li>
-          <li class="nav-item"><a href="/user/cart" class="nav-link">Cart<i class="bi bi-cart-fill"></i></a></li>
-          <li class="nav-item"><a href="/user/wishlist" class="nav-link">Wishlist</a></li>
-          <li class="nav-item"><a href="/user/settings/basicInfo" class="nav-link">Settings</a></li>
+          <li class="nav-item active"><a href="/" class="nav-link">Home</a></li>
+          <li class="nav-item active"><a href="/shop" class="nav-link">Shop</a></li>
+          <li class="nav-item"><a href="/aboutUs" class="nav-link">About</a></li>
+          <li class="nav-item"><a href="/contactUs" class="nav-link">Contact Us</a></li>
+          <li class="nav-item"><a href="/cart" class="nav-link">Cart<i class="bi bi-cart-fill"></i></a></li>
+          <li class="nav-item"><a href="/wishlist" class="nav-link">Wishlist</a></li>
+          <li class="nav-item"><a href="/settings/basicInfo" class="nav-link">Settings</a></li>
           <% if(isLogged) { %>
-            <li class="nav-item"><form action="/user/logout" method="post"><input id="logout" type="submit" value="Logout"></form></li>
+            <li class="nav-item"><form action="/logout" method="post"><input id="logout" type="submit" value="Logout"></form></li>
           <% }else{ %>
-            <li class="nav-item"><a href="/user/login" class="nav-link" style="color: rgba(0, 38, 255, 0.916);">Login</a></li>
+            <li class="nav-item"><a href="/login" class="nav-link" style="color: rgba(0, 38, 255, 0.916);">Login</a></li>
           <% } %>
         </ul>   
       </div>

@@ -215,8 +215,8 @@
         <div class="row">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                  <li><a href="/user" style="color: rgba(33, 37, 41, 0.75);">Home&nbsp;&nbsp;>&nbsp;&nbsp;</a></li>
-                  <li><a href="/user/shop" style="color: rgba(33, 37, 41, 0.75);">Shop&nbsp;&nbsp;>&nbsp;&nbsp;</a></li>
+                  <li><a href="/" style="color: rgba(33, 37, 41, 0.75);">Home&nbsp;&nbsp;>&nbsp;&nbsp;</a></li>
+                  <li><a href="/shop" style="color: rgba(33, 37, 41, 0.75);">Shop&nbsp;&nbsp;>&nbsp;&nbsp;</a></li>
                   <li>Checkout</li>
                 </ol>
               </nav>
@@ -474,7 +474,7 @@
           </div>
 
           <div class="text-center">
-              <button class="mt-2" style="background-color: #e3ca82;border-radius: 50px;width: 20%;height: 40px;border: none;color: white;">Add Address</button>
+              <button id="submitAddress" class="mt-2" style="background-color: #e3ca82;border-radius: 50px;width: 20%;height: 40px;border: none;color: white;">Add Address</button>
           </div>
       </form>
       </div>
@@ -517,9 +517,10 @@ const openModal = (cartId)=>{
   if(document.querySelector('[name="altphone"]').value){
     document.querySelector('[name="altphone"]').value=''
   }
-  const name1 = document.getElementById("name").value.trim();
+  document.getElementById('submitAddress').addEventListener('click', (event)=>{
+    event.preventDefault();
+    const name1 = document.getElementById("name").value.trim();
         if (name1.length < 3) {
-        event.preventDefault();
         return Swal.fire({
             icon:'error',
             title:'Input Error',
@@ -529,7 +530,6 @@ const openModal = (cartId)=>{
 
         const postcode1 = document.getElementById("postcode").value.trim();
         if (!/^\d{5,6}$/.test(postcode1)) {
-        event.preventDefault();
         return Swal.fire({
             icon:'error',
             title:'Input Error',
@@ -539,7 +539,6 @@ const openModal = (cartId)=>{
 
         const phone1 = document.getElementById("phone").value.trim();
         if (!/^\d{10}$/.test(phone1)) {
-        event.preventDefault();
         return Swal.fire({
             icon:'error',
             title:'Input Error',
@@ -548,15 +547,19 @@ const openModal = (cartId)=>{
         }
 
         const altphone1 = document.getElementById("altphone").value.trim();
-        if (altphone && !/^\d{10}$/.test(altphone1)) {
-        event.preventDefault();
+        if (altphone1 && !/^\d{10}$/.test(altphone1)) {
         return Swal.fire({
             icon:'error',
             title:'Input Error',
             text:'Alternative phone number must be 10 digits if provided'
         })
         }
-  document.querySelector('.addressForm').action=`/user/settings/addAddressFromCheckout/${cartId}`
+
+        document.querySelector('.addressForm').action=`/settings/addAddressFromCheckout/${cartId}`
+        document.querySelector('.addressForm').submit()
+
+  })
+  
 }
 
 closeModalBtn.addEventListener("click", () => {
@@ -608,69 +611,46 @@ const payFromWallet = () =>{
   walletPayment.style.borderColor = "gold";
 }
 
-const editAddress = (id,name,state,street,apartment,city,postcode,phone,altPhone,cartId) =>{
-  modal.style.display = "block";
-  if(name){
-    document.querySelector('[name="name"]').value=name
-  }
-  if(state){
-    document.querySelector('[name="state"]').value=state
-  }
-  if(street){
-    document.querySelector('[name="street"]').value=street
-  }
-  if(apartment){
-    document.querySelector('[name="apartment"]').value=apartment
-  }
-  if(city){
-    document.querySelector('[name="city"]').value=city
-  }
-  if(postcode){
-    document.querySelector('[name="postcode"]').value=postcode
-  }
-  if(phone){
-    document.querySelector('[name="phone"]').value=phone
-  }
-  if(altPhone){
-    document.querySelector('[name="altphone"]').value=altPhone
-  }
+const editAddress = (id, name, state, street, apartment, city, postcode, phone, altPhone, cartId) => {
+    modal.style.display = "block";
+
+    if (name) document.querySelector('[name="name"]').value = name;
+    if (state) document.querySelector('[name="state"]').value = state;
+    if (street) document.querySelector('[name="street"]').value = street;
+    if (apartment) document.querySelector('[name="apartment"]').value = apartment;
+    if (city) document.querySelector('[name="city"]').value = city;
+    if (postcode) document.querySelector('[name="postcode"]').value = postcode;
+    if (phone) document.querySelector('[name="phone"]').value = phone;
+    if (altPhone) document.querySelector('[name="altphone"]').value = altPhone;
+
+    let form = document.querySelector('.addressForm');
+    form.action = `/settings/addAddressFromCheckout/${cartId}?address=${id}`;
+    form.method = "POST"; 
+
+    let submitBtn = document.getElementById('submitAddress');
+    let newSubmitHandler = function (event) {
+        event.preventDefault(); 
+
         if (name.length < 3) {
-        event.preventDefault();
-        return Swal.fire({
-            icon:'error',
-            title:'Input Error',
-            text:'Name must be at least 3 characters long'
-        })
+            return Swal.fire({ icon: 'error', title: 'Input Error', text: 'Name must be at least 3 characters long' });
         }
-
         if (!/^\d{5,6}$/.test(postcode)) {
-        event.preventDefault();
-        return Swal.fire({
-            icon:'error',
-            title:'Input Error',
-            text:'Postcode must be 5-6 digits long'
-        })
+            return Swal.fire({ icon: 'error', title: 'Input Error', text: 'Postcode must be 5-6 digits long' });
         }
-
         if (!/^\d{10}$/.test(phone)) {
-        event.preventDefault();
-        return Swal.fire({
-            icon:'error',
-            title:'Input Error',
-            text:'Phone number must be 10 digits'
-        })
+            return Swal.fire({ icon: 'error', title: 'Input Error', text: 'Phone number must be 10 digits' });
+        }
+        if (altPhone && !/^\d{10}$/.test(altPhone)) {
+            return Swal.fire({ icon: 'error', title: 'Input Error', text: 'Alternative phone number must be 10 digits if provided' });
         }
 
-        if (altPhone && !/^\d{10}$/.test(altPhone)) {
-        event.preventDefault();
-        return Swal.fire({
-            icon:'error',
-            title:'Input Error',
-            text:'Alternative phone number must be 10 digits if provided'
-        })
-        }
-  document.querySelector('.addressForm').action=`/user/settings/addAddressFromCheckout/${cartId}?address=${id}`
-}
+        form.submit(); 
+    };
+
+    submitBtn.removeEventListener('submit', newSubmitHandler);
+    submitBtn.addEventListener('submit', newSubmitHandler);
+};
+
 
 const orderBtn = async () =>{
   const selectedAddress=document.querySelector('input[name="address"]:checked')
@@ -697,7 +677,7 @@ const orderBtn = async () =>{
     if(document.getElementById('couponApply').style.display=='none'){
       couponApplied=document.getElementById('coupon').value
     }
-    await fetch(`/user/razorPayment?cart=<%= products._id %>&&code=${couponApplied}`, {
+    await fetch(`/razorPayment?cart=<%= products._id %>&&code=${couponApplied}`, {
       method:'GET'
     })
     .then(response=>response.json())
@@ -718,7 +698,7 @@ const orderBtn = async () =>{
           description:'Purchase from DejaVu store',
           order_id:data.orders.id,
           handler:async function(response){
-            const verifyResponse=await fetch('/user/razorpay/verify-payment', {
+            const verifyResponse=await fetch('/razorpay/verify-payment', {
               method:'POST',
               headers:{
                 'Content-Type':'application/json'
@@ -736,7 +716,7 @@ const orderBtn = async () =>{
                 if(document.getElementById('couponApply').style.display='none'){
                   couponApplied=document.getElementById('coupon').value
                 }
-                fetch(`/user/placeOrder?address=${address}&&cart=<%= products._id %>&&method=${paymentMethod}&&coupon=${couponApplied}`,{
+                fetch(`/placeOrder?address=${address}&&cart=<%= products._id %>&&method=${paymentMethod}&&coupon=${couponApplied}`,{
                   method:'GET'
                 })
                 .then(response=>response.json())
@@ -750,7 +730,7 @@ const orderBtn = async () =>{
                     })
                     .then(result=>{
                       if(result.isConfirmed){
-                        return window.location.href=`/user/settings/orders`
+                        return window.location.href=`/settings/orders`
                       }
                     })
                   }else{
@@ -812,7 +792,7 @@ const orderBtn = async () =>{
                   if(document.getElementById('couponApply').style.display='none'){
                     couponApplied=document.getElementById('coupon').value
                   }
-                  fetch(`/user/placeOrder?address=${address}&&cart=<%= products._id %>&&method=${paymentMethod}&&coupon=${couponApplied}`,{
+                  fetch(`/placeOrder?address=${address}&&cart=<%= products._id %>&&method=${paymentMethod}&&coupon=${couponApplied}`,{
                     method:'GET'
                   })
                   .then(response=>response.json())
@@ -826,7 +806,7 @@ const orderBtn = async () =>{
                       })
                       .then(result=>{
                         if(result.isConfirmed){
-                          return window.location.href=`/user/settings/orders`
+                          return window.location.href=`/settings/orders`
                         }
                       })
                     }else{
@@ -852,7 +832,7 @@ const orderBtn = async () =>{
     if(document.getElementById('couponApply').style.display='none'){
       couponApplied=document.getElementById('coupon').value
     }
-    fetch(`/user/placeOrder?address=${address}&&cart=<%= products._id %>&&method=${paymentMethod}&&coupon=${couponApplied}`,{
+    fetch(`/placeOrder?address=${address}&&cart=<%= products._id %>&&method=${paymentMethod}&&coupon=${couponApplied}`,{
       method:'GET'
     })
     .then(response=>response.json())
@@ -866,7 +846,7 @@ const orderBtn = async () =>{
         })
         .then(result=>{
           if(result.isConfirmed){
-            window.location.href=`/user/settings/orders`
+            window.location.href=`/settings/orders`
           }
         })
       }else if(data.walletNotExists){
@@ -905,7 +885,7 @@ closeCouponModal.addEventListener('click', ()=>{
 
 const applyCoupon = (couponId) =>{
   const couponCode=document.getElementById('coupon').value
-  fetch(`/user/getCouponDetails?couponId=${couponId}&&couponCode=${couponCode}`, {
+  fetch(`/getCouponDetails?couponId=${couponId}&&couponCode=${couponCode}`, {
     method:'GET'
   })
   .then(response=>response.json())
@@ -932,7 +912,7 @@ const applyCoupon = (couponId) =>{
       newElement.textContent="Remove"
       document.getElementById('addCoupon').appendChild(newElement)
       newElement.addEventListener('click', ()=>{
-        window.location.href=`/user/loadCheckout/<%= products._id %>`
+        window.location.href=`/loadCheckout/<%= products._id %>`
       })
     }else{
       Swal.fire({

@@ -175,8 +175,8 @@
             <nav aria-label="breadcrumb">
               <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                  <li><a href="/user" style="color: rgba(33, 37, 41, 0.75);">Home&nbsp;&nbsp;>&nbsp;&nbsp;</a></li>
-                  <li><a href="/user/shop" style="color: rgba(33, 37, 41, 0.75);">Shop&nbsp;&nbsp;>&nbsp;&nbsp;</a></li>
+                  <li><a href="/" style="color: rgba(33, 37, 41, 0.75);">Home&nbsp;&nbsp;>&nbsp;&nbsp;</a></li>
+                  <li><a href="/shop" style="color: rgba(33, 37, 41, 0.75);">Shop&nbsp;&nbsp;>&nbsp;&nbsp;</a></li>
                   <li>Product Details</li>
                 </ol>
                 </nav>
@@ -275,7 +275,7 @@
           <div class="mt-5">
             <div><h4><b>Add your Review</b></h4></div>
             <div class="rating-input">
-              <form action="/user/shop/product-details/add-review/<%= product._id %>" method="post">
+              <form action="/shop/product-details/add-review/<%= product._id %>" method="post">
                 <div class="stars">
                   <% for(let i=5;i>=1;i-- ){ %>
                     <input type="radio" name="rating" id="star<%= i %>" value="<%= i %>">
@@ -319,7 +319,7 @@
                 <% for(let i=0;i<3;i++){ %>
                   <div class="col-md-4">
                       <div class="product d-flex flex-column">
-                          <a href="/user/shop/product-details/<%= similarProducts[i]._id %>" class="img-prod"><img class="img-fluid" src="<%= similarProducts[i].images[0] %>" alt="Colorlib Template">
+                          <a href="/shop/product-details/<%= similarProducts[i]._id %>" class="img-prod"><img class="img-fluid" src="<%= similarProducts[i].images[0] %>" alt="Colorlib Template">
                               <div class="overlay"></div>
                           </a>
                           <div class="text py-3 pb-4 px-3">
@@ -337,7 +337,7 @@
                                       </p>
                                   </div>
                               </div>
-                              <h3><a href="/user/shop/product-details/<%= similarProducts[i]._id %>"><%= similarProducts[i].productName %></a></h3>
+                              <h3><a href="/shop/product-details/<%= similarProducts[i]._id %>"><%= similarProducts[i].productName %></a></h3>
                               <div class="pricing">
                                 <% if(similarProducts[i].regularPrice){ %>
                                   <p class="price"><span class="mr-2" style="color: red;"><del>₹<%= similarProducts[i].regularPrice %></del></span><span class="mr-2">₹<%= similarProducts[i].regularPrice %></span><span style="font-size: 12px;color: white;background-color: red; padding-left: 2px;padding-right: 2px;"><%= Math.floor(((similarProducts[i].regularPrice-similarProducts[i].amount)/similarProducts[i].regularPrice)*100) %>% off</span></p>
@@ -346,10 +346,10 @@
                                 <% } %>
                               </div>
                               <p class="bottom-area d-flex px-3">
-                                  <a href="/user/shop/product-details/<%= similarProducts[i]._id %>" class="add-to-cart text-center py-2 mr-1"><span>Add to cart <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-cart-fill" viewBox="0 0 16 16">
+                                  <a href="/shop/product-details/<%= similarProducts[i]._id %>" class="add-to-cart text-center py-2 mr-1"><span>Add to cart <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-cart-fill" viewBox="0 0 16 16">
                                     <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5M5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4m7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4m-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2m7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
                                   </svg></span></a>
-                                  <a href="/user/shop/product-details/<%= similarProducts[i]._id %>" class="buy-now text-center py-2">Add to Wishlist<span><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-heart-fill" viewBox="0 0 16 16">
+                                  <a href="/shop/product-details/<%= similarProducts[i]._id %>" class="buy-now text-center py-2">Add to Wishlist<span><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-heart-fill" viewBox="0 0 16 16">
                                     <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314"/>
                                   </svg></span></a>
                               </p>
@@ -466,7 +466,7 @@
         return
       }
 
-      fetch(`/user/product/addToCart?product=${productId}&&size=${size}&&quantity=${quantity}`,{
+      fetch(`/product/addToCart?product=${productId}&&size=${size}&&quantity=${quantity}`,{
         method:'GET'
       })
       .then(response=>response.json())
@@ -496,7 +496,7 @@
             text:'The maximum quantity for a product is 5. Please reduce the quantity or check the cart'
           })
         }else if(data.needLogin){
-          window.location.href='/user/login'
+          window.location.href='/login'
         }else{
           Swal.fire({
             icon:'error',
@@ -523,7 +523,7 @@
         return
       }
 
-      fetch(`/user/product/addToWishlist?product=${productId}&&size=${size}`,{
+      fetch(`/product/addToWishlist?product=${productId}&&size=${size}`,{
         method:"GET"
       })
       .then(response=>response.json())
@@ -541,7 +541,7 @@
             text:'Item already Exists in your Wishlist'
           })
         }else if(data.needLogin){
-          window.location.href='/user/login'
+          window.location.href='/login'
         }
       })
     }

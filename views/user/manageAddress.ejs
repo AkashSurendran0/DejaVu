@@ -37,8 +37,8 @@
         <div class="row">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                  <li><a href="/user" style="color: rgba(33, 37, 41, 0.75);">Home&nbsp;&nbsp;>&nbsp;&nbsp;</a></li>
-                  <li><a href="/user/shop" style="color: rgba(33, 37, 41, 0.75);">Shop&nbsp;&nbsp;>&nbsp;&nbsp;</a></li>
+                  <li><a href="/" style="color: rgba(33, 37, 41, 0.75);">Home&nbsp;&nbsp;>&nbsp;&nbsp;</a></li>
+                  <li><a href="/shop" style="color: rgba(33, 37, 41, 0.75);">Shop&nbsp;&nbsp;>&nbsp;&nbsp;</a></li>
                   <li>Manage Address</li>
                 </ol>
               </nav>
@@ -61,8 +61,8 @@
                                             <p class="mb-0"><%= foundAddress.address[i].state %>, <%= foundAddress.address[i].streetAddress %>, <%= foundAddress.address[i].city %>, <%= foundAddress.address[i].postcode %>, <%= foundAddress.address[i].phone %></p>
                                         </div>
                                         <div>
-                                            <button class="btn btn-primary"><a href="/user/settings/editAddress/<%= foundAddress.address[i]._id %>" style="color: white;">Edit</a></button>
-                                            <button class="btn btn-danger"><a href="/user/settings/deleteAddress/<%= foundAddress.address[i]._id %>" style="color: white;" onclick="confirm('<%= foundAddress.address[i]._id %>', event)">Delete</a></button>
+                                            <button class="btn btn-primary"><a href="/settings/editAddress/<%= foundAddress.address[i]._id %>" style="color: white;">Edit</a></button>
+                                            <button class="btn btn-danger"><a href="/settings/deleteAddress/<%= foundAddress.address[i]._id %>" style="color: white;" onclick="confirm('<%= foundAddress.address[i]._id %>', event)">Delete</a></button>
                                         </div>
                                     </div>
                                 </div>
@@ -70,7 +70,7 @@
                         <% } %>
                     <% } %>
 
-                    <button class="mt-2" style="background-color: rgb(31, 255, 19);border-radius: 50px;width: 20%;height: 40px;border: none;"><a href="/user/settings/addAddress" style="color: white;">Add Address</a></button>
+                    <button class="mt-2" style="background-color: rgb(31, 255, 19);border-radius: 50px;width: 20%;height: 40px;border: none;"><a href="/settings/addAddress" style="color: white;">Add Address</a></button>
                 </div>
                 <div class="row mt-5">
               <div class="col text-center">
@@ -103,7 +103,7 @@
             confirmButtonText:'Delete',
         }).then((result)=>{
             if(result.isConfirmed){
-                window.location.href=`/user/settings/deleteAddress/${addressId}`
+                window.location.href=`/settings/deleteAddress/${addressId}`
             }
         })
     }

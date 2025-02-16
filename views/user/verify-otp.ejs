@@ -174,11 +174,11 @@ input[type="submit"]:hover{
                 <br>
                 <p class="text-danger"><%= OTPerr %></p>
             <% } %>
-            <form action="/user/signup-VerifyOTP" method="post" onsubmit="validateOTP(event)">
+            <form action="/signup-VerifyOTP" method="post" onsubmit="validateOTP(event)">
                 <input type="text" placeholder="Enter OTP" name="otp" id="otp" required><br>
                 <input id="submitBtn" type="submit" value="Verify OTP"/>
             </form>
-            <form id="resendOTPform" action="/user/resendOTP" method="post">
+            <form id="resendOTPform" action="/resendOTP" method="post">
                 <button id="resendOTPbutton" style="background-color: grey;">Resend OTP</button>
             </form>
        </div>
@@ -218,13 +218,13 @@ input[type="submit"]:hover{
     function validateOTP(event){
         event.preventDefault()
         const otpInput=document.getElementById('otp').value
-        fetch(`/user/signup-VerifyOTP?otp=${otpInput}`, {
+        fetch(`/signup-VerifyOTP?otp=${otpInput}`, {
             method:'GET'
         })
         .then(response=>response.json())
         .then(data=>{
             if(data.success){
-                window.location.href='/user/signup-details'
+                window.location.href='/signup-details'
             }else{
                 Swal.fire({
                     icon:'error',
@@ -236,7 +236,7 @@ input[type="submit"]:hover{
     }
 
     document.getElementById('logoImg').addEventListener('click', ()=>{
-        window.location.href='/user'
+        window.location.href='/'
     })
 </script>
 

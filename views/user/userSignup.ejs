@@ -155,7 +155,7 @@ input[type="checkbox"]{
             <% if(err && err.length>0) { %>
                 <p class="text-danger"><%= err %></p>
             <% } %>
-            <form action="/user/signup-details" method="post">
+            <form action="/signup-details" method="post">
                 <input type="text" placeholder="Enter your Name" name="name" required>
                 <input type="password" placeholder="Password" name="password" required>
                 <input type="password" placeholder="Confirm Password" name="confirmPassword"><br>
@@ -179,7 +179,7 @@ input[type="checkbox"]{
 
 <script>
     document.getElementById('logoImg').addEventListener('click', ()=>{
-        window.location.href='/user'
+        window.location.href='/'
     })
 </script>
 

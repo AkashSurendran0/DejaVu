@@ -34,10 +34,10 @@ routes.get('/forgot-password/emailverification', allowAuth, blockCheck, userRout
 routes.post('/signup-SendVerifyOTP', userRoutes.sendVerifyOTP)
 routes.post('/recover-VerifyOTP', userRoutes.verifyRecoverOTP)
 routes.get('/auth/google', allowAuth, passport.authenticate('google'))
-routes.get('/auth/google/callback', allowAuth, passport.authenticate('google',{failureRedirect:'/user/login'}),(req,res)=>{
+routes.get('/auth/google/callback', allowAuth, passport.authenticate('google',{failureRedirect:'/login'}),(req,res)=>{
     req.session.userEmail=req.user.email
     req.session.isLogged = true
-    res.redirect('/user')
+    res.redirect('/')
 })
 routes.get('/settings/basicInfo', blockCheck, userContinue, userRoutes.loadBasicInfoPage)
 routes.post('/settings/updateUser/:id', upload.single('userImage'), userRoutes.updateUser)

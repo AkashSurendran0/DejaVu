@@ -32,8 +32,8 @@
           <div class="row">
               <nav aria-label="breadcrumb">
                   <ol class="breadcrumb">
-                    <li><a href="/user" style="color: rgba(33, 37, 41, 0.75);">Home&nbsp;&nbsp;>&nbsp;&nbsp;</a></li>
-                    <li><a href="/user/shop" style="color: rgba(33, 37, 41, 0.75);">Shop&nbsp;&nbsp;>&nbsp;&nbsp;</a></li>
+                    <li><a href="/" style="color: rgba(33, 37, 41, 0.75);">Home&nbsp;&nbsp;>&nbsp;&nbsp;</a></li>
+                    <li><a href="/shop" style="color: rgba(33, 37, 41, 0.75);">Shop&nbsp;&nbsp;>&nbsp;&nbsp;</a></li>
                     <li>Basic Info</li>
                   </ol>
                 </nav>
@@ -44,7 +44,7 @@
                         <span class="text-success noti"><%= msg %></span>
                         <br>
                       <% } %>
-                      <form action="/user/settings/updateUser/<%= user._id %>" method="post" enctype="multipart/form-data">
+                      <form action="/settings/updateUser/<%= user._id %>" method="post" enctype="multipart/form-data">
                         <div class="basicInfo row">
                         <div class="col-md-4"> 
                           <% if(user.image){ %>
@@ -89,7 +89,7 @@
                     
                     <div class="mt-5">
                       <% if(user.password){ %>
-                        <form action="/user/settings/changePassword/<%= user._id %>" method="post" style="display: flex;flex-direction: column;">
+                        <form action="/settings/changePassword/<%= user._id %>" method="post" style="display: flex;flex-direction: column;">
                           <h4>Change Password?</h4>
                           <% if(msg2.length>0){ %>
                             <span class="text-danger noti"><%= msg2 %></span>

@@ -191,8 +191,8 @@
         <div class="row">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                  <li><a href="/user" style="color: rgba(33, 37, 41, 0.75);">Home&nbsp;&nbsp;>&nbsp;&nbsp;</a></li>
-                  <li><a href="/user/shop" style="color: rgba(33, 37, 41, 0.75);">Shop&nbsp;&nbsp;>&nbsp;&nbsp;</a></li>
+                  <li><a href="/" style="color: rgba(33, 37, 41, 0.75);">Home&nbsp;&nbsp;>&nbsp;&nbsp;</a></li>
+                  <li><a href="/shop" style="color: rgba(33, 37, 41, 0.75);">Shop&nbsp;&nbsp;>&nbsp;&nbsp;</a></li>
                   <li>Order Summary</li>
                 </ol>
             </nav>
@@ -362,7 +362,7 @@
 <script>
 
     const downloadInvoice = (orderId) =>{
-      window.location.href=`/user/order/downloadInvoice?order=${orderId}`
+      window.location.href=`/order/downloadInvoice?order=${orderId}`
     }
 
     const deliveryStatus='<%= order.status %>'
@@ -437,7 +437,7 @@
         if (reason.trim() === "") {
             alert("Please enter a reason for cancellation.");
         } else {
-            fetch(`/user/order/cancel-order?order=<%= order._id %>&&reason=${reason}&&orderProductId=${orderProductId}`,{
+            fetch(`/order/cancel-order?order=<%= order._id %>&&reason=${reason}&&orderProductId=${orderProductId}`,{
               method:'GET'
             })
             .then(response=>response.json())
@@ -450,7 +450,7 @@
                 })
                 .then(result=>{
                   if(result.isConfirmed){
-                    window.location.href=`/user/settings/orders`
+                    window.location.href=`/settings/orders`
                   }
                 })
               }else{
@@ -472,7 +472,7 @@
         if(reason.trim()===""){
           alert('Please enter a reason for return')
         }else{
-          fetch(`/user/order/returnOrder?order=<%= order._id %>&&reason=${reason}&&orderProductId=${orderProductId}`, {
+          fetch(`/order/returnOrder?order=<%= order._id %>&&reason=${reason}&&orderProductId=${orderProductId}`, {
             method:'GET'
           })
           .then(response=>response.json())
@@ -484,7 +484,7 @@
                 text:'The return request has been send.'
               }).then(result=>{
                 if(result.isConfirmed){
-                  window.location.href=`/user/order/order-summary/<%= order._id %>`
+                  window.location.href=`/order/order-summary/<%= order._id %>`
                 }
               })
             }else{
@@ -500,7 +500,7 @@
     }
 
     const retryPayment = (orderId) =>{
-      fetch(`/user/razorPayment?order=${orderId}`, {
+      fetch(`/razorPayment?order=${orderId}`, {
         method:'GET'
       })
       .then(response=>response.json())
@@ -520,7 +520,7 @@
             description:'Purchase from DejaVu store',
             order_id:data.orders.id,
             handler:async function(response){
-              const verifyResponse=await fetch('/user/razorpay/verify-payment', {
+              const verifyResponse=await fetch('/razorpay/verify-payment', {
                 method:'POST',
                 headers:{
                   'Content-Type':'application/json'
@@ -534,7 +534,7 @@
               .then(response=>response.json())
                 .then(data=>{
                   if(data.success){
-                    fetch(`/user/completePayment?order=${orderId}`, {
+                    fetch(`/completePayment?order=${orderId}`, {
                       method:'GET'
                     })
                     .then(response=>response.json())
@@ -547,7 +547,7 @@
                         })
                         .then(result=>{
                           if(result.isConfirmed){
-                            window.location.href=`/user/order/order-summary/${orderId}`
+                            window.location.href=`/order/order-summary/${orderId}`
                           }
                         })
                       }else{

@@ -38,7 +38,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 db()
 
 app.use('/admin', adminRoutes)
-app.use('/user', userRoutes)
+app.use('/', userRoutes)
 
 app.listen(process.env.PORT, ()=>{
     console.log('Server is running');

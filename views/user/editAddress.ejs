@@ -16,8 +16,8 @@
         <div class="row">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                  <li><a href="/user" style="color: rgba(33, 37, 41, 0.75);">Home&nbsp;&nbsp;>&nbsp;&nbsp;</a></li>
-                  <li><a href="/user/shop" style="color: rgba(33, 37, 41, 0.75);">Shop&nbsp;&nbsp;>&nbsp;&nbsp;</a></li>
+                  <li><a href="/" style="color: rgba(33, 37, 41, 0.75);">Home&nbsp;&nbsp;>&nbsp;&nbsp;</a></li>
+                  <li><a href="/shop" style="color: rgba(33, 37, 41, 0.75);">Shop&nbsp;&nbsp;>&nbsp;&nbsp;</a></li>
                   <li>Edit Address</li>
                 </ol>
               </nav>
@@ -25,7 +25,7 @@
             <div class="col-md-10 order-md-last">
                 <h2 class="mb-4" style="font-weight: bold;">EDIT ADDRESS</h2>
 
-                <form action="/user/settings/editAddress/<%= address[0].address._id %>" method="POST" class="p-4 rounded">
+                <form action="/settings/editAddress/<%= address[0].address._id %>" method="POST" class="p-4 rounded">
                     <div class="form-group mb-4">
                         <label for="name" class="form-label">Name</label>
                         <input type="text" class="form-control" id="name" name="name" value="<%= address[0].address.name %>" required>

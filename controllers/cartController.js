@@ -256,7 +256,7 @@ const removeProduct = async (req,res)=>{
                 }
             ]
         )
-        res.redirect('/user/cart')
+        res.redirect('/cart')
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
         

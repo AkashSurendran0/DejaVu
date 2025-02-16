@@ -48,10 +48,10 @@
                   <% for(let i=0;i<cart.products.length;i++){ %>
                     <tr class="text-center">
                       <td class="product-remove">
-                        <a href="/user/cart/removeProduct?cart=<%= cart._id %>&&product=<%= cart.products[i]._id %>"><span>&times;</span></a>
+                        <a href="/cart/removeProduct?cart=<%= cart._id %>&&product=<%= cart.products[i]._id %>"><span>&times;</span></a>
                       </td>
                       <td class="image-prod">
-                        <a href="/user/shop/product-details/<%= cart.products[i].productId._id %>"><img src="<%= cart.products[i].productId.images[0] %>" alt="NIKE FREE RN 2019-ID" class="img-fluid" style="width: 100px;"></a>
+                        <a href="/shop/product-details/<%= cart.products[i].productId._id %>"><img src="<%= cart.products[i].productId.images[0] %>" alt="NIKE FREE RN 2019-ID" class="img-fluid" style="width: 100px;"></a>
                       </td>
                       <td class="product-name">
                         <h3><%= cart.products[i].productId.productName %></h3>
@@ -100,13 +100,13 @@
   <script>
 
     const goToCheckout=(cartId)=>{      
-      fetch(`/user/checkQuantity/${cartId}`, {
+      fetch(`/checkQuantity/${cartId}`, {
         method:'GET'
       })
       .then(response=>response.json())
       .then(data=>{
         if(data.success){
-          window.location.href=`/user/loadCheckout/${cartId}`
+          window.location.href=`/loadCheckout/${cartId}`
         }else{
           Swal.fire({
             icon:'error',
@@ -122,7 +122,7 @@
       let currentQuantity=parseInt(quantityInput.value)
       
       if(currentQuantity>=1 && currentQuantity<=5){
-        fetch(`/user/shop/cart/changeQuantity?cart=${cartId}&&cartProduct=${cartProductId}&&action=${action}&&quantity=${currentQuantity}&&cartProductId=${productId}`,{
+        fetch(`/shop/cart/changeQuantity?cart=${cartId}&&cartProduct=${cartProductId}&&action=${action}&&quantity=${currentQuantity}&&cartProductId=${productId}`,{
         method:'GET'
       })
       .then(response=>response.json())

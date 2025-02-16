@@ -98,15 +98,15 @@ const sendOTP = async (req,res)=>{
         const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
         if(!email){
             req.flash('emailReq', 'Email is required!')
-            return res.redirect('/user/signUp-Email')
+            return res.redirect('/signUp-Email')
         }else if(!emailPattern.test(email)){
             req.flash('emailReq', 'Invalid Email Format!')
-            return res.redirect('/user/signUp-Email')
+            return res.redirect('/signUp-Email')
         }
         const sameEmail=await users.findOne({email:email})
         if(sameEmail){
             req.flash('emailReq', 'User Exists')
-            return res.redirect('/user/signUp-Email')
+            return res.redirect('/signUp-Email')
         }
         const otp=generateOTP()
         storeOTP[email]={otp, expires:Date.now() + 1*60*1000 }
@@ -203,7 +203,7 @@ const userSignup = async (req,res)=>{
         })
         req.session.userEmail=email
         req.session.isLogged=true
-        res.redirect('/user')
+        res.redirect('/')
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
         
@@ -213,7 +213,7 @@ const userSignup = async (req,res)=>{
 const userLogout = async (req,res)=>{
     try {
         req.session.destroy(()=>{
-            res.redirect('/user')
+            res.redirect('/')
         })
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
@@ -229,19 +229,19 @@ const userLogin = async (req,res)=>{
         })
         if(!user){
             req.flash('invalidUser', 'User Not Found')
-            return res.redirect('/user/login')
+            return res.redirect('/login')
         }else if(user.isBlocked==true){
             req.flash('invalidUser', 'Unauthorized User')
-            return res.redirect('/user/login') 
+            return res.redirect('/login') 
         }
         const check=await bcrypt.check(password,user.password)
         if(!check){
             req.flash('invalidUser', 'Password Incorrect')
-            return res.redirect('/user/login')
+            return res.redirect('/login')
         }
         req.session.userEmail=email
         req.session.isLogged = true
-        res.redirect('/user')
+        res.redirect('/')
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
         
@@ -264,10 +264,10 @@ const sendVerifyOTP = async (req,res)=>{
         const existingUser = await users.findOne({email: email})
         if(!existingUser){
             req.flash('noUser', 'User Doesnt Exist')
-            return res.redirect('/user/forgot-password/emailverification')
+            return res.redirect('/forgot-password/emailverification')
         }else if(existingUser.isBlocked==true){
             req.flash('invalidUser', 'Unauthorized User')
-            return res.redirect('/user/login')
+            return res.redirect('/login')
         }
         const otp=generateOTP()
         storeOTP[email]={otp, expires:Date.now() + 1*60*1000 }
@@ -299,7 +299,7 @@ const verifyRecoverOTP = async (req,res)=>{
         if(parseInt(otp)==storedOTP.otp){
             delete storeOTP[email]
             req.session.authenticate=true
-            res.json({success:true, redirectURL:'/user/changePassword'})
+            res.json({success:true, redirectURL:'/changePassword'})
         }else{
             res.status(STATUS_NOT_FOUND).json({success:false})
         }
@@ -336,7 +336,7 @@ const changePassword = async (req,res)=>{
             {$set: {password:hashedPass}}
         )
         req.flash('userLogin', 'Login using new Credentials')
-        res.redirect('/user/login')
+        res.redirect('/login')
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
         
@@ -376,7 +376,7 @@ const updateUser = async (req,res)=>{
             {$set: data}
         )
         req.flash('msg', 'User Updated Successfully')
-        res.redirect('/user/settings/basicInfo')
+        res.redirect('/settings/basicInfo')
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
         
@@ -392,15 +392,15 @@ const changePasswordFromSettings = async (req,res)=>{
         const passwordPattern=/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])[A-Za-z0-9!@#$%^&*]{8,}$/
         if(!check){
             req.flash('msg2', 'Incorrect Password')
-            return res.redirect('/user/settings/basicInfo')
+            return res.redirect('/settings/basicInfo')
         }
         if(newPass != confirmNewPass){
             req.flash('msg2', 'Password doesnt match')
-            return res.redirect('/user/settings/basicInfo')
+            return res.redirect('/settings/basicInfo')
         }
         if(!passwordPattern.test(newPass)){
             req.flash('msg2', 'Password doesnt meet the criteria')
-            return res.redirect('/user/settings/basicInfo')
+            return res.redirect('/settings/basicInfo')
         }
         const hashedPass=await bcrypt.hashPassword(newPass)
         await users.updateOne(
@@ -408,7 +408,7 @@ const changePasswordFromSettings = async (req,res)=>{
             {$set: {password:hashedPass}}
         )
         req.flash('msg3', 'Password updated successfully')
-        res.redirect('/user/settings/basicInfo')
+        res.redirect('/settings/basicInfo')
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
         
@@ -425,7 +425,7 @@ const deleteAccount = async (req,res)=>{
             {user: id}
         )
         req.session.destroy(()=>{
-            res.redirect('/user')
+            res.redirect('/')
         })
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')

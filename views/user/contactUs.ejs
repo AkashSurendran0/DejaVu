@@ -83,7 +83,7 @@
             message:message
         }
         
-        fetch('/user/sendMail', {
+        fetch('/sendMail', {
             method:'POST',
             headers:{
                 'Content-Type':'application/json'
@@ -100,7 +100,7 @@
                 })
                 .then(result=>{
                     if(result.isConfirmed){
-                        window.location.href='/user/contactUs'
+                        window.location.href='/contactUs'
                     }
                 })
             }else{

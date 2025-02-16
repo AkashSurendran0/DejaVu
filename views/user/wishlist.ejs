@@ -61,7 +61,7 @@
                           <a class="removeProduct" onclick="removeProduct('<%= wishlist.products[i]._id %>','<%= wishlist._id %>')"><span>&times;</span></a>
                         </td>
                         <td class="image-prod">
-                          <a href="/user/shop/product-details/<%= wishlist.products[i].productId._id %>"><img src="<%= wishlist.products[i].productId.images[0] %>" alt="NIKE FREE RN 2019-ID" class="img-fluid" style="width: 100px;"></a>
+                          <a href="/shop/product-details/<%= wishlist.products[i].productId._id %>"><img src="<%= wishlist.products[i].productId.images[0] %>" alt="NIKE FREE RN 2019-ID" class="img-fluid" style="width: 100px;"></a>
                         </td>
                         <td class="product-name">
                           <h3><%= wishlist.products[i].productId.productName %></h3>
@@ -85,7 +85,7 @@
  <script>
 
   const removeProduct = (productId,wishlistId) =>{
-    fetch(`/user/wishlist/removeItemFromWishlist?productId=${productId}&&wishlist=${wishlistId}`,{
+    fetch(`/wishlist/removeItemFromWishlist?productId=${productId}&&wishlist=${wishlistId}`,{
       method:'GET'
     })
     .then(response=>response.json())
@@ -103,7 +103,7 @@
   }
 
   const addToCart = (productId,size,cartProductId,wishlistId)=>{    
-    fetch(`/user/product/addToCart?product=${productId}&&size=${size}&&fromWishlist=${true}`, {
+    fetch(`/product/addToCart?product=${productId}&&size=${size}&&fromWishlist=${true}`, {
       method:'GET'
     })
     .then(response=>response.json())
@@ -115,13 +115,13 @@
           text:'Product added to cart successfully'
         }).then(result=>{
           if(result.isConfirmed){
-            fetch(`/user/wishlist/removeItemFromWishlist?productId=${cartProductId}&&wishlist=${wishlistId}`, {
+            fetch(`/wishlist/removeItemFromWishlist?productId=${cartProductId}&&wishlist=${wishlistId}`, {
               method:'GET'
             })
             .then(response=>response.json())
             .then(data=>{
               if(data.success){
-                window.location.href='/user/cart'
+                window.location.href='/cart'
               }
             })
           }
