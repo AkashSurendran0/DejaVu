@@ -49,7 +49,7 @@
                     <span class="text-success noti mb-2"><%= msg %></span>
                 <% } %>
                 <div class="address-container">
-                    <% if(foundAddress.length==0){ %>
+                    <% if(!foundAddress || foundAddress.length==0){ %>
                         <h6>No saved Address</h6>
                     <% }else{ %>
                         <% for(let i=0;i<foundAddress.address.length;i++){ %>
