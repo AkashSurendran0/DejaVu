@@ -677,12 +677,12 @@
     }
 
     const loadRazorPayment = async (req,res)=>{
-        try {
+        try {            
             const id=req.query.cart?? req.query.order
-            const coupon=req.query.code   
+            const coupon=req.query.code               
             const item=await carts.findOne({_id:id})?? await orders.findOne({_id:id})
             let amount=item.totalAmount
-            if(coupon!='undefined'){                
+            if(coupon && coupon!='undefined'){                                
                 const couponFound=await coupons.findOne({code:coupon})
                 const reducedAmount=((item.totalAmount*couponFound.offer)/100).toFixed(2)
                 if(reducedAmount < couponFound.maxPrice){                
@@ -690,13 +690,13 @@
                 }else{                
                     amount=(item.totalAmount-couponFound.maxPrice).toFixed(2)
                 }
-            }
-
+            }            
             const order=await razorpayInstance.orders.create({
                 amount:Math.round(amount*100),
                 currency:'INR',
                 receipt:`receipt_${Date.now()}`
             })
+            
             res.json({success:true, orders:order})
         } catch (error) {
             res.status(STATUS_SERVER_ERROR).render('404page')
