@@ -17,8 +17,8 @@
     const STATUS_NOT_FOUND=parseInt(process.env.STATUS_NOT_FOUND)
 
     const razorpayInstance=new Razorpay({
-        key_id:'rzp_test_8RKWZFiJMDAIeS',
-        key_secret:'ljyU5ZIohEiwxZvhtRqyGFy0'
+        key_id:'rzp_test_RlTalei3CXVNOp',
+        key_secret:'a5O63TvhwP7O56VS67VyHszD'
     })
 
     const checkProductQuantity = async (req,res)=>{
@@ -707,7 +707,7 @@
     const verifyRazorPayment = async (req,res)=>{
         try {        
             const {payment_id,order_id,signature}=req.body
-            const secret='ljyU5ZIohEiwxZvhtRqyGFy0'        
+            const secret='a5O63TvhwP7O56VS67VyHszD'        
             const generated_signature=crypto
                 .createHmac('sha256', secret)
                 .update(order_id+'|'+payment_id)

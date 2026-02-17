@@ -299,7 +299,7 @@ const verifyRecoverOTP = async (req,res)=>{
         if(parseInt(otp)==storedOTP.otp){
             delete storeOTP[email]
             req.session.authenticate=true
-            res.json({success:true, redirectURL:'/changePassword'})
+            res.redirect("/changePassword")
         }else{
             res.status(STATUS_NOT_FOUND).json({success:false})
         }
