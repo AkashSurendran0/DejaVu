@@ -199,7 +199,7 @@
 
 </style>
 
-<div class="hero-wrap hero-bread" style="background-image: url('/uploads/checkoutbanner.png');">
+<div class="hero-wrap hero-bread" style="background-image: url(https://res.cloudinary.com/djhmcbiq9/image/upload/v1771911487/checkoutbanner_tkyls3.png);">
     <div class="container">
       <div class="row no-gutters slider-text align-items-center justify-content-center">
         <div class="col-md-9 ftco-animate text-center">
@@ -268,6 +268,7 @@
                   <thead>
                     <tr>
                       <th>Product</th>
+                      <th>Product Name</th>
                       <th>Size</th>
                       <th>Quantity</th>
                       <th>Amount</th>
@@ -279,9 +280,10 @@
                         <td>
                           <img src="<%= products.products[i].productId.images[0] %>" alt="Product Image">
                         </td>
+                        <td><%= products.products[i].productId.productName %></td>
                         <td><%= products.products[i].size %></td>
                         <td><%= products.products[i].quantity %></td>
-                        <td><%= ((products.products[i].productId.amount) * (products.products[i].quantity)).toFixed(2) %></td>
+                        <td>₹<%= ((products.products[i].amount) * (products.products[i].quantity)).toFixed(2) %></td>
                       </tr>
                     <% } %>
                   </tbody>
@@ -295,7 +297,7 @@
                 </div>
                 <div style="display: flex;justify-content: space-between;">
                   <p>Discount:</p>
-                  <p>₹<%= products.offerDiscount?? 0 %></p>
+                  <p id="discountAmount">₹<%= products.offerDiscount?? 0 %></p>
                 </div>
                 <div style="display: flex;justify-content: space-between;">
                   <p>GST Applied @ 5%:</p>
@@ -898,13 +900,21 @@ const applyCoupon = (couponId) =>{
       const totalAmount=parseInt(document.getElementById('totalAmount').innerText.split('').filter(item=>item!='₹').join(''))      
       const reducedAmount=(totalAmount*data.coupon.offer)/100    
       
+      let discountAmount = reducedAmount;
       if(reducedAmount < data.coupon.maxPrice){
         const finalAmount=totalAmount-reducedAmount        
         document.getElementById('boldAmount').innerText=`₹${finalAmount}`
+        discountAmount = reducedAmount;
       }else{
         const finalAmount=totalAmount-data.coupon.maxPrice
         document.getElementById('boldAmount').innerText=`₹${finalAmount}`
+        discountAmount = data.coupon.maxPrice;
       }
+      
+      // Update discount display
+      const currentDiscount = parseInt(document.getElementById('discountAmount').innerText.split('').filter(item => item !== '₹').join('')) || 0;
+      document.getElementById('discountAmount').innerText = `₹${Math.round(discountAmount + currentDiscount)}`
+      
       document.getElementById('viewCoupons').style.display='none'
       document.getElementById('couponApply').style.display='none'
       couponModal.style.display='none'

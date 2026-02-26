@@ -12,19 +12,22 @@ const loadCartPage = async (req,res)=>{
         const user=await users.findOne({email:req.session.userEmail})       
         const productDetails=await carts.findOne({user:user._id}).populate('products.productId')   
         let totalAmount=0 
+        let totalDiscount=0
         if(productDetails!=null){
             productDetails.products.forEach(product=>{
-                if(product.productId.regularPrice){
-                  totalAmount+=(product.productId.regularPrice*product.quantity)
-                }else{
-                  totalAmount+=(product.productId.amount*product.quantity)
+                // Use saved amount from cart instead of live product amount
+                totalAmount+=(product.amount*product.quantity)
+                // Calculate discount from saved regular price
+                if(product.regularPrice && product.regularPrice > product.amount){
+                    totalDiscount+=((product.regularPrice - product.amount)*product.quantity)
                 }
               })  
         }       
                   
         res.render('cart', {
             cart:productDetails,
-            totalAmount:totalAmount
+            totalAmount:totalAmount,
+            totalDiscount:totalDiscount
         })
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('404page')
@@ -87,7 +90,8 @@ const addToCart = async (req,res)=>{
             }else if((itemAlreadyExist[0].quantity)+quantity > 5 ){
                 return res.json({quantityFive:true})
             }else{
-                const gstAmount=Math.floor(((foundProduct.amount*quantity)/100)*5)
+                const regularPriceToUse = foundProduct.regularPrice || foundProduct.amount
+                const gstAmount=Math.floor(((regularPriceToUse*quantity)/100)*5)
                 await carts.updateOne(
                     {
                         user: user._id,
@@ -103,14 +107,14 @@ const addToCart = async (req,res)=>{
                     }
                 )
                 const offerAmount=((foundProduct.regularPrice-foundProduct.amount)*quantity).toFixed(2)
-                if(foundProduct.hasOffer){
+                if(foundProduct.hasOffer && foundProduct.regularPrice){
                     await carts.updateOne(
                         {
                             user:user._id
                         },
                         {
                             $inc:{
-                                offerDiscount:offerAmount
+                                offerDiscount:parseFloat(offerAmount)
                             }
                         }
                     )
@@ -136,7 +140,8 @@ const addToCart = async (req,res)=>{
             return res.json({success:true})
         }  
         
-        const gstAmount=Math.floor(((foundProduct.amount*quantity)/100)*5)
+        const regularPriceToUse = foundProduct.regularPrice || foundProduct.amount
+        const gstAmount=Math.floor(((regularPriceToUse*quantity)/100)*5)
         await carts.updateOne(
             {user: user._id},   
             {
@@ -144,7 +149,9 @@ const addToCart = async (req,res)=>{
                     products:{
                         productId:product,
                         size:size,
-                        quantity:quantity
+                        quantity:quantity,
+                        amount:foundProduct.amount,
+                        regularPrice:regularPriceToUse
                     }
                 },
                 $inc:{
@@ -155,21 +162,19 @@ const addToCart = async (req,res)=>{
             },
             {upsert:true}
         )
-        if(foundProduct.regularPrice){
+        if(foundProduct.regularPrice && foundProduct.hasOffer){
             const offerAmount=((foundProduct.regularPrice-foundProduct.amount)*quantity).toFixed(2)
             
-            if(foundProduct.hasOffer){
-                await carts.updateOne(
-                    {
-                        user:user._id
-                    },
-                    {
-                        $inc:{
-                            offerDiscount:offerAmount
-                        }
+            await carts.updateOne(
+                {
+                    user:user._id
+                },
+                {
+                    $inc:{
+                        offerDiscount:parseFloat(offerAmount)
                     }
-                )
-            }
+                }
+            )
         }
         await carts.updateOne(
             {

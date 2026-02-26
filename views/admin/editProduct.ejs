@@ -302,7 +302,7 @@ input[type="file"] {
       const file = fileInput.files[0]
       if (!file) return;
 
-      const validTypes=['image/jpeg', 'image/png', 'image/gif', 'image/webp']
+      const validTypes=['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/avif']
       if(!validTypes.includes(file.type)){
         Swal.fire({
           icon:'error',

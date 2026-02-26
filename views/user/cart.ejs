@@ -12,7 +12,7 @@
 
 </style>
 
-<div class="hero-wrap hero-bread" style="background-image: url('/uploads/cartbanner.png');">
+<div class="hero-wrap hero-bread" style="background-image: url(https://res.cloudinary.com/djhmcbiq9/image/upload/v1771911492/cartbanner_bt1bcx.png);">
     <div class="container">
         <div class="row no-gutters slider-text align-items-center justify-content-center">
             <div class="col-md-9 ftco-animate text-center">
@@ -56,10 +56,10 @@
                       <td class="product-name">
                         <h3><%= cart.products[i].productId.productName %></h3>
                       </td>
-                      <td class="price">₹<%= cart.products[i].productId.amount %></td>
+                      <td class="price">₹<%= cart.products[i].amount %></td>
                       <td class="size"><%= cart.products[i].size %></td>
-                      <td class="quantity"><div style="display: flex;justify-content: center;"><button id="decreaseBtn<%= cart.products[i]._id %>" onclick="changeQuantity('<%= cart._id %>','<%= cart.products[i].productId._id %>','decrease', '<%= cart.products[i].productId.amount %>', '<%= cart.products[i]._id %>')" class="d-flex align-items-center decreaseBtn"><b>-</b></button><input style="background-color: white;text-align: center;width: 50px;border: none;" type="text" value="<%= cart.products[i].quantity %>" name="quantity" id="quantity<%= cart.products[i]._id %>" disabled><button id="increaseBtn<%= cart.products[i]._id %>" onclick="changeQuantity('<%= cart._id %>','<%= cart.products[i].productId._id %>','increase', '<%= cart.products[i].productId.amount %>', '<%= cart.products[i]._id %>')" class="d-flex align-items-center increaseBtn"><b>+</b></button></div></td>
-                      <td class="total" id="amountData<%= cart.products[i]._id %>">₹<%= ((cart.products[i].productId.amount)*(cart.products[i].quantity)).toFixed(2) %></td>
+                      <td class="quantity"><div style="display: flex;justify-content: center;"><button id="decreaseBtn<%= cart.products[i]._id %>" onclick="changeQuantity('<%= cart._id %>','<%= cart.products[i].productId._id %>','decrease', '<%= cart.products[i].amount %>', '<%= cart.products[i]._id %>')" class="d-flex align-items-center decreaseBtn"><b>-</b></button><input style="background-color: white;text-align: center;width: 50px;border: none;" type="text" value="<%= cart.products[i].quantity %>" name="quantity" id="quantity<%= cart.products[i]._id %>" disabled><button id="increaseBtn<%= cart.products[i]._id %>" onclick="changeQuantity('<%= cart._id %>','<%= cart.products[i].productId._id %>','increase', '<%= cart.products[i].amount %>', '<%= cart.products[i]._id %>')" class="d-flex align-items-center increaseBtn"><b>+</b></button></div></td>
+                      <td class="total" id="amountData<%= cart.products[i]._id %>">₹<%= ((cart.products[i].amount)*(cart.products[i].quantity)).toFixed(2) %></td>
                     </tr>
                   <% } %>
                 </tbody>
@@ -78,7 +78,7 @@
               </div>
               <div style="display: flex;justify-content: space-between;">
                   <p>Discount</p>
-                  <p id="discount">₹<%= cart.offerDiscount?? 0 %></p>
+                  <p id="discount">₹<%= Math.round(totalDiscount ?? 0) %></p>
               </div>
               <div style="display: flex;justify-content: space-between;">
                 <p>GST Applied @ 5%</p>
@@ -141,16 +141,18 @@
           }
         }
         let totalAmount=0
+        let totalDiscount=0
         cart.products.forEach(product=>{
-          if(product.productId.regularPrice){
-            totalAmount+=(product.productId.regularPrice*product.quantity)
-          }else{
-            totalAmount+=(product.productId.amount*product.quantity)
+          // Use saved amount instead of live product amount
+          totalAmount+=(product.amount*product.quantity)
+          // Calculate discount from saved regular price
+          if(product.regularPrice && product.regularPrice > product.amount){
+            totalDiscount+=((product.regularPrice - product.amount)*product.quantity)
           }
         })
         
         document.getElementById('subTotal').innerText=`₹${totalAmount}`
-        document.getElementById('discount').innerText=`₹${cart.offerDiscount}`
+        document.getElementById('discount').innerText=`₹${Math.round(totalDiscount)}`
         document.getElementById('gst').innerText=`₹${cart.GST}`
         document.getElementById(`amountData${productId}`).innerText=`₹${(productAmount*currentQuantity).toFixed(2)}`
         document.getElementById('totalAmount').innerText=`₹${cart.totalAmount}`

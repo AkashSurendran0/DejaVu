@@ -397,13 +397,14 @@
     let salesArray
     let saleQuantity
     let topOrders
+    let dateRange
 
     const getCustomReport = (value) =>{
         if(value=='lastWeek'){
             const startDate=new Date()
             startDate.setDate(startDate.getDate()-6)
             const endDate=new Date()
-            fetch(`/admin/getSalesReport?startDate=${startDate}&&endDate=${endDate}`, {
+            fetch(`/admin/getSalesReport?startDate=${startDate}&endDate=${endDate}`, {
                 method:'GET'
             })
             .then(response=>response.json())
@@ -411,20 +412,21 @@
                 salesArray=data.salesData
                 saleQuantity=data.saleQuantity
                 topOrders=data.topOrders
+                dateRange=data.dateRange
                 
                 if (!Array.isArray(salesArray)) {
                     console.error("Error: salesData is not an array", salesArray);
                     return;
                 }
-                const labels=salesArray.map(entry=>entry._id)
+                const labels=salesArray.map(entry=>entry._id) 
                 const sales=salesArray.map(entry=>entry.totalSales)
                 updateChart(labels,sales,saleQuantity,topOrders)
             })
-        }else if(value=='lastMonth'){
+        }else if(value=='lastMonth'){ 
             const startDate=new Date()
             startDate.setDate(startDate.getDate()-29)
             const endDate=new Date()
-            fetch(`/admin/getSalesReport?startDate=${startDate}&&endDate=${endDate}`, {
+            fetch(`/admin/getSalesReport?startDate=${startDate}&endDate=${endDate}`, {
                 method:'GET'
             })
             .then(response=>response.json())
@@ -432,6 +434,7 @@
                 salesArray=data.salesData
                 saleQuantity=data.saleQuantity
                 topOrders=data.topOrders
+                dateRange=data.dateRange
                 
                 if (!Array.isArray(salesArray)) {
                     console.error("Error: salesData is not an array", salesArray);
@@ -445,7 +448,7 @@
             const startDate=new Date()
             startDate.setDate(startDate.getDate()-364)
             const endDate=new Date()
-            fetch(`/admin/getSalesReport?startDate=${startDate}&&endDate=${endDate}`, {
+            fetch(`/admin/getSalesReport?startDate=${startDate}&endDate=${endDate}`, {
                 method:'GET'
             })
             .then(response=>response.json())
@@ -453,6 +456,7 @@
                 salesArray=data.salesData
                 saleQuantity=data.saleQuantity
                 topOrders=data.topOrders
+                dateRange=data.dateRange
                 
                 if (!Array.isArray(salesArray)) {
                     console.error("Error: salesData is not an array", salesArray);
@@ -487,7 +491,7 @@
                 text:'End date cannot be less then start date'
             })
         }
-        fetch(`/admin/getSalesReport?startDate=${startDate}&&endDate=${endDate}`, {
+        fetch(`/admin/getSalesReport?startDate=${startDate}&endDate=${endDate}`, {
             method:'GET'
         })
         .then(response=>response.json())
@@ -495,6 +499,7 @@
             salesArray=data.salesData
             saleQuantity=data.saleQuantity
             topOrders=data.topOrders
+            dateRange=data.dateRange
             
             if (!Array.isArray(salesArray)) {
                 console.error("Error: salesData is not an array", salesArray);
@@ -515,6 +520,7 @@
             salesArray=data.salesData
             saleQuantity=data.saleQuantity
             topOrders=data.topOrders
+            dateRange=data.dateRange
             
             if (!Array.isArray(salesArray)) {
                 console.error("Error: salesData is not an array", salesArray);
@@ -595,13 +601,15 @@
     const downloadPDF = () =>{
         const saleCount=JSON.stringify(saleQuantity)
         const orders=JSON.stringify(topOrders)
-        window.location.href=`/admin/downloadSalesReport?saleQuantity=${saleCount}&&topOrders=${orders}`
+        const dateRangeStr=JSON.stringify(dateRange)
+        window.location.href=`/admin/downloadSalesReport?saleQuantity=${encodeURIComponent(saleCount)}&topOrders=${encodeURIComponent(orders)}&dateRange=${encodeURIComponent(dateRangeStr)}`
     }
 
     const downloadExcel = () =>{
         const saleCount=JSON.stringify(saleQuantity)
         const orders=JSON.stringify(topOrders)
-        window.location.href=`/admin/downloadSalesExcelReport?saleQuantity=${saleCount}&&topOrders=${orders}`
+        const dateRangeStr=JSON.stringify(dateRange)
+        window.location.href=`/admin/downloadSalesExcelReport?saleQuantity=${encodeURIComponent(saleCount)}&topOrders=${encodeURIComponent(orders)}&dateRange=${encodeURIComponent(dateRangeStr)}`
     }
 
 </script>

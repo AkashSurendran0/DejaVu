@@ -361,7 +361,7 @@ const loadBasicInfoPage = async (req,res)=>{
 const updateUser = async (req,res)=>{
     try {
         const id=req.params.id
-        const imagePath=req.file ? `/uploads/${req.file.filename}` : null;
+        const imagePath=req.file ? req.file.secure_url : null;
         const date=new Date(req.body.dob)
         const data={
             image: imagePath?? req.body.userExistingImage,

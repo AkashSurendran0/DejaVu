@@ -159,7 +159,7 @@
 
 </style>
 
-<div class="hero-wrap hero-bread" style="background-image: url('/uploads/productBanner.png');">
+<div class="hero-wrap hero-bread" style="background-image: url(https://res.cloudinary.com/djhmcbiq9/image/upload/v1771911492/productBanner_flc1dm.png);">
     <div class="container">
       <div class="row no-gutters slider-text align-items-center justify-content-center">
         <div class="col-md-9 ftco-animate text-center">
@@ -273,39 +273,49 @@
           </div>
 
           <div class="mt-5">
-            <div><h4><b>Add your Review</b></h4></div>
-            <div class="rating-input">
-              <form action="/shop/product-details/add-review/<%= product._id %>" method="post">
-                <div class="stars">
-                  <% for(let i=5;i>=1;i-- ){ %>
-                    <input type="radio" name="rating" id="star<%= i %>" value="<%= i %>">
-                    <label for="star<%= i %>">★</i></label>
-                  <% } %>
-                </div>
-                <div>
-                  <input type="text" name="comment" placeholder="Write your review here..." required>
-                </div>  
-                <input type="submit" value="Submit Review">
-              </form>
-            </div>
-            <div><h4><b>See other Reviews:</b></h4></div>
-              <% for(let i=0;i<product.review.length;i++){ %>
-                <div class="other-reviews">
-                  <p style="font-size: 15px;">Review by : <%= product.review[i].user %></p>
-                  <div class="review-stars">
-                    <% for(let j=5;j>=1;j-- ){ %>
-                      <% if(j<=product.review[i].rating){ %>
-                        <input type="radio" name="rating" id="review-star<%= j %>" value="<%= j %>" disabled>
-                        <label for="review-star<%= j %>" style="color: #dbcc8f;">★</i></label>
-                      <% }else{ %>
-                        <input type="radio" name="rating" id="review-star<%= j %>" value="<%= j %>" disabled>
-                        <label for="review-star<%= j %>" style="color: #ddd;">★</i></label>
-                      <% } %>
+            <% if(canAddReview){ %>
+              <div><h4><b>Add your Review</b></h4></div>
+              <div class="rating-input">
+                <form action="/shop/product-details/add-review/<%= product._id %>" method="post">
+                  <div class="stars">
+                    <% for(let i=5;i>=1;i-- ){ %>
+                      <input type="radio" name="rating" id="star<%= i %>" value="<%= i %>">
+                      <label for="star<%= i %>">★</i></label>
                     <% } %>
                   </div>
-                  <p><b><%= product.review[i].desc %></b></p>
-                  <hr style="color: black;">
-                </div>
+                  <div>
+                    <input type="text" name="comment" placeholder="Write your review here..." required>
+                  </div>  
+                  <input type="submit" value="Submit Review">
+                </form>
+              </div>
+            <% }else{ %>
+              <div style="background-color: #f9f9f9; padding: 20px; border-radius: 5px; margin-bottom: 20px;">
+                <p style="color: #666; margin: 0;"><b>To write a review, you need to have purchased and received this product.</b></p>
+              </div>
+            <% } %>
+            <div><h4><b>See other Reviews:</b></h4></div>
+              <% if(product.review.length === 0){ %>
+                <p style="color: #999;">No reviews yet. Be the first to review this product!</p>
+              <% }else{ %>
+                <% for(let i=0;i<product.review.length;i++){ %>
+                  <div class="other-reviews">
+                    <p style="font-size: 15px;">Review by : <%= product.review[i].user %></p>
+                    <div class="review-stars">
+                      <% for(let j=5;j>=1;j-- ){ %>
+                        <% if(j<=product.review[i].rating){ %>
+                          <input type="radio" name="rating" id="review-star<%= j %>" value="<%= j %>" disabled>
+                          <label for="review-star<%= j %>" style="color: #dbcc8f;">★</i></label>
+                        <% }else{ %>
+                          <input type="radio" name="rating" id="review-star<%= j %>" value="<%= j %>" disabled>
+                          <label for="review-star<%= j %>" style="color: #ddd;">★</i></label>
+                        <% } %>
+                      <% } %>
+                    </div>
+                    <p><b><%= product.review[i].desc %></b></p>
+                    <hr style="color: black;">
+                  </div>
+                <% } %>
               <% } %>
             </div>
 

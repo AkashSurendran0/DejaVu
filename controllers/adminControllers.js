@@ -258,6 +258,17 @@ const getSalesReport = async (req,res)=>{
                     }
                 },
                 {
+                    $lookup:{
+                        from:'users',
+                        localField:'user',
+                        foreignField:'_id',
+                        as:'userDetails'
+                    }
+                },
+                {
+                    $unwind:'$userDetails'
+                },
+                {
                     $sort:{
                         totalAmount:-1
                     }
@@ -291,6 +302,9 @@ const getSalesReport = async (req,res)=>{
                         },
                         couponDiscount:{
                             $sum:"$couponDiscount"
+                        },
+                        totalGST:{
+                            $sum:"$GST"
                         }
                     }
                 },
@@ -300,7 +314,15 @@ const getSalesReport = async (req,res)=>{
                         totalAmount: { $round: ["$totalAmount", 2] },
                         totalOrders: 1,
                         totalDiscount: { $round: ["$totalDiscount", 2] },
-                        couponDiscount: { $round: ["$couponDiscount", 2] }
+                        couponDiscount: { $round: ["$couponDiscount", 2] },
+                        totalGST: { $round: ["$totalGST", 2] },
+                        netRevenue: {
+                            $round: [{
+                                $subtract: [
+                                    "$totalAmount","$totalGST"
+                                ]
+                            }, 2]
+                        }
                     }
                 }
             ])
@@ -334,7 +356,7 @@ const getSalesReport = async (req,res)=>{
                 }
                 
             ])
-            return res.json({salesData:salesData, saleQuantity:saleQuantity, topOrders:topOrders})
+            return res.json({salesData:salesData, saleQuantity:saleQuantity, topOrders:topOrders, dateRange:{startDate, endDate}})
         }
         
         const saleQuantity=await orders.aggregate([
@@ -360,6 +382,9 @@ const getSalesReport = async (req,res)=>{
                     },
                     couponDiscount:{
                         $sum:"$couponDiscount"
+                    },
+                    totalGST:{
+                        $sum:"$GST"
                     }
                 }
             },
@@ -369,7 +394,16 @@ const getSalesReport = async (req,res)=>{
                     totalAmount: { $round: ["$totalAmount", 2] },
                     totalOrders: 1,
                     totalDiscount: { $round: ["$totalDiscount", 2] },
-                    couponDiscount: { $round: ["$couponDiscount", 2] }
+                    couponDiscount: { $round: ["$couponDiscount", 2] },
+                    totalGST: { $round: ["$totalGST", 2] },
+                    netRevenue: {
+                        $round: [{
+                            $subtract: [
+                                "$totalAmount",
+                                "$totalGST"
+                            ]
+                        }, 2]
+                    }
                 }
             }
         ])
@@ -382,6 +416,17 @@ const getSalesReport = async (req,res)=>{
                     },
                     status:'Delivered'
                 }
+            },
+            {
+                $lookup:{
+                    from:'users',
+                    localField:'user',
+                    foreignField:'_id',
+                    as:'userDetails'
+                }
+            },
+            {
+                $unwind:'$userDetails'
             },
             {
                 $sort:{
@@ -421,17 +466,18 @@ const getSalesReport = async (req,res)=>{
             }
             
         ])
-        res.json({salesData:salesData, saleQuantity:saleQuantity, topOrders:topOrders})
+        res.json({salesData:salesData, saleQuantity:saleQuantity, topOrders:topOrders, dateRange:{startDate:last7Days, endDate:new Date()}})
     } catch (error) {
         res.status(STATUS_SERVER_ERROR).render('admin404')
-        consle.log(error.message);
+        console.log(error.message);
     }
 }
 
 const downloadSalesReport = async (req,res)=>{
     try {        
         const saleQuantity=JSON.parse(req.query.saleQuantity)
-        const topOrders=JSON.parse(req.query.topOrders)        
+        const topOrders=JSON.parse(req.query.topOrders)
+        const dateRange=JSON.parse(req.query.dateRange)
 
         const doc = new PDFDocument();
 
@@ -439,58 +485,92 @@ const downloadSalesReport = async (req,res)=>{
         res.setHeader("Content-Disposition", 'attachment; filename="DeJavu_Sales_Report.pdf"');
 
         doc.pipe(res);
-        doc.fontSize(22).fillColor('#333').text('DeJavu Sales Reoprt', { align: 'center', underline: true });
-        doc.moveDown(1);
+        doc.fontSize(22).fillColor('#333').text('DeJavu Sales Report', { align: 'center', underline: true });
+        doc.moveDown(0.5);
 
+        // Date Range
+        const startDate = new Date(dateRange.startDate).toLocaleDateString()
+        const endDate = new Date(dateRange.endDate).toLocaleDateString()
+        doc.fontSize(10).fillColor('#666').text(`Report Period: ${startDate} to ${endDate}`, { align: 'center' });
+        doc.moveDown(1.5);
+
+        // Summary Section
         if (saleQuantity.length > 0) {
-            doc.fontSize(14).fillColor("#222");
-            doc.text(`Date: ${new Date().toLocaleDateString()}`);
-            doc.moveDown(0.5);
-            doc.text(`Total Orders: ${saleQuantity[0].totalOrders}`);
-            doc.moveDown(0.5);
-            doc.text(`Total Sales: ${saleQuantity[0].totalAmount}`);
-            doc.moveDown(0.5);
-            doc.text(`Total Discount: ${saleQuantity[0].totalDiscount}`);
-            doc.moveDown(0.5);
-            doc.text(`Coupon Discount: ${saleQuantity[0].couponDiscount}`);
-            doc.moveDown(2);
+            doc.fontSize(12).fillColor("#000").font('Helvetica-Bold').text('SUMMARY');
+            doc.fontSize(9).font('Helvetica');
+            doc.moveDown(0.3);
+            
+            const summaryData = [
+                ['Total Orders', saleQuantity[0].totalOrders],
+                ['Gross Sales', `₹${saleQuantity[0].totalAmount}`],
+                ['Offer Discount', `₹${saleQuantity[0].totalDiscount}`],
+                ['Coupon Discount', `₹${saleQuantity[0].couponDiscount}`],
+                ['Tax (GST 5%)', `₹${saleQuantity[0].totalGST}`],
+                ['Net Revenue', `₹${saleQuantity[0].netRevenue}`]
+            ];
+            
+            summaryData.forEach(([label, value]) => {
+                const y = doc.y;
+                doc.text(`${label}: ${value}`, 50, y);
+                doc.moveDown(0.35);
+            });
+            doc.moveDown(1);
         } else {
-            doc.fontSize(14).fillColor("#222").text("No Sales Data Available", { align: "center" });
+            doc.fontSize(12).fillColor("#222").text("No Sales Data Available", { align: "center" });
             doc.moveDown(2);
         }
 
-        const headerY = doc.y; 
-        doc.rect(50, headerY, 500, 25).fill('#5CBDFE'); 
-        doc.fillColor('#000').fontSize(12).text('Order ID', 55, headerY + 5, { width: 100, align: 'left' });
-        doc.text('Date', 160, headerY + 5, { width: 100, align: 'left' });
-        doc.text('Order Amount', 260, headerY + 5, { width: 100, align: 'left' });
-        doc.text('Discount', 360, headerY + 5, { width: 100, align: 'left' });
-        doc.text('Coupon', 460, headerY + 5, { width: 100, align: 'left' });
+        // Orders Table Header
+        const headerY = doc.y;
+        doc.rect(40, headerY, 520, 22).fill('#0072C6');
+        doc.fillColor('#FFFFFF').fontSize(9).font('Helvetica-Bold');
+        doc.text('Order ID', 45, headerY + 6, { width: 90, align: 'left' });
+        doc.text('Customer', 140, headerY + 6, { width: 80, align: 'left' });
+        doc.text('Email', 225, headerY + 6, { width: 90, align: 'left' });
+        doc.text('Payment', 320, headerY + 6, { width: 70, align: 'center' });
+        doc.text('Amount', 395, headerY + 6, { width: 60, align: 'right' });
+        doc.text('GST', 460, headerY + 6, { width: 40, align: 'right' });
+        doc.text('Net', 505, headerY + 6, { width: 50, align: 'right' });
 
-        doc.strokeColor('#0000FF').lineWidth(1).moveTo(50, headerY + 25).lineTo(550, headerY + 25).stroke();
-        doc.moveDown(1);
+        doc.strokeColor('#000000').lineWidth(0.5).moveTo(40, headerY + 22).lineTo(560, headerY + 22).stroke();
+        doc.moveDown(1.2);
 
+        // Orders Data
         if (topOrders.length > 0) {
             topOrders.forEach((order, index) => {
                 const rowY = doc.y;
-                const bgColor = index % 2 === 0 ? '#f9f9f9' : '#ffffff';
-                doc.rect(50, rowY, 500, 20).fill(bgColor);  
-                doc.fillColor('#000');
-                doc.text(`#${order._id.substring(0, 10)}...`, 55, rowY + 5, { width: 100, align: 'left' });
-                doc.text(new Date(order.createdAt).toLocaleDateString(), 160, rowY + 5, { width: 100, align: 'left' });
-                doc.text(`${order.totalAmount}`, 260, rowY + 5, { width: 100, align: 'left' });
-                doc.text(`${order.offerDiscount ?? 0}`, 360, rowY + 5, { width: 100, align: 'left' });
-                doc.text(`${order.couponDiscount ?? 0}`, 460, rowY + 5, { width: 100, align: 'left' });
+                const bgColor = index % 2 === 0 ? '#f5f5f5' : '#ffffff';
+                doc.rect(40, rowY, 520, 18).fill(bgColor);
+                
+                doc.fillColor('#000000').fontSize(8).font('Helvetica');
+                const orderId = order._id.toString().substring(0, 12);
+                doc.text(orderId, 45, rowY + 4, { width: 90, align: 'left' });
+                
+                const customerName = order.userDetails?.name || 'N/A';
+                doc.text(customerName.substring(0, 15), 140, rowY + 4, { width: 80, align: 'left' });
+                
+                const email = order.userDetails?.email || 'N/A';
+                doc.text(email.substring(0, 18), 225, rowY + 4, { width: 90, align: 'left' });
+                
+                const paymentMethod = order.paymentmethod || 'N/A';
+                doc.text(paymentMethod.substring(0, 10), 320, rowY + 4, { width: 70, align: 'center' });
+                
+                doc.text(`₹${order.totalAmount}`, 395, rowY + 4, { width: 60, align: 'right' });
+                doc.text(`₹${order.GST || 0}`, 460, rowY + 4, { width: 40, align: 'right' });
+                
+                const netAmount = (order.totalAmount - (order.GST || 0)).toFixed(2);
+                doc.text(`₹${netAmount}`, 505, rowY + 4, { width: 50, align: 'right' });
 
-                doc.moveDown(1); 
+                doc.strokeColor('#CCCCCC').lineWidth(0.5).moveTo(40, rowY + 18).lineTo(560, rowY + 18).stroke();
+                doc.moveDown(1.1);
             });
         } else {
             doc.text("No Orders Available", { align: "center" });
             doc.moveDown(2);
         }
 
-        doc.moveDown(2);
-        doc.fontSize(10).fillColor('#008000').text('Generated by DeJavu Sales System', { align: 'center' });
+        doc.moveDown(1);
+        doc.fontSize(8).fillColor('#008000').text('Generated by DeJavu Sales System', { align: 'center' });
 
         doc.end();
     } catch (error) {

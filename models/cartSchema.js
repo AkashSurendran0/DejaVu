@@ -19,6 +19,16 @@ const cartSchema=new mongoose.Schema({
         quantity:{
             type:Number,
             required:true
+        },
+        amount:{
+            type:Number,
+            required:true,
+            description:'Discounted price of product at time of adding to cart'
+        },
+        regularPrice:{
+            type:Number,
+            required:false,
+            description:'Original price of product at time of adding to cart'
         }
     }],
     totalQuantity:{

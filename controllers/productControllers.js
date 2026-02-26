@@ -5,6 +5,7 @@ const categories=require('../models/categorySchema')
 const users=require('../models/userSchema')
 const products=require('../models/productSchema')
 const banners=require('../models/bannerSchema')
+const orders=require('../models/orderSchema')
 const {ObjectId}=require('mongodb')
 const offers=require('../models/offerSchema')
 
@@ -67,7 +68,7 @@ const addProduct = async (req,res)=>{
         const colors=colorsInput.split(',').map(color=>color.trim())
         const description=req.body.productDesc
         const desc=description.split(',').map(desc=>desc.trim().charAt(0).toUpperCase() + desc.trim().slice(1).toLowerCase())
-        const imagePaths=req.files.map(file=> `/uploads/${file.filename}`)
+        const imagePaths=req.files.map(file=> file.secure_url)
         const data={
             images: imagePaths,
             productName: req.body.productName,
@@ -120,7 +121,7 @@ const editProduct = async(req,res)=>{
         const description=req.body.productDesc
         const desc=description.split(',').map(desc=>desc.trim().charAt(0).toUpperCase() + desc.trim().slice(1).toLowerCase())
         const {existingImages}=req.body
-        const imagePaths=req.files.map(file=> `/uploads/${file.filename}`)
+        const imagePaths=req.files.map(file=> file.secure_url)
         const data={
             images: imagePaths.length>0? imagePaths:existingImages,
             productName: req.body.productName,
@@ -412,10 +413,30 @@ const loadProductDetailsPage = async (req,res)=>{
             simProducts[i]=similarProducts[randomNums[i]-1]
         }
         
+        // Check if user has ordered and received this product
+        let canAddReview = false
+        if(req.session.isLogged && req.session.userEmail){
+            const user=await users.findOne({email:req.session.userEmail})
+            if(user){
+                // Check if user has this specific product with 'Delivered' status
+                const deliveredOrder = await orders.findOne({
+                    user: user._id,
+                    'products': {
+                        $elemMatch: {
+                            productId: new ObjectId(id),
+                            status: 'Delivered'
+                        }
+                    }
+                })
+                canAddReview = deliveredOrder ? true : false
+            }
+        }
+        
         res.render('singleProduct', {
             product:singleProduct, 
             similarProducts: simProducts, 
             rating: productRating,
+            canAddReview: canAddReview,
             quantityErr: req.flash('quantityErr')
         })
     } catch (error) {
