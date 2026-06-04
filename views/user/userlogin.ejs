@@ -163,14 +163,15 @@ input[type="checkbox"]{
                 <p class="text-success"><%= loginErr %></p>
             <% } %>
             <form action="/login" method="post">
-                <input type="email" placeholder="Email" name="email" required>
-                <input type="password" placeholder="Password" name="password" required><br>
+                <input type="email" placeholder="Email" name="email" id="email" required>
+                <input type="password" placeholder="Password" name="password" id="password" required><br>
                 <div style="display: flex;justify-content: space-between;">
                     <a href="/signup-Email">Create New Account?</a>
                     <a href="/forgot-password/emailverification">Forgot password?</a>
                 </div>
                 <button>Log In</button>
             </form>
+            <button id="demoBtn" style="margin-top: 10px;">Use Demo Account</button>
             <hr><p>Or Login With</p><hr>
             <br>
             <div style="display: flex;justify-content: center;">
@@ -187,4 +188,8 @@ input[type="checkbox"]{
     document.getElementById('logoImg').addEventListener('click', ()=>{
         window.location.href='/'
     })
+    document.getElementById("demoBtn").addEventListener("click", () => {
+        document.getElementById("email").value = "ndeqapwvpqcwpuqsuu@jbsze.com";
+        document.getElementById("password").value = "Demo123#";
+    });
   </script>
